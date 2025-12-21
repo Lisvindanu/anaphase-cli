@@ -23,8 +23,20 @@ Anaphase is an intelligent code scaffolding tool that generates production-ready
 
 ### Installation
 
+**Quick install (recommended):**
+
 ```bash
-go install github.com/lisvindanuu/anaphase-cli/cmd/anaphase@latest
+curl -fsSL https://raw.githubusercontent.com/lisvindanu/anaphase-cli/main/install.sh | bash
+```
+
+**Manual install:**
+
+```bash
+go install github.com/lisvindanu/anaphase-cli/cmd/anaphase@latest
+
+# Add to PATH if needed
+echo 'export PATH="$HOME/go/bin:$PATH"' >> ~/.zshrc
+source ~/.zshrc
 ```
 
 ### Configuration

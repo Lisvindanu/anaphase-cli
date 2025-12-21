@@ -18,26 +18,28 @@ go version
 
 ## Install Anaphase
 
-### Option 1: From Source (Recommended)
+### Option 1: Quick Install (Recommended)
 
-Clone and build from source:
+Use our install script that automatically configures your PATH:
 
 ```bash
-# Clone repository
-git clone https://github.com/lisvindanu/anaphase-cli.git
-cd anaphase-cli
-
-# Install dependencies
-go mod download
-
-# Install CLI
-go install ./cmd/anaphase
-
-# Verify installation
-anaphase --version
+curl -fsSL https://raw.githubusercontent.com/lisvindanu/anaphase-cli/main/install.sh | bash
 ```
 
-### Option 2: Using Go Install
+Or download and run manually:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/lisvindanu/anaphase-cli/main/install.sh -o install.sh
+chmod +x install.sh
+./install.sh
+```
+
+The script will:
+- Install the latest version via `go install`
+- Detect your shell (bash, zsh, fish)
+- Offer to add `~/go/bin` to your PATH automatically
+
+### Option 2: Manual Install
 
 Install directly using `go install`:
 
@@ -45,15 +47,36 @@ Install directly using `go install`:
 go install github.com/lisvindanu/anaphase-cli/cmd/anaphase@latest
 ```
 
-::: warning PATH Configuration
-Make sure `$GOPATH/bin` or `$HOME/go/bin` is in your PATH:
+Then add to your PATH:
 
-```bash
-export PATH=$PATH:$(go env GOPATH)/bin
+::: code-group
+
+```bash [Bash]
+echo 'export PATH="$HOME/go/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
 ```
 
-Add this to your `.bashrc`, `.zshrc`, or equivalent.
+```bash [Zsh]
+echo 'export PATH="$HOME/go/bin:$PATH"' >> ~/.zshrc
+source ~/.zshrc
+```
+
+```bash [Fish]
+set -gx PATH $HOME/go/bin $PATH
+```
+
 :::
+
+### Option 3: From Source
+
+Clone and build from source for development:
+
+```bash
+git clone https://github.com/lisvindanu/anaphase-cli.git
+cd anaphase-cli
+go mod download
+go install ./cmd/anaphase
+```
 
 ## Configure AI Provider
 
