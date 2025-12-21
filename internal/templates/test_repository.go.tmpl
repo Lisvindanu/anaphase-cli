@@ -1,0 +1,116 @@
+package postgres
+
+import (
+	"context"
+	"testing"
+	"time"
+
+	"github.com/google/uuid"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
+	"{{.Module}}/internal/core/entity"
+	"{{.Module}}/internal/core/valueobject"
+)
+
+// Integration tests - require running PostgreSQL
+func TestIntegration{{.EntityName}}Repository(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping integration tests")
+	}
+
+	db := setupTestDB(t)
+	defer cleanupTestDB(t, db)
+
+	repo := New{{.EntityName}}Repository(db)
+	ctx := context.Background()
+
+	t.Run("Save and FindByID", func(t *testing.T) {
+		// Create test entity
+		{{.EntityNameLower}} := &entity.{{.EntityName}}{
+			ID: uuid.New(),
+			{{range .Fields}}{{if ne .Name "ID" "CreatedAt" "UpdatedAt"}}{{.Name}}: {{.TestValue}},
+			{{end}}{{end}}CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+		}
+
+		// Save
+		err := repo.Save(ctx, {{.EntityNameLower}})
+		require.NoError(t, err)
+
+		// Find by ID
+		found, err := repo.FindByID(ctx, {{.EntityNameLower}}.ID)
+		require.NoError(t, err)
+		require.NotNil(t, found)
+
+		// Verify fields
+		assert.Equal(t, {{.EntityNameLower}}.ID, found.ID)
+		{{range .Fields}}{{if ne .Name "ID" "CreatedAt" "UpdatedAt"}}assert.Equal(t, {{$.EntityNameLower}}.{{.Name}}, found.{{.Name}})
+		{{end}}{{end}}
+	})
+
+	t.Run("Save updates existing", func(t *testing.T) {
+		// Create and save
+		{{.EntityNameLower}} := &entity.{{.EntityName}}{
+			ID: uuid.New(),
+			{{range .Fields}}{{if ne .Name "ID" "CreatedAt" "UpdatedAt"}}{{.Name}}: {{.TestValue}},
+			{{end}}{{end}}CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+		}
+		err := repo.Save(ctx, {{.EntityNameLower}})
+		require.NoError(t, err)
+
+		// Update
+		{{range .Fields}}{{if and (ne .Name "ID") (ne .Name "CreatedAt") (ne .Name "UpdatedAt")}}{{$.EntityNameLower}}.{{.Name}} = {{.UpdatedTestValue}}
+		{{break}}{{end}}{{end}}{{.EntityNameLower}}.UpdatedAt = time.Now()
+
+		// Save again
+		err = repo.Save(ctx, {{.EntityNameLower}})
+		require.NoError(t, err)
+
+		// Verify update
+		found, err := repo.FindByID(ctx, {{.EntityNameLower}}.ID)
+		require.NoError(t, err)
+		{{range .Fields}}{{if and (ne .Name "ID") (ne .Name "CreatedAt") (ne .Name "UpdatedAt")}}assert.Equal(t, {{$.EntityNameLower}}.{{.Name}}, found.{{.Name}})
+		{{break}}{{end}}{{end}}
+	})
+
+	t.Run("FindByID not found", func(t *testing.T) {
+		found, err := repo.FindByID(ctx, uuid.New())
+		assert.Error(t, err)
+		assert.Nil(t, found)
+	})
+
+	{{if .HasUniqueFields}}
+	{{range .Fields}}{{if .IsUnique}}
+	t.Run("FindBy{{.Name}}", func(t *testing.T) {
+		// Create and save
+		{{$.EntityNameLower}} := &entity.{{$.EntityName}}{
+			ID: uuid.New(),
+			{{range $.Fields}}{{if ne .Name "ID" "CreatedAt" "UpdatedAt"}}{{.Name}}: {{.TestValue}},
+			{{end}}{{end}}CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+		}
+		err := repo.Save(ctx, {{$.EntityNameLower}})
+		require.NoError(t, err)
+
+		// Find by {{.Name}}
+		found, err := repo.FindBy{{.Name}}(ctx, {{$.EntityNameLower}}.{{.Name}})
+		require.NoError(t, err)
+		require.NotNil(t, found)
+		assert.Equal(t, {{$.EntityNameLower}}.ID, found.ID)
+	})
+	{{end}}{{end}}
+	{{end}}
+}
+
+// Unit tests - mock database
+func Test{{.EntityName}}Repository_Save(t *testing.T) {
+	// TODO: Add unit tests with mocked database
+	t.Skip("Unit tests not implemented - use integration tests")
+}
+
+func Test{{.EntityName}}Repository_FindByID(t *testing.T) {
+	// TODO: Add unit tests with mocked database
+	t.Skip("Unit tests not implemented - use integration tests")
+}

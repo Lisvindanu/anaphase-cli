@@ -1,0 +1,56 @@
+package config
+
+import (
+	"fmt"
+
+	"github.com/spf13/viper"
+)
+
+// Config holds application configuration
+type Config struct {
+	Environment string
+	ServerPort  string
+	DatabaseURL string
+{{- if .Cache}}
+	RedisURL    string
+{{- end}}
+{{- if .EventBus}}
+	EventBusURL string
+{{- end}}
+}
+
+// Load loads configuration from environment variables
+func Load() (*Config, error) {
+	viper.SetConfigFile(".env")
+	viper.AutomaticEnv()
+
+	// Load .env file if it exists (optional)
+	_ = viper.ReadInConfig()
+
+	config := &Config{
+		Environment: viper.GetString("ENVIRONMENT"),
+		ServerPort:  viper.GetString("SERVER_PORT"),
+		DatabaseURL: viper.GetString("DATABASE_URL"),
+{{- if .Cache}}
+		RedisURL:    viper.GetString("REDIS_URL"),
+{{- end}}
+{{- if .EventBus}}
+		EventBusURL: viper.GetString("EVENT_BUS_URL"),
+{{- end}}
+	}
+
+	// Set defaults
+	if config.Environment == "" {
+		config.Environment = "development"
+	}
+	if config.ServerPort == "" {
+		config.ServerPort = "8080"
+	}
+
+	// Validate required fields
+	if config.DatabaseURL == "" {
+		return nil, fmt.Errorf("DATABASE_URL is required")
+	}
+
+	return config, nil
+}

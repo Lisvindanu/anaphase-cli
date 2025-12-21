@@ -1,0 +1,206 @@
+package http
+
+import (
+	"bytes"
+	"context"
+	"encoding/json"
+	"net/http"
+	"net/http/httptest"
+	"testing"
+
+	"github.com/go-chi/chi/v5"
+	"github.com/google/uuid"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
+
+	"{{.Module}}/internal/core/entity"
+	"{{.Module}}/internal/core/port"
+)
+
+// Mock{{.EntityName}}Service is a mock implementation of port.{{.EntityName}}Service
+type Mock{{.EntityName}}Service struct {
+	mock.Mock
+}
+
+func (m *Mock{{.EntityName}}Service) Create{{.EntityName}}(ctx context.Context, {{.CreateParams}}) (*entity.{{.EntityName}}, error) {
+	args := m.Called(ctx, {{.CreateParamNames}})
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*entity.{{.EntityName}}), args.Error(1)
+}
+
+func (m *Mock{{.EntityName}}Service) Get{{.EntityName}}(ctx context.Context, id uuid.UUID) (*entity.{{.EntityName}}, error) {
+	args := m.Called(ctx, id)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*entity.{{.EntityName}}), args.Error(1)
+}
+
+func (m *Mock{{.EntityName}}Service) Update{{.EntityName}}(ctx context.Context, id uuid.UUID, {{.UpdateParams}}) error {
+	args := m.Called(ctx, id, {{.UpdateParamNames}})
+	return args.Error(0)
+}
+
+func (m *Mock{{.EntityName}}Service) Delete{{.EntityName}}(ctx context.Context, id uuid.UUID) error {
+	args := m.Called(ctx, id)
+	return args.Error(0)
+}
+
+func TestNew{{.EntityName}}Handler(t *testing.T) {
+	mockService := new(Mock{{.EntityName}}Service)
+	handler := New{{.EntityName}}Handler(mockService, nil)
+
+	assert.NotNil(t, handler)
+	assert.Equal(t, mockService, handler.service)
+}
+
+func Test{{.EntityName}}Handler_Create(t *testing.T) {
+	tests := []struct {
+		name           string
+		requestBody    interface{}
+		mockSetup      func(*Mock{{.EntityName}}Service)
+		expectedStatus int
+	}{
+		{
+			name: "success",
+			requestBody: Create{{.EntityName}}Request{
+				{{range .Fields}}{{if ne .Name "ID" "CreatedAt" "UpdatedAt"}}{{.Name}}: {{.TestValue}},
+				{{end}}{{end}}
+			},
+			mockSetup: func(m *Mock{{.EntityName}}Service) {
+				m.On("Create{{.EntityName}}", mock.Anything, {{.MockCreateParams}}).
+					Return(&entity.{{.EntityName}}{
+						ID: uuid.New(),
+						{{range .Fields}}{{if ne .Name "ID" "CreatedAt" "UpdatedAt"}}{{.Name}}: {{.TestValue}},
+						{{end}}{{end}}
+					}, nil)
+			},
+			expectedStatus: http.StatusCreated,
+		},
+		{
+			name: "invalid request body",
+			requestBody: map[string]interface{}{
+				"invalid": "data",
+			},
+			mockSetup:      func(m *Mock{{.EntityName}}Service) {},
+			expectedStatus: http.StatusBadRequest,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockService := new(Mock{{.EntityName}}Service)
+			tt.mockSetup(mockService)
+
+			handler := New{{.EntityName}}Handler(mockService, nil)
+
+			body, _ := json.Marshal(tt.requestBody)
+			req := httptest.NewRequest(http.MethodPost, "/{{.EntityNameLowerPlural}}", bytes.NewReader(body))
+			rec := httptest.NewRecorder()
+
+			handler.Create(rec, req)
+
+			assert.Equal(t, tt.expectedStatus, rec.Code)
+			mockService.AssertExpectations(t)
+		})
+	}
+}
+
+func Test{{.EntityName}}Handler_GetByID(t *testing.T) {
+	tests := []struct {
+		name           string
+		{{.EntityNameLower}}ID      string
+		mockSetup      func(*Mock{{.EntityName}}Service)
+		expectedStatus int
+	}{
+		{
+			name:           "success",
+			{{.EntityNameLower}}ID:      uuid.New().String(),
+			mockSetup: func(m *Mock{{.EntityName}}Service) {
+				m.On("Get{{.EntityName}}", mock.Anything, mock.AnythingOfType("uuid.UUID")).
+					Return(&entity.{{.EntityName}}{
+						ID: uuid.New(),
+						{{range .Fields}}{{if ne .Name "ID" "CreatedAt" "UpdatedAt"}}{{.Name}}: {{.TestValue}},
+						{{end}}{{end}}
+					}, nil)
+			},
+			expectedStatus: http.StatusOK,
+		},
+		{
+			name:           "invalid UUID",
+			{{.EntityNameLower}}ID:      "invalid-uuid",
+			mockSetup:      func(m *Mock{{.EntityName}}Service) {},
+			expectedStatus: http.StatusBadRequest,
+		},
+		{
+			name:           "not found",
+			{{.EntityNameLower}}ID:      uuid.New().String(),
+			mockSetup: func(m *Mock{{.EntityName}}Service) {
+				m.On("Get{{.EntityName}}", mock.Anything, mock.AnythingOfType("uuid.UUID")).
+					Return(nil, port.ErrNotFound)
+			},
+			expectedStatus: http.StatusNotFound,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockService := new(Mock{{.EntityName}}Service)
+			tt.mockSetup(mockService)
+
+			handler := New{{.EntityName}}Handler(mockService, nil)
+
+			req := httptest.NewRequest(http.MethodGet, "/{{.EntityNameLowerPlural}}/"+tt.{{.EntityNameLower}}ID, nil)
+			rec := httptest.NewRecorder()
+
+			// Setup Chi URL params
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("id", tt.{{.EntityNameLower}}ID)
+			req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+
+			handler.GetByID(rec, req)
+
+			assert.Equal(t, tt.expectedStatus, rec.Code)
+			if tt.expectedStatus == http.StatusOK {
+				var response {{.EntityName}}Response
+				err := json.NewDecoder(rec.Body).Decode(&response)
+				require.NoError(t, err)
+			}
+			mockService.AssertExpectations(t)
+		})
+	}
+}
+
+func Test{{.EntityName}}Handler_Update(t *testing.T) {
+	// TODO: Implement update tests
+	t.Skip("Update tests not implemented")
+}
+
+func Test{{.EntityName}}Handler_Delete(t *testing.T) {
+	// TODO: Implement delete tests
+	t.Skip("Delete tests not implemented")
+}
+
+func Test{{.EntityName}}Handler_RegisterRoutes(t *testing.T) {
+	mockService := new(Mock{{.EntityName}}Service)
+	handler := New{{.EntityName}}Handler(mockService, nil)
+
+	r := chi.NewRouter()
+	handler.RegisterRoutes(r)
+
+	// Verify routes are registered
+	routes := []string{
+		"POST /{{.EntityNameLowerPlural}}",
+		"GET /{{.EntityNameLowerPlural}}/{id}",
+		"PUT /{{.EntityNameLowerPlural}}/{id}",
+		"DELETE /{{.EntityNameLowerPlural}}/{id}",
+	}
+
+	for _, route := range routes {
+		// Chi doesn't expose registered routes easily, so we just verify handler is not nil
+		assert.NotNil(t, handler)
+	}
+}

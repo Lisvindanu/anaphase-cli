@@ -1,0 +1,99 @@
+.PHONY: run build test clean migrate-up migrate-down lint help
+
+# Run the application
+run:
+	@echo "Starting {{.Name}}..."
+	@go run cmd/api/main.go
+
+# Build the application
+build:
+	@echo "Building {{.Name}}..."
+	@CGO_ENABLED=0 go build -o bin/api cmd/api/main.go
+	@echo "Build complete: bin/api"
+
+# Run tests
+test:
+	@echo "Running tests..."
+	@go test ./... -v -race -coverprofile=coverage.out
+
+# Run tests with coverage
+test-cover:
+	@go test ./... -coverprofile=coverage.out
+	@go tool cover -html=coverage.out
+
+# Clean build artifacts
+clean:
+	@echo "Cleaning..."
+	@rm -rf bin/
+	@rm -f coverage.out
+	@echo "Clean complete"
+
+# Install dependencies
+deps:
+	@echo "Installing dependencies..."
+	@go mod download
+	@go mod tidy
+
+{{- if eq .Database "postgres"}}
+
+# Run database migrations up
+migrate-up:
+	@echo "Running migrations..."
+	@goose -dir migrations {{.Database}} "$(DATABASE_URL)" up
+
+# Run database migrations down
+migrate-down:
+	@echo "Rolling back migrations..."
+	@goose -dir migrations {{.Database}} "$(DATABASE_URL)" down
+{{- end}}
+
+# Run linter
+lint:
+	@echo "Running linter..."
+	@golangci-lint run
+
+# Format code
+fmt:
+	@echo "Formatting code..."
+	@go fmt ./...
+
+# Start development environment
+dev:
+{{- if not .SkipDocker}}
+	@echo "Starting development environment..."
+	@docker-compose up -d
+{{- else}}
+	@echo "No Docker configuration available"
+{{- end}}
+
+# Stop development environment
+dev-down:
+{{- if not .SkipDocker}}
+	@echo "Stopping development environment..."
+	@docker-compose down
+{{- else}}
+	@echo "No Docker configuration available"
+{{- end}}
+
+# Show help
+help:
+	@echo "Available targets:"
+	@echo "  run          - Run the application"
+	@echo "  build        - Build the application"
+	@echo "  test         - Run tests"
+	@echo "  test-cover   - Run tests with coverage report"
+	@echo "  clean        - Remove build artifacts"
+	@echo "  deps         - Install dependencies"
+{{- if eq .Database "postgres"}}
+	@echo "  migrate-up   - Run database migrations up"
+	@echo "  migrate-down - Run database migrations down"
+{{- end}}
+	@echo "  lint         - Run linter"
+	@echo "  fmt          - Format code"
+{{- if not .SkipDocker}}
+	@echo "  dev          - Start development environment (Docker)"
+	@echo "  dev-down     - Stop development environment"
+{{- end}}
+	@echo "  help         - Show this help message"
+
+.DEFAULT_GOAL := help

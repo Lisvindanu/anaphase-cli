@@ -1,0 +1,78 @@
+# Binaries
+bin/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+anaphase
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool
+*.out
+coverage.out
+
+# Go workspace file
+go.work
+
+# Dependencies
+vendor/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+config.yaml
+
+# Cache
+.anaphase/
+cache/
+
+# Generated files
+dist/
+
+# VitePress documentation build
+docs/node_modules/
+docs/.vitepress/dist/
+docs/.vitepress/cache/
+docs/package-lock.json
+docs/yarn.lock
+
+# Swagger generated docs (can be regenerated)
+docs/docs.go
+docs/swagger.json
+docs/swagger.yaml
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Internal project files (not for public)
+ADDENDUM.MD
+TESTING.md
+PROJECT_STATUS.md
+PHASE0_COMPLETE.md
+PHASE1_COMPLETE.md
+TA.md
+test-*.go
+test-*.sh
+
+# VSCode Local History
+.history/

@@ -1,0 +1,94 @@
+package entity
+
+import (
+	"testing"
+
+	"github.com/google/uuid"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
+	"{{.Module}}/internal/core/valueobject"
+)
+
+func Test{{.EntityName}}_New{{.EntityName}}(t *testing.T) {
+	tests := []struct {
+		name    string
+		{{range .Fields}}{{.Name}} {{.Type}}
+		{{end}}wantErr bool
+	}{
+		{
+			name: "valid {{.EntityNameLower}}",
+			{{range .Fields}}{{if ne .Name "ID" "CreatedAt" "UpdatedAt"}}{{.Name}}: {{.TestValue}},
+			{{end}}{{end}}wantErr: false,
+		},
+		{
+			name: "invalid {{.EntityNameLower}} - empty required fields",
+			{{range .Fields}}{{if ne .Name "ID" "CreatedAt" "UpdatedAt"}}{{.Name}}: {{.EmptyValue}},
+			{{end}}{{end}}wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			{{.EntityNameLower}}, err := New{{.EntityName}}(
+				{{range .Fields}}{{if ne .Name "ID" "CreatedAt" "UpdatedAt"}}tt.{{.Name}},
+				{{end}}{{end}}
+			)
+
+			if tt.wantErr {
+				assert.Error(t, err)
+				assert.Nil(t, {{.EntityNameLower}})
+			} else {
+				require.NoError(t, err)
+				require.NotNil(t, {{.EntityNameLower}})
+				assert.NotEqual(t, uuid.Nil, {{.EntityNameLower}}.ID)
+				{{range .Fields}}{{if ne .Name "ID" "CreatedAt" "UpdatedAt"}}assert.Equal(t, tt.{{.Name}}, {{.EntityNameLower}}.{{.Name}})
+				{{end}}{{end}}assert.False(t, {{.EntityNameLower}}.CreatedAt.IsZero())
+				assert.False(t, {{.EntityNameLower}}.UpdatedAt.IsZero())
+			}
+		})
+	}
+}
+
+func Test{{.EntityName}}_Validate(t *testing.T) {
+	tests := []struct {
+		name    string
+		{{.EntityNameLower}} *{{.EntityName}}
+		wantErr bool
+	}{
+		{
+			name: "valid {{.EntityNameLower}}",
+			{{.EntityNameLower}}: &{{.EntityName}}{
+				ID: uuid.New(),
+				{{range .Fields}}{{if ne .Name "ID" "CreatedAt" "UpdatedAt"}}{{.Name}}: {{.TestValue}},
+				{{end}}{{end}}
+			},
+			wantErr: false,
+		},
+		{
+			name: "invalid {{.EntityNameLower}} - nil required fields",
+			{{.EntityNameLower}}: &{{.EntityName}}{
+				ID: uuid.New(),
+			},
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.{{.EntityNameLower}}.Validate()
+			if tt.wantErr {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+			}
+		})
+	}
+}
+
+{{range .Methods}}
+func Test{{$.EntityName}}_{{.Name}}(t *testing.T) {
+	// TODO: Implement test for {{.Name}}
+	t.Skip("Test not implemented")
+}
+{{end}}

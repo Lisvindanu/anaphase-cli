@@ -1,0 +1,473 @@
+# Project Structure
+
+Understanding the generated project layout and organization.
+
+## Overview
+
+Anaphase generates projects following Clean Architecture and Hexagonal Architecture patterns:
+
+```
+my-project/
+├── cmd/                      # Application entry points
+│   └── api/
+│       ├── main.go          # HTTP server
+│       └── wire.go          # Dependency injection
+├── internal/                # Private application code
+│   ├── core/               # Domain Layer (Business Logic)
+│   │   ├── entity/         # Domain entities
+│   │   ├── port/           # Interfaces (ports)
+│   │   └── valueobject/    # Value objects
+│   └── adapter/            # Infrastructure Layer
+│       ├── handler/        # Presentation adapters
+│       │   └── http/
+│       └── repository/     # Persistence adapters
+│           └── postgres/
+├── go.mod                   # Go module file
+├── go.sum                   # Go dependencies
+└── README.md               # Project documentation
+```
+
+## Directory Breakdown
+
+### `cmd/`
+
+Application entry points.
+
+**Purpose:**
+- Main programs
+- Executable commands
+- Server startup
+
+**Contents:**
+```
+cmd/
+└── api/
+    ├── main.go    # HTTP server with graceful shutdown
+    └── wire.go    # Dependency injection wiring
+```
+
+**When to add:**
+- Multiple services (api, worker, cli)
+- Different execution modes
+
+**Example:**
+```
+cmd/
+├── api/         # REST API server
+├── worker/      # Background worker
+└── cli/         # CLI tool
+```
+
+### `internal/`
+
+Private application code (not importable by other projects).
+
+**Purpose:**
+- Encapsulate implementation
+- Hide internals
+- Prevent external dependencies
+
+### `internal/core/`
+
+Domain Layer - business logic and rules.
+
+**Characteristics:**
+- Independent of frameworks
+- No infrastructure dependencies
+- Pure business logic
+- Most important code
+
+#### `internal/core/entity/`
+
+Domain entities with identity.
+
+**Files:**
+```
+entity/
+├── customer.go
+├── product.go
+└── order.go
+```
+
+**Content:**
+```go
+// Entity with identity and lifecycle
+type Customer struct {
+    ID        uuid.UUID
+    Email     *valueobject.Email
+    Name      string
+    CreatedAt time.Time
+    UpdatedAt time.Time
+}
+
+// Business logic methods
+func (c *Customer) UpdateEmail(email *valueobject.Email) error {
+    // Validation and business rules
+}
+```
+
+#### `internal/core/valueobject/`
+
+Value objects without identity.
+
+**Files:**
+```
+valueobject/
+├── email.go
+├── money.go
+├── address.go
+└── phone.go
+```
+
+**Content:**
+```go
+// Immutable value object
+type Email struct {
+    value string
+}
+
+func NewEmail(value string) (*Email, error) {
+    // Validation
+}
+```
+
+#### `internal/core/port/`
+
+Interfaces defining contracts.
+
+**Files:**
+```
+port/
+├── customer_repo.go      # Repository interface
+├── customer_service.go   # Service interface
+├── product_repo.go
+└── product_service.go
+```
+
+**Content:**
+```go
+// Repository interface (port)
+type CustomerRepository interface {
+    Save(ctx context.Context, c *entity.Customer) error
+    FindByID(ctx context.Context, id uuid.UUID) (*entity.Customer, error)
+}
+```
+
+### `internal/adapter/`
+
+Infrastructure Layer - external concerns.
+
+**Characteristics:**
+- Implements ports
+- Framework-specific code
+- Database, HTTP, etc.
+
+#### `internal/adapter/handler/`
+
+Presentation layer adapters.
+
+**Structure:**
+```
+handler/
+└── http/
+    ├── customer_handler.go
+    ├── customer_dto.go
+    ├── product_handler.go
+    └── product_dto.go
+```
+
+**Content:**
+```go
+// HTTP handler (adapter)
+type CustomerHandler struct {
+    service port.CustomerService
+    logger  *slog.Logger
+}
+
+// HTTP-specific concerns
+func (h *CustomerHandler) Create(w http.ResponseWriter, r *http.Request) {
+    // Parse HTTP request
+    // Call service
+    // Return HTTP response
+}
+```
+
+#### `internal/adapter/repository/`
+
+Persistence layer adapters.
+
+**Structure:**
+```
+repository/
+└── postgres/
+    ├── customer_repo.go
+    ├── product_repo.go
+    └── schema.sql
+```
+
+**Content:**
+```go
+// PostgreSQL repository (adapter)
+type customerRepository struct {
+    db *pgxpool.Pool
+}
+
+// Implements port.CustomerRepository
+func (r *customerRepository) Save(ctx context.Context, c *entity.Customer) error {
+    // SQL queries
+}
+```
+
+## Dependency Rules
+
+### Layer Dependencies
+
+```
+┌─────────────────┐
+│   cmd/api       │  Application Layer
+│   (main.go)     │  Wires everything together
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│  adapter/       │  Infrastructure Layer
+│  (handler, repo)│  Depends on Core
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│  core/          │  Domain Layer
+│  (entity, port) │  No dependencies
+└─────────────────┘
+```
+
+**Rules:**
+- Core has NO dependencies
+- Adapter depends on Core
+- Application wires Adapter to Core
+
+**Example:**
+```go
+// ✅ Good: Adapter imports Core
+package postgres
+import "myapp/internal/core/port"
+
+// ❌ Bad: Core imports Adapter
+package port
+import "myapp/internal/adapter/repository/postgres"
+```
+
+## Package Organization
+
+### By Domain (Recommended)
+
+Organize by business domain:
+
+```
+internal/
+├── core/
+│   ├── entity/
+│   │   ├── customer.go
+│   │   ├── order.go
+│   │   └── product.go
+│   └── port/
+│       ├── customer_repo.go
+│       ├── order_repo.go
+│       └── product_repo.go
+└── adapter/
+    ├── handler/
+    │   └── http/
+    │       ├── customer_handler.go
+    │       ├── order_handler.go
+    │       └── product_handler.go
+    └── repository/
+        └── postgres/
+            ├── customer_repo.go
+            ├── order_repo.go
+            └── product_repo.go
+```
+
+### By Feature (Alternative)
+
+For complex domains:
+
+```
+internal/
+├── customer/
+│   ├── entity/
+│   │   └── customer.go
+│   ├── port/
+│   │   ├── repository.go
+│   │   └── service.go
+│   ├── handler/
+│   │   └── http_handler.go
+│   └── repository/
+│       └── postgres.go
+├── order/
+│   └── ...
+└── product/
+    └── ...
+```
+
+## File Naming
+
+### Conventions
+
+**Entities:**
+```
+customer.go      # Singular, lowercase
+product.go
+order.go
+```
+
+**Repositories:**
+```
+customer_repo.go           # Interface
+postgres/customer_repo.go  # Implementation
+```
+
+**Handlers:**
+```
+customer_handler.go   # Handler
+customer_dto.go       # DTOs
+customer_test.go      # Tests
+```
+
+**Tests:**
+```
+customer_test.go           # Unit tests (same package)
+customer_integration_test.go  # Integration tests
+```
+
+## Adding New Components
+
+### Add New Domain
+
+```bash
+# 1. Generate domain
+anaphase gen domain --name inventory --prompt "..."
+
+# Result:
+internal/core/
+├── entity/
+│   └── inventory.go      # ✅ Created
+└── port/
+    └── inventory_repo.go # ✅ Created
+
+# 2. Generate infrastructure
+anaphase gen handler --domain inventory
+anaphase gen repository --domain inventory --db postgres
+
+# 3. Wire
+anaphase wire
+```
+
+### Add Service Layer
+
+Manually create service implementation:
+
+```bash
+mkdir -p internal/core/service
+```
+
+```go
+// internal/core/service/customer_service.go
+package service
+
+type customerService struct {
+    repo port.CustomerRepository
+}
+
+func NewCustomerService(repo port.CustomerRepository) port.CustomerService {
+    return &customerService{repo: repo}
+}
+
+func (s *customerService) CreateCustomer(ctx context.Context, email, name string) (*entity.Customer, error) {
+    // Business logic
+}
+```
+
+Update wire.go:
+```go
+customerService := service.NewCustomerService(customerRepo)
+customerHandler := http.NewCustomerHandler(customerService, logger)
+```
+
+### Add Middleware
+
+```bash
+mkdir -p internal/adapter/middleware
+```
+
+```go
+// internal/adapter/middleware/auth.go
+package middleware
+
+func Auth(next http.Handler) http.Handler {
+    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+        // Auth logic
+        next.ServeHTTP(w, r)
+    })
+}
+```
+
+Use in main.go:
+```go
+r.Use(middleware.Auth)
+```
+
+## Best Practices
+
+### Keep Core Pure
+
+```go
+// ✅ Good: Core doesn't import infrastructure
+package entity
+import "github.com/google/uuid"
+
+// ❌ Bad: Core imports database
+package entity
+import "github.com/jackc/pgx/v5"
+```
+
+### Small, Focused Files
+
+```go
+// ✅ Good: One entity per file
+// customer.go
+type Customer struct { ... }
+
+// ❌ Bad: Multiple entities per file
+// entities.go
+type Customer struct { ... }
+type Product struct { ... }
+type Order struct { ... }
+```
+
+### Consistent Naming
+
+```go
+// Repositories
+type CustomerRepository interface    // Interface
+type customerRepository struct       // Implementation
+
+// Services
+type CustomerService interface       // Interface
+type customerService struct          // Implementation
+```
+
+### Package Comments
+
+```go
+// Package entity contains domain entities.
+//
+// Entities are objects with identity that persist over time.
+// They contain business logic and enforce business rules.
+package entity
+```
+
+## See Also
+
+- [Architecture](/guide/architecture)
+- [DDD Concepts](/guide/ddd)
+- [Quick Start](/guide/quick-start)

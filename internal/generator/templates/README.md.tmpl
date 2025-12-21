@@ -1,0 +1,101 @@
+# {{.Name}}
+
+Microservice built with Domain-Driven Design architecture.
+
+## Getting Started
+
+### Prerequisites
+
+- Go 1.22+
+{{- if not .SkipDocker}}
+- Docker & Docker Compose
+{{- end}}
+{{- if eq .Database "postgres"}}
+- PostgreSQL 16+
+{{- end}}
+
+### Installation
+
+```bash
+# Install dependencies
+make deps
+
+{{- if not .SkipDocker}}
+# Start development environment
+make dev
+{{- end}}
+
+# Copy environment variables
+cp .env.example .env
+
+# Run the application
+make run
+```
+
+### Development
+
+```bash
+# Run tests
+make test
+
+# Build binary
+make build
+
+# Run linter
+make lint
+
+# Format code
+make fmt
+```
+
+## Architecture
+
+This project follows Clean Architecture principles with Domain-Driven Design:
+
+```
+cmd/api/                    # Application entry point
+internal/
+  ├── core/                # Business logic (pure, no external deps)
+  │   ├── entity/         # Domain entities
+  │   ├── port/           # Interface definitions
+  │   ├── service/        # Business logic implementation
+  │   └── valueobject/    # Value objects
+  │
+  ├── adapter/            # External interfaces
+  │   ├── handler/        # HTTP/gRPC handlers
+  │   ├── repository/     # Database implementations
+  │   └── integration/    # External service clients
+  │
+  ├── config/             # Configuration management
+  └── server/             # HTTP server setup
+
+pkg/                       # Shared utilities
+migrations/                # Database migrations
+```
+
+## API Endpoints
+
+- `GET /health` - Health check
+- `GET /api/v1/` - API root
+
+## Configuration
+
+Environment variables:
+
+- `ENVIRONMENT` - Environment (development/staging/production)
+- `SERVER_PORT` - HTTP server port (default: 8080)
+- `DATABASE_URL` - Database connection string
+{{- if .Cache}}
+- `REDIS_URL` - Redis connection string
+{{- end}}
+{{- if .EventBus}}
+- `EVENT_BUS_URL` - Event bus connection string
+{{- end}}
+
+## License
+
+MIT
+
+---
+
+Generated with [Anaphase CLI](https://github.com/lisvindanuu/anaphase-cli)
