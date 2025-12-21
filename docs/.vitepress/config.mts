@@ -60,7 +60,7 @@ export default defineConfig({
     ],
 
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/lisvindanuu/anaphase-cli' }
+      { icon: 'github', link: 'https://github.com/lisvindanu/anaphase-cli' }
     ],
 
     footer: {

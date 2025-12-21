@@ -17,7 +17,7 @@ npm install
 npm run docs:dev
 ```
 
-Visit http://localhost:5173
+Visit `http://localhost:5173` in your browser.
 
 ### Build for Production
 
@@ -49,7 +49,7 @@ npm run docs:preview
    git init
    git add -A
    git commit -m 'Deploy documentation'
-   git push -f git@github.com:lisvindanuu/anaphase-cli.git main:gh-pages
+   git push -f git@github.com:lisvindanu/anaphase-cli.git main:gh-pages
    ```
 
 3. Enable GitHub Pages in repository settings (source: gh-pages branch)

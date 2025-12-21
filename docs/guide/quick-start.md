@@ -13,7 +13,7 @@ Get started with Anaphase in under 5 minutes.
 ### From Source
 
 ```bash
-git clone https://github.com/lisvindanuu/anaphase-cli.git
+git clone https://github.com/lisvindanu/anaphase-cli.git
 cd anaphase-cli
 go install ./cmd/anaphase
 ```
@@ -21,7 +21,7 @@ go install ./cmd/anaphase
 ### Using Go Install
 
 ```bash
-go install github.com/lisvindanuu/anaphase-cli/cmd/anaphase@latest
+go install github.com/lisvindanu/anaphase-cli/cmd/anaphase@latest
 ```
 
 Verify installation:

@@ -455,10 +455,10 @@ func TestCreateCustomer(t *testing.T) {
 ## Complete Example
 
 Full working example available at:
-https://github.com/lisvindanuu/anaphase-examples/tree/main/ecommerce-api
+https://github.com/lisvindanu/anaphase-examples/tree/main/ecommerce-api
 
 ## See Also
 
-- [Multi-Domain Service](/examples/multi-domain)
-- [Custom Handlers](/examples/custom-handlers)
 - [Architecture Guide](/guide/architecture)
+- [Quick Start](/guide/quick-start)
+- [Command Reference](/reference/commands)

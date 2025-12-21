@@ -214,8 +214,8 @@ import (
     "github.com/go-chi/chi/v5"
     "github.com/jackc/pgx/v5/pgxpool"
 
-    handlerhttp "github.com/lisvindanuu/anaphase-cli/internal/adapter/handler/http"
-    "github.com/lisvindanuu/anaphase-cli/internal/adapter/repository/postgres"
+    handlerhttp "github.com/lisvindanu/anaphase-cli/internal/adapter/handler/http"
+    "github.com/lisvindanu/anaphase-cli/internal/adapter/repository/postgres"
 )
 
 // App holds all application dependencies
@@ -434,7 +434,7 @@ anaphase gen domain --name customer --prompt "..."
 ### Import Errors
 
 ```
-could not import github.com/lisvindanuu/anaphase-cli/internal/adapter/handler/http
+could not import github.com/lisvindanu/anaphase-cli/internal/adapter/handler/http
 ```
 
 **Cause**: Handlers not generated yet

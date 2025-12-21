@@ -24,7 +24,7 @@ Clone and build from source:
 
 ```bash
 # Clone repository
-git clone https://github.com/lisvindanuu/anaphase-cli.git
+git clone https://github.com/lisvindanu/anaphase-cli.git
 cd anaphase-cli
 
 # Install dependencies
@@ -42,7 +42,7 @@ anaphase --version
 Install directly using `go install`:
 
 ```bash
-go install github.com/lisvindanuu/anaphase-cli/cmd/anaphase@latest
+go install github.com/lisvindanu/anaphase-cli/cmd/anaphase@latest
 ```
 
 ::: warning PATH Configuration

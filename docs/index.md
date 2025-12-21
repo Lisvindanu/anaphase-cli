@@ -14,7 +14,7 @@ hero:
       link: /guide/quick-start
     - theme: alt
       text: View on GitHub
-      link: https://github.com/lisvindanuu/anaphase-cli
+      link: https://github.com/lisvindanu/anaphase-cli
 
 features:
   - icon: 🤖
