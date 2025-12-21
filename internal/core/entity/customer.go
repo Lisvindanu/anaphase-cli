@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/lisvindanuu/anaphase-cli/internal/core/valueobject"
+	"github.com/lisvindanu/anaphase-cli/internal/core/valueobject"
 )
 
 // Common errors

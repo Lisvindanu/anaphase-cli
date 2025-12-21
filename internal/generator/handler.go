@@ -125,7 +125,7 @@ func (g *HandlerGenerator) generateHandler(outputDir string) (string, error) {
 	b.WriteString("\t\"net/http\"\n\n")
 	b.WriteString("\t\"github.com/go-chi/chi/v5\"\n")
 	b.WriteString("\t\"github.com/google/uuid\"\n\n")
-	b.WriteString("\t\"github.com/lisvindanuu/anaphase-cli/internal/core/port\"\n")
+	b.WriteString("\t\"github.com/lisvindanu/anaphase-cli/internal/core/port\"\n")
 	b.WriteString(")\n\n")
 
 	// Handler struct

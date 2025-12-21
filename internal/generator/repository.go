@@ -92,8 +92,8 @@ func (g *RepositoryGenerator) generateRepository(outputDir string) (string, erro
 		b.WriteString("\t\"go.mongodb.org/mongo-driver/bson\"\n")
 	}
 
-	b.WriteString("\n\t\"github.com/lisvindanuu/anaphase-cli/internal/core/entity\"\n")
-	b.WriteString("\t\"github.com/lisvindanuu/anaphase-cli/internal/core/port\"\n")
+	b.WriteString("\n\t\"github.com/lisvindanu/anaphase-cli/internal/core/entity\"\n")
+	b.WriteString("\t\"github.com/lisvindanu/anaphase-cli/internal/core/port\"\n")
 	b.WriteString(")\n\n")
 
 	// Repository struct

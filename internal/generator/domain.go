@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/lisvindanuu/anaphase-cli/internal/ai"
-	"github.com/lisvindanuu/anaphase-cli/pkg/fileutil"
+	"github.com/lisvindanu/anaphase-cli/internal/ai"
+	"github.com/lisvindanu/anaphase-cli/pkg/fileutil"
 )
 
 // DomainGenerator generates domain code files from AI spec
@@ -113,7 +113,7 @@ func (g *DomainGenerator) generateEntity(entity ai.EntitySpec) (string, error) {
 	}
 	b.WriteString("\n\t\"github.com/google/uuid\"\n")
 	if needsValueObject {
-		b.WriteString("\t\"github.com/lisvindanuu/anaphase-cli/internal/core/valueobject\"\n")
+		b.WriteString("\t\"github.com/lisvindanu/anaphase-cli/internal/core/valueobject\"\n")
 	}
 	b.WriteString(")\n\n")
 
@@ -294,8 +294,8 @@ func (g *DomainGenerator) generateRepository() (string, error) {
 	b.WriteString("import (\n")
 	b.WriteString("\t\"context\"\n\n")
 	b.WriteString("\t\"github.com/google/uuid\"\n")
-	b.WriteString("\t\"github.com/lisvindanuu/anaphase-cli/internal/core/entity\"\n")
-	b.WriteString("\t\"github.com/lisvindanuu/anaphase-cli/internal/core/valueobject\"\n")
+	b.WriteString("\t\"github.com/lisvindanu/anaphase-cli/internal/core/entity\"\n")
+	b.WriteString("\t\"github.com/lisvindanu/anaphase-cli/internal/core/valueobject\"\n")
 	b.WriteString(")\n\n")
 
 	// Interface
@@ -330,8 +330,8 @@ func (g *DomainGenerator) generateService() (string, error) {
 	b.WriteString("import (\n")
 	b.WriteString("\t\"context\"\n\n")
 	b.WriteString("\t\"github.com/google/uuid\"\n")
-	b.WriteString("\t\"github.com/lisvindanuu/anaphase-cli/internal/core/entity\"\n")
-	b.WriteString("\t\"github.com/lisvindanuu/anaphase-cli/internal/core/valueobject\"\n")
+	b.WriteString("\t\"github.com/lisvindanu/anaphase-cli/internal/core/entity\"\n")
+	b.WriteString("\t\"github.com/lisvindanu/anaphase-cli/internal/core/valueobject\"\n")
 	b.WriteString(")\n\n")
 
 	// Interface

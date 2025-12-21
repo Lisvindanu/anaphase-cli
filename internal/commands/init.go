@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/lisvindanuu/anaphase-cli/internal/generator"
+	"github.com/lisvindanu/anaphase-cli/internal/generator"
 	"github.com/spf13/cobra"
 )
 

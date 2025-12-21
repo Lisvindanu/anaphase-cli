@@ -226,7 +226,7 @@ func (g *SwaggerGenerator) addMainAnnotations() error {
 			`"github.com/go-chi/chi/v5/middleware"`,
 			`"github.com/go-chi/chi/v5/middleware"
 	httpSwagger "github.com/swaggo/http-swagger"
-	_ "github.com/lisvindanuu/anaphase-cli/docs" // swagger docs`,
+	_ "github.com/lisvindanu/anaphase-cli/docs" // swagger docs`,
 			1)
 
 		// Add swagger route

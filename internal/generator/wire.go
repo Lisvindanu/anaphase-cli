@@ -244,8 +244,8 @@ func (g *WireGenerator) generateWire() (string, error) {
 
 	// Import handlers and repositories for each domain
 	if len(g.domains) > 0 {
-		b.WriteString("\thandlerhttp \"github.com/lisvindanuu/anaphase-cli/internal/adapter/handler/http\"\n")
-		b.WriteString("\t\"github.com/lisvindanuu/anaphase-cli/internal/adapter/repository/postgres\"\n")
+		b.WriteString("\thandlerhttp \"github.com/lisvindanu/anaphase-cli/internal/adapter/handler/http\"\n")
+		b.WriteString("\t\"github.com/lisvindanu/anaphase-cli/internal/adapter/repository/postgres\"\n")
 	}
 
 	b.WriteString(")\n\n")

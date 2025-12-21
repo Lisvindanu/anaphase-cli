@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/google/uuid"
-	"github.com/lisvindanuu/anaphase-cli/internal/core/entity"
-	"github.com/lisvindanuu/anaphase-cli/internal/core/valueobject"
+	"github.com/lisvindanu/anaphase-cli/internal/core/entity"
+	"github.com/lisvindanu/anaphase-cli/internal/core/valueobject"
 )
 
 // CustomerService defines the contract for customer business logic

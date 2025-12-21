@@ -6,8 +6,8 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/lisvindanuu/anaphase-cli/internal/ai"
-	"github.com/lisvindanuu/anaphase-cli/internal/generator"
+	"github.com/lisvindanu/anaphase-cli/internal/ai"
+	"github.com/lisvindanu/anaphase-cli/internal/generator"
 	"github.com/spf13/cobra"
 )
 

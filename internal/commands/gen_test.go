@@ -5,8 +5,8 @@ import (
 	"fmt"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/lisvindanuu/anaphase-cli/internal/generator"
-	"github.com/lisvindanuu/anaphase-cli/internal/ui"
+	"github.com/lisvindanu/anaphase-cli/internal/generator"
+	"github.com/lisvindanu/anaphase-cli/internal/ui"
 	"github.com/spf13/cobra"
 )
 

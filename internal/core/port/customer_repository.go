@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/google/uuid"
-	"github.com/lisvindanuu/anaphase-cli/internal/core/entity"
-	"github.com/lisvindanuu/anaphase-cli/internal/core/valueobject"
+	"github.com/lisvindanu/anaphase-cli/internal/core/entity"
+	"github.com/lisvindanu/anaphase-cli/internal/core/valueobject"
 )
 
 // CustomerRepository defines the contract for customer persistence

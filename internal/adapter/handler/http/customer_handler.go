@@ -8,7 +8,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 
-	"github.com/lisvindanuu/anaphase-cli/internal/core/port"
+	"github.com/lisvindanu/anaphase-cli/internal/core/port"
 )
 
 // CustomerHandler handles HTTP requests for customer domain

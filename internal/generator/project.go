@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"text/template"
 
-	"github.com/lisvindanuu/anaphase-cli/pkg/fileutil"
+	"github.com/lisvindanu/anaphase-cli/pkg/fileutil"
 )
 
 //go:embed templates/*

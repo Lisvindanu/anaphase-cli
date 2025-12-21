@@ -8,9 +8,9 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	"github.com/lisvindanuu/anaphase-cli/internal/core/entity"
-	"github.com/lisvindanuu/anaphase-cli/internal/core/port"
-	"github.com/lisvindanuu/anaphase-cli/internal/core/valueobject"
+	"github.com/lisvindanu/anaphase-cli/internal/core/entity"
+	"github.com/lisvindanu/anaphase-cli/internal/core/port"
+	"github.com/lisvindanu/anaphase-cli/internal/core/valueobject"
 )
 
 type customerRepository struct {
