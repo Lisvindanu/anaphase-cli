@@ -3,6 +3,42 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: 'Anaphase',
   description: 'AI-Powered Golang Microservice Generator',
+  lang: 'en-US',
+
+  // SEO
+  head: [
+    // Favicon
+    ['link', { rel: 'icon', type: 'image/svg+xml', href: '/logo.svg' }],
+
+    // SEO Meta Tags
+    ['meta', { name: 'keywords', content: 'golang, go, microservices, ddd, clean architecture, domain-driven design, code generator, ai, gemini, scaffolding, cli, tool' }],
+    ['meta', { name: 'author', content: 'Anaphase' }],
+    ['meta', { name: 'robots', content: 'index, follow' }],
+
+    // Open Graph / Facebook
+    ['meta', { property: 'og:type', content: 'website' }],
+    ['meta', { property: 'og:url', content: 'https://anaphygon.my.id/' }],
+    ['meta', { property: 'og:title', content: 'Anaphase - AI-Powered Golang Microservice Generator' }],
+    ['meta', { property: 'og:description', content: 'Generate production-ready Golang microservices with AI. From idea to deployment in minutes using Domain-Driven Design and Clean Architecture.' }],
+    ['meta', { property: 'og:image', content: 'https://anaphygon.my.id/hero-image.svg' }],
+    ['meta', { property: 'og:site_name', content: 'Anaphase' }],
+    ['meta', { property: 'og:locale', content: 'en_US' }],
+
+    // Twitter Card
+    ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
+    ['meta', { name: 'twitter:url', content: 'https://anaphygon.my.id/' }],
+    ['meta', { name: 'twitter:title', content: 'Anaphase - AI-Powered Golang Microservice Generator' }],
+    ['meta', { name: 'twitter:description', content: 'Generate production-ready Golang microservices with AI. From idea to deployment in minutes.' }],
+    ['meta', { name: 'twitter:image', content: 'https://anaphygon.my.id/hero-image.svg' }],
+
+    // Additional Meta
+    ['meta', { name: 'theme-color', content: '#667eea' }],
+    ['meta', { name: 'apple-mobile-web-app-capable', content: 'yes' }],
+    ['meta', { name: 'apple-mobile-web-app-status-bar-style', content: 'black-translucent' }],
+
+    // Canonical URL
+    ['link', { rel: 'canonical', href: 'https://anaphygon.my.id/' }]
+  ],
 
   themeConfig: {
     logo: '/logo.svg',
@@ -67,9 +103,5 @@ export default defineConfig({
       message: 'Released under the MIT License.',
       copyright: 'Copyright © 2024-present Anaphase'
     }
-  },
-
-  head: [
-    ['link', { rel: 'icon', type: 'image/svg+xml', href: '/logo.svg' }]
-  ]
+  }
 })

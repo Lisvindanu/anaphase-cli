@@ -1,0 +1,11 @@
+# robots.txt for Anaphase Documentation
+User-agent: *
+Allow: /
+
+# Sitemaps
+Sitemap: https://anaphygon.my.id/sitemap.xml
+
+# Block assets that don't need indexing
+Disallow: /assets/
+Disallow: /*.js$
+Disallow: /*.css$
