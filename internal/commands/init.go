@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/lisvindanu/anaphase-cli/internal/generator"
+	"github.com/lisvindanu/anaphase-cli/internal/setup"
 	"github.com/spf13/cobra"
 )
 
@@ -115,6 +116,31 @@ func runInit(cmd *cobra.Command, args []string) error {
 	}
 
 	fmt.Printf("\n✅ Project '%s' created successfully!\n\n", projectName)
+
+	// Auto-setup: Ensure Anaphase config exists
+	fmt.Println("🔧 Setting up Anaphase configuration...")
+	if err := setup.CreateAnaphaseConfig(); err != nil {
+		fmt.Printf("Warning: Could not create Anaphase config: %v\n", err)
+	}
+
+	// Auto-setup: Ensure project configs
+	fmt.Println("📝 Setting up project configuration files...")
+	// Change to project directory temporarily
+	currentDir, _ := os.Getwd()
+	os.Chdir(projectName)
+
+	if err := setup.EnsureProjectConfig(); err != nil {
+		fmt.Printf("Warning: Could not create project configs: %v\n", err)
+	}
+
+	if err := setup.EnsureGitignore(); err != nil {
+		fmt.Printf("Warning: Could not update .gitignore: %v\n", err)
+	}
+
+	// Return to original directory
+	os.Chdir(currentDir)
+
+	fmt.Println()
 	fmt.Println("Next steps:")
 	fmt.Printf("  cd %s\n", projectName)
 	fmt.Println("  make run")

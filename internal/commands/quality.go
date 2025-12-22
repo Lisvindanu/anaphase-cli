@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/lisvindanu/anaphase-cli/internal/setup"
 	"github.com/lisvindanu/anaphase-cli/internal/ui"
 	"github.com/spf13/cobra"
 )
@@ -97,8 +98,19 @@ func runLint(cmd *cobra.Command, args []string) error {
 	ui.PrintInfo(fmt.Sprintf("Linting: %s", path))
 	fmt.Println()
 
+	// Auto-setup: Ensure config exists
+	if err := setup.EnsureGolangciLintConfig(); err != nil {
+		ui.PrintWarning(fmt.Sprintf("Could not create config: %v", err))
+	}
+
+	// Auto-setup: Ensure golangci-lint is installed
+	hasGolangciLint, err := setup.EnsureGolangciLint()
+	if err != nil {
+		ui.PrintWarning("Failed to install golangci-lint")
+	}
+
 	// Try golangci-lint first
-	if isCommandAvailable("golangci-lint") {
+	if hasGolangciLint {
 		fmt.Println("📋 Running golangci-lint...")
 
 		// Convert path to Go package notation if needed
@@ -127,9 +139,6 @@ func runLint(cmd *cobra.Command, args []string) error {
 	} else {
 		// Fall back to go vet
 		fmt.Println("📋 Running go vet...")
-		ui.PrintWarning("golangci-lint not found, using go vet instead")
-		ui.PrintInfo("Install golangci-lint for better linting: https://golangci-lint.run/usage/install/")
-		fmt.Println()
 
 		output, err := runCommand("go", "vet", path)
 		if err != nil {
@@ -205,6 +214,12 @@ func runFormat(cmd *cobra.Command, args []string) error {
 		}
 	}
 
+	// Auto-setup: Ensure goimports is installed
+	fmt.Println()
+	if err := setup.EnsureGoimports(); err != nil {
+		ui.PrintWarning("goimports not available (optional)")
+	}
+
 	// Try goimports if available
 	if isCommandAvailable("goimports") {
 		fmt.Println("\n📦 Running goimports...")
@@ -237,9 +252,6 @@ func runFormat(cmd *cobra.Command, args []string) error {
 				ui.PrintSuccess("All imports already organized")
 			}
 		}
-	} else {
-		ui.PrintInfo("\nInstall goimports for automatic import organization:")
-		fmt.Println("  go install golang.org/x/tools/cmd/goimports@latest")
 	}
 
 	fmt.Println()

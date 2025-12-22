@@ -40,7 +40,8 @@ func Execute() error {
 // showInteractiveMenu shows an interactive TUI menu
 func showInteractiveMenu(cmd *cobra.Command) {
 	m := ui.NewMenuModel()
-	p := tea.NewProgram(m)
+	// Use alternate screen buffer to properly manage terminal state
+	p := tea.NewProgram(m, tea.WithAltScreen())
 
 	finalModel, err := p.Run()
 	if err != nil {
@@ -64,6 +65,10 @@ func showInteractiveMenu(cmd *cobra.Command) {
 				fmt.Fprintf(os.Stderr, "Error finding command: %v\n", err)
 				return
 			}
+
+			// Ensure command output goes to stdout/stderr properly
+			subCmd.SetOut(os.Stdout)
+			subCmd.SetErr(os.Stderr)
 
 			// Set args and execute
 			subCmd.SetArgs(cmdParts[1:]) // Skip the first part which is the command name
