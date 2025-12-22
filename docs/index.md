@@ -19,7 +19,7 @@ hero:
 features:
   - icon: 🎯
     title: Domain-Driven Design First
-    details: **Our key differentiator.** True DDD with Aggregates, Entities, Value Objects, and Bounded Contexts. Not just MVC with extra layers - actual tactical DDD patterns that scale.
+    details: "**Our key differentiator.** True DDD with Aggregates, Entities, Value Objects, and Bounded Contexts. Not just MVC with extra layers - actual tactical DDD patterns that scale."
 
   - icon: 🤖
     title: AI-Powered Generation
