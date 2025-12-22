@@ -56,7 +56,8 @@ export default defineConfig({
         items: [
           { text: 'What is Anaphase?', link: '/guide/introduction' },
           { text: 'Quick Start', link: '/guide/quick-start' },
-          { text: 'Installation', link: '/guide/installation' }
+          { text: 'Installation', link: '/guide/installation' },
+          { text: '🆘 Troubleshooting', link: '/guide/troubleshooting' }
         ]
       },
       {
