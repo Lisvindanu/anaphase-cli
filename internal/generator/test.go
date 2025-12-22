@@ -30,13 +30,13 @@ type TestGenerator struct {
 
 // EntityInfo holds information about the entity
 type EntityInfo struct {
-	EntityName           string
-	EntityNameLower      string
+	EntityName            string
+	EntityNameLower       string
 	EntityNameLowerPlural string
-	Module               string
-	Fields               []FieldInfo
-	Methods              []MethodInfo
-	HasUniqueFields      bool
+	Module                string
+	Fields                []FieldInfo
+	Methods               []MethodInfo
+	HasUniqueFields       bool
 }
 
 // FieldInfo holds field information
@@ -78,12 +78,12 @@ func (g *TestGenerator) ScanDomain() error {
 
 	// Extract entity information
 	info := &EntityInfo{
-		EntityName:      toPascalCase(g.config.Domain),
-		EntityNameLower: strings.ToLower(g.config.Domain),
+		EntityName:            toPascalCase(g.config.Domain),
+		EntityNameLower:       strings.ToLower(g.config.Domain),
 		EntityNameLowerPlural: strings.ToLower(g.config.Domain) + "s",
-		Module:          getModuleName(),
-		Fields:          []FieldInfo{},
-		Methods:         []MethodInfo{},
+		Module:                getModuleName(),
+		Fields:                []FieldInfo{},
+		Methods:               []MethodInfo{},
 	}
 
 	// Find the entity struct

@@ -9,11 +9,11 @@ import (
 
 // DomainSpec represents the parsed domain specification from AI
 type DomainSpec struct {
-	DomainName          string              `json:"domain_name"`
-	Entities            []EntitySpec        `json:"entities"`
-	ValueObjects        []ValueObjectSpec   `json:"value_objects"`
-	RepositoryInterface RepositorySpec      `json:"repository_interface"`
-	ServiceInterface    ServiceSpec         `json:"service_interface"`
+	DomainName          string            `json:"domain_name"`
+	Entities            []EntitySpec      `json:"entities"`
+	ValueObjects        []ValueObjectSpec `json:"value_objects"`
+	RepositoryInterface RepositorySpec    `json:"repository_interface"`
+	ServiceInterface    ServiceSpec       `json:"service_interface"`
 }
 
 // EntitySpec represents an entity specification
@@ -49,8 +49,8 @@ type ValueObjectSpec struct {
 
 // RepositorySpec represents a repository interface specification
 type RepositorySpec struct {
-	Name    string              `json:"name"`
-	Methods []InterfaceMethod   `json:"methods"`
+	Name    string            `json:"name"`
+	Methods []InterfaceMethod `json:"methods"`
 }
 
 // ServiceSpec represents a service interface specification
@@ -99,7 +99,7 @@ func GenerateDomain(ctx context.Context, orchestrator *Orchestrator, description
 	req := &GenerateRequest{
 		SystemPrompt: SystemPromptDDD,
 		UserPrompt:   UserPromptTemplate(description),
-		Temperature:  0.3, // Lower temperature for more consistent output
+		Temperature:  0.3,  // Lower temperature for more consistent output
 		MaxTokens:    8000, // Increased for complex domain specs
 		TopP:         0.9,
 	}

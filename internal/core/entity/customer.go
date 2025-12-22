@@ -11,22 +11,22 @@ import (
 // Common errors
 var (
 	ErrCustomerNotFound = errors.New("customer not found")
-	ErrInvalidCustomer = errors.New("invalid customer")
+	ErrInvalidCustomer  = errors.New("invalid customer")
 )
 
 // Customer is an aggregate root
 type Customer struct {
-	ID uuid.UUID // Unique identifier for the customer
-	Name valueobject.PersonName // Customer's full name
-	Email valueobject.Email // Customer's email address
-	CreatedAt time.Time // Timestamp when the customer record was created
-	UpdatedAt time.Time // Timestamp when the customer record was last updated
+	ID        uuid.UUID              // Unique identifier for the customer
+	Name      valueobject.PersonName // Customer's full name
+	Email     valueobject.Email      // Customer's email address
+	CreatedAt time.Time              // Timestamp when the customer record was created
+	UpdatedAt time.Time              // Timestamp when the customer record was last updated
 }
 
 // NewCustomer creates a new customer
 func NewCustomer() *Customer {
 	return &Customer{
-		ID: uuid.New(),
+		ID:        uuid.New(),
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}

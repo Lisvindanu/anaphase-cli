@@ -18,5 +18,4 @@ type CustomerRepository interface {
 
 	// FindByEmail Retrieves a customer entity by its email address.
 	FindByEmail(ctx context.Context, email valueobject.Email) (*entity.Customer, error)
-
 }

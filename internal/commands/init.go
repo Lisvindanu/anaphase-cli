@@ -9,11 +9,11 @@ import (
 )
 
 var (
-	initModule    string
-	initDB        string
-	initCache     bool
-	initEventBus  string
-	initNoDocker  bool
+	initModule   string
+	initDB       string
+	initCache    bool
+	initEventBus string
+	initNoDocker bool
 )
 
 var initCmd = &cobra.Command{
@@ -81,13 +81,13 @@ func runInit(cmd *cobra.Command, args []string) error {
 
 	// Create project configuration
 	config := &generator.ProjectConfig{
-		Name:         projectName,
-		Module:       initModule,
-		Database:     initDB,
-		Cache:        initCache,
-		EventBus:     initEventBus,
-		SkipDocker:   initNoDocker,
-		OutputDir:    projectName,
+		Name:       projectName,
+		Module:     initModule,
+		Database:   initDB,
+		Cache:      initCache,
+		EventBus:   initEventBus,
+		SkipDocker: initNoDocker,
+		OutputDir:  projectName,
 	}
 
 	// Check if directory already exists

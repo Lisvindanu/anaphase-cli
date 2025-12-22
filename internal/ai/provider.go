@@ -35,15 +35,15 @@ type GenerateRequest struct {
 
 // GenerateResponse contains the provider's output
 type GenerateResponse struct {
-	Content       string            // Generated text
-	TokensUsed    TokenUsage        // Token consumption
-	Provider      string            // Which provider was used
-	Model         string            // Specific model used
-	Duration      time.Duration     // Request duration
-	CacheHit      bool              // Was response cached?
-	Cost          float64           // Estimated cost in USD
-	FinishReason  string            // Why generation stopped
-	Metadata      map[string]string // Response metadata
+	Content      string            // Generated text
+	TokensUsed   TokenUsage        // Token consumption
+	Provider     string            // Which provider was used
+	Model        string            // Specific model used
+	Duration     time.Duration     // Request duration
+	CacheHit     bool              // Was response cached?
+	Cost         float64           // Estimated cost in USD
+	FinishReason string            // Why generation stopped
+	Metadata     map[string]string // Response metadata
 }
 
 // TokenUsage tracks token consumption

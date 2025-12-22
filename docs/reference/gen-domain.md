@@ -5,404 +5,404 @@ Generate domain models (entities, value objects, repository ports, service ports
 ## Synopsis
 
 ```bash
-anaphase gen domain --name <domain-name> --prompt <description> [flags]
+anaphase gen domain "<description>" [flags]
+anaphase gen domain --interactive
 ```
 
 ## Description
 
-Uses AI (Google Gemini) to analyze your domain description and generate:
+Uses AI to analyze your domain description and generate:
 
-- **Entity**: Domain entity with fields, constructors, and validation
+- **Entities**: Domain entities with fields, constructors, validation, and business methods
 - **Value Objects**: Immutable objects for important concepts
-- **Repository Port**: Interface for data persistence
-- **Service Port**: Interface for business logic
+- **Repository Interface**: Port for data persistence
+- **Service Interface**: Port for business logic
 
 All generated code follows Domain-Driven Design (DDD) and Clean Architecture principles.
 
-## Required Flags
+## Usage Modes
 
-### `--name` (string)
+### 1. Direct Mode (Default)
 
-Domain name in singular form.
-
-```bash
-# Good
---name customer
---name product
---name order
-
-# Avoid
---name customers  # Plural
---name Customer   # Capitalized (will be normalized)
-```
-
-### `--prompt` (string)
-
-Natural language description of your domain.
+Provide description as argument:
 
 ```bash
---prompt "Customer with email, name, and billing address"
+anaphase gen domain "User with email, name, and password"
 ```
 
-## Optional Flags
+### 2. Interactive Mode
 
-### `--temperature` (float)
-
-AI creativity level. Lower = more consistent, higher = more creative.
-
-- **Range**: 0.0 to 1.0
-- **Default**: 0.3
-- **Recommended**: 0.1-0.3 for production
+Use guided prompts for input:
 
 ```bash
-# Very consistent
---temperature 0.1
-
-# Balanced (default)
---temperature 0.3
-
-# More creative
---temperature 0.7
+anaphase gen domain --interactive
 ```
 
-### `--output` (string)
+**Interactive Prompts:**
+1. **Domain description** - Your business requirement
+2. **AI provider** - Select from available providers (gemini, groq, openai, claude)
+3. **Output directory** - Where to generate files (default: internal/core)
 
-Output directory for generated files.
-
-- **Default**: Current directory
-- Generated files go to `internal/core/`
-
-```bash
---output /path/to/project
+**Example Session:**
 ```
+⚡ Interactive Domain Generation
+
+Enter domain description: User with email and password. Can login and logout
+Select AI provider:
+  1) gemini (default)
+  2) groq
+  3) openai
+  4) claude
+Enter choice [1]: 2
+
+Output directory [internal/core]:
+
+⚡ AI-Powered Domain Generation
+ℹ Description: User with email and password. Can login and logout
+ℹ Using provider: groq
+...
+```
+
+## Flags
+
+| Flag | Short | Default | Description |
+|------|-------|---------|-------------|
+| `--interactive` | `-i` | `false` | Run in interactive mode with guided prompts |
+| `--provider` | | (config) | AI provider: gemini, groq, openai, claude |
+| `--output` | | `internal/core` | Output directory for generated files |
+
+## Global Flags
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--debug` | `-d` | Enable debug mode with verbose logging |
+| `--verbose` | `-v` | Enable verbose output |
 
 ## Examples
 
-### Basic Entity
+### Basic Usage
 
 ```bash
-anaphase gen domain \
-  --name user \
-  --prompt "User with email address and full name"
+anaphase gen domain "Cart with Items. User can add, remove, update quantity"
 ```
 
-**Generates:**
+Output:
 ```
-internal/core/
-├── entity/
-│   └── user.go
-├── valueobject/
-│   └── email.go
-└── port/
-    ├── user_repo.go
-    └── user_service.go
+⚡ AI-Powered Domain Generation
+ℹ Description: Cart with Items. User can add, remove, update quantity
+
+⚙️  Step 1/3: Loading configuration...
+ℹ Using provider: gemini
+
+🧠 Step 2/3: Analyzing with AI...
+✓ AI Analysis Complete!
+
+Generated Specification:
+  📦 Domain: Cart
+  📄 Entities: 2
+  📄 Value Objects: 1
+  ⚙️  Repository: CartRepository
+  ⚙️  Service: CartService
+
+📂 Step 3/3: Generating code files...
+
+Generated Files:
+✓ internal/core/entity/cart.go
+✓ internal/core/entity/item.go
+✓ internal/core/valueobject/quantity.go
+✓ internal/core/port/cart_repository.go
+✓ internal/core/port/cart_service.go
+
+✓ Domain generation complete! 🚀
 ```
 
-### Complex Entity
+### With Provider Selection
 
 ```bash
-anaphase gen domain \
-  --name product \
-  --prompt "Product with SKU code, name, description, price in USD,
-            inventory quantity, category, and status (active, discontinued).
-            Products must have unique SKU."
+# Use Groq (fastest)
+anaphase gen domain "User with email" --provider groq
+
+# Use OpenAI (most accurate)
+anaphase gen domain "Order processing system" --provider openai
+
+# Use Gemini (default, free)
+anaphase gen domain "Product catalog" --provider gemini
 ```
 
-**Generates:**
-```go
-// entity/product.go
-type Product struct {
-    ID          uuid.UUID
-    SKU         *valueobject.SKU
-    Name        string
-    Description string
-    Price       *valueobject.Money
-    Quantity    int
-    Category    string
-    Status      ProductStatus
-    CreatedAt   time.Time
-    UpdatedAt   time.Time
-}
-
-// valueobject/sku.go
-type SKU struct {
-    value string
-}
-
-// valueobject/money.go
-type Money struct {
-    amount   int64  // cents
-    currency string
-}
-
-// port/product_repo.go
-type ProductRepository interface {
-    Save(ctx context.Context, product *entity.Product) error
-    FindByID(ctx context.Context, id uuid.UUID) (*entity.Product, error)
-    FindBySKU(ctx context.Context, sku valueobject.SKU) (*entity.Product, error)
-}
-```
-
-### With Relationships
+### Interactive Mode
 
 ```bash
-anaphase gen domain \
-  --name order \
-  --prompt "Order with customer reference, multiple line items containing
-            products and quantities, shipping address, total amount,
-            and status (pending, confirmed, shipped, delivered)"
+anaphase gen domain -i
+# or
+anaphase gen domain --interactive
 ```
 
-**Generates:**
-- Order entity (aggregate root)
-- LineItem entity (part of aggregate)
-- Address value object
-- Money value object
-- OrderStatus enum
-- OrderRepository interface
+Benefits:
+- Guided prompts for all inputs
+- Provider selection with descriptions
+- Default value suggestions
+- Validation of inputs
 
-### E-commerce Example
+### Custom Output Directory
 
 ```bash
-# Customer domain
-anaphase gen domain \
-  --name customer \
-  --prompt "Customer with email, name, phone, billing address, and shipping address"
-
-# Product domain
-anaphase gen domain \
-  --name product \
-  --prompt "Product with SKU, name, price, inventory, and category"
-
-# Order domain
-anaphase gen domain \
-  --name order \
-  --prompt "Order with customer, products with quantities, total, and status"
+anaphase gen domain "User" --output pkg/domain
 ```
 
-## Writing Good Prompts
-
-### Be Specific
-
-Good:
-```bash
-"Customer with validated email address, full name (first and last),
- phone number in E.164 format, and loyalty points balance"
-```
-
-Vague:
-```bash
-"Customer with info"
-```
-
-### Include Validation Rules
+### Complex Domain Description
 
 ```bash
-"Product with SKU (alphanumeric, 8-12 chars), price (must be positive),
- inventory (non-negative integer)"
+anaphase gen domain "
+Order with ID, Total, Status, Items.
+Customer can place order, cancel if pending.
+Status can be: pending, confirmed, shipped, delivered, cancelled.
+Each Item has product reference, quantity, and price.
+"
 ```
 
-### Specify Relationships
+## AI Provider Selection
+
+You can override the configured provider:
 
 ```bash
-"Order containing multiple line items. Each line item references a product,
- has quantity, and unit price. Order has single customer reference."
+# Check available providers
+anaphase config show-providers
+
+# Use specific provider
+anaphase gen domain "User" --provider groq
+
+# Set default provider
+anaphase config set-provider groq
 ```
 
-### Mention Business Rules
+**Provider Comparison:**
 
-```bash
-"Account with balance. Balance cannot go negative.
- Account can be active, suspended, or closed.
- Closed accounts cannot be reactivated."
-```
+| Provider | Speed | Quality | Cost | Best For |
+|----------|-------|---------|------|----------|
+| **Gemini** | ⚡⚡⚡ | ⭐⭐⭐⭐ | Free | General use, default choice |
+| **Groq** | ⚡⚡⚡⚡⚡ | ⭐⭐⭐ | Free | Speed-critical, real-time |
+| **OpenAI** | ⚡⚡⚡ | ⭐⭐⭐⭐⭐ | Paid | Complex domains, accuracy |
+| **Claude** | ⚡⚡⚡ | ⭐⭐⭐⭐⭐ | Paid | Large contexts |
 
-## AI Understanding
+## Generated Code Structure
 
-The AI recognizes:
-
-### Entity vs Value Object
-
-- **Entity**: Has ID, mutable
-  - Customer, Order, Product
-- **Value Object**: No ID, immutable
-  - Email, Money, Address
-
-### Field Types
-
-- Simple: string, int, float, bool
-- Time: dates, timestamps
-- Complex: nested objects, arrays
-- References: IDs to other entities
-
-### Enums
-
-```bash
-"status (pending, approved, rejected)"
-→ Generates ProductStatus enum
-```
-
-### Validation
-
-```bash
-"email (validated)"
-→ Generates Email value object with validation
-
-"price (positive)"
-→ Adds validation in constructor
-```
-
-## Output Files
-
-### Entity
-
-`internal/core/entity/{name}.go`
+### Entity Example
 
 ```go
+// internal/core/entity/cart.go
 package entity
 
-type Customer struct {
+import (
+    "errors"
+    "time"
+    "github.com/google/uuid"
+    "yourproject/internal/core/valueobject"
+)
+
+var (
+    ErrCartNotFound = errors.New("cart not found")
+    ErrInvalidCart = errors.New("invalid cart")
+)
+
+// Cart is an aggregate root
+type Cart struct {
     ID        uuid.UUID
-    Email     *valueobject.Email
-    Name      string
+    UserID    uuid.UUID
+    Items     []Item
+    Total     float64
     CreatedAt time.Time
     UpdatedAt time.Time
 }
 
-func NewCustomer(email *valueobject.Email, name string) (*Customer, error) {
-    if email == nil || name == "" {
-        return nil, ErrInvalidInput
-    }
-    return &Customer{
+// NewCart creates a new cart
+func NewCart() *Cart {
+    return &Cart{
         ID:        uuid.New(),
-        Email:     email,
-        Name:      name,
+        Items:     []Item{},
         CreatedAt: time.Now(),
         UpdatedAt: time.Now(),
-    }, nil
+    }
 }
 
-func (c *Customer) Validate() error {
-    if c.Email == nil {
-        return ErrInvalidEmail
-    }
-    if c.Name == "" {
-        return ErrInvalidName
+// AddItem adds an item to the cart
+func (c *Cart) AddItem(item Item) error {
+    // Business logic here
+    return nil
+}
+
+// RemoveItem removes an item from the cart
+func (c *Cart) RemoveItem(itemID uuid.UUID) error {
+    // Business logic here
+    return nil
+}
+
+// Validate validates the cart
+func (c *Cart) Validate() error {
+    if c.ID == uuid.Nil {
+        return ErrInvalidCart
     }
     return nil
 }
 ```
 
-### Value Object
-
-`internal/core/valueobject/{type}.go`
+### Repository Interface Example
 
 ```go
-package valueobject
-
-type Email struct {
-    value string
-}
-
-func NewEmail(value string) (*Email, error) {
-    if !isValidEmail(value) {
-        return nil, ErrInvalidEmail
-    }
-    return &Email{value: strings.ToLower(value)}, nil
-}
-
-func (e *Email) String() string {
-    return e.value
-}
-
-func (e *Email) Validate() error {
-    if !isValidEmail(e.value) {
-        return ErrInvalidEmail
-    }
-    return nil
-}
-```
-
-### Repository Port
-
-`internal/core/port/{name}_repo.go`
-
-```go
+// internal/core/port/cart_repository.go
 package port
 
-type CustomerRepository interface {
-    Save(ctx context.Context, customer *entity.Customer) error
-    FindByID(ctx context.Context, id uuid.UUID) (*entity.Customer, error)
-    FindByEmail(ctx context.Context, email valueobject.Email) (*entity.Customer, error)
+import (
+    "context"
+    "github.com/google/uuid"
+    "yourproject/internal/core/entity"
+)
+
+// CartRepository defines the contract for cart persistence
+type CartRepository interface {
+    // Create creates a new cart
+    Create(ctx context.Context, cart *entity.Cart) error
+
+    // FindByID finds a cart by ID
+    FindByID(ctx context.Context, id uuid.UUID) (*entity.Cart, error)
+
+    // Update updates an existing cart
+    Update(ctx context.Context, cart *entity.Cart) error
+
+    // Delete deletes a cart
+    Delete(ctx context.Context, id uuid.UUID) error
 }
 ```
 
-### Service Port
-
-`internal/core/port/{name}_service.go`
+### Service Interface Example
 
 ```go
+// internal/core/port/cart_service.go
 package port
 
-type CustomerService interface {
-    CreateCustomer(ctx context.Context, email, name string) (*entity.Customer, error)
-    GetCustomer(ctx context.Context, id uuid.UUID) (*entity.Customer, error)
-    UpdateCustomer(ctx context.Context, id uuid.UUID, name string) error
+import (
+    "context"
+    "github.com/google/uuid"
+    "yourproject/internal/core/entity"
+)
+
+// CartService defines the contract for cart business logic
+type CartService interface {
+    // AddItemToCart adds an item to the cart
+    AddItemToCart(ctx context.Context, cartID uuid.UUID, item entity.Item) error
+
+    // RemoveItemFromCart removes an item from the cart
+    RemoveItemFromCart(ctx context.Context, cartID uuid.UUID, itemID uuid.UUID) error
+
+    // GetCart retrieves a cart by ID
+    GetCart(ctx context.Context, id uuid.UUID) (*entity.Cart, error)
 }
 ```
 
-## Caching
+## Writing Good Descriptions
 
-Responses are cached by default:
+### ✅ Good Descriptions
 
 ```bash
-# First call - hits AI API (~1-2s)
-anaphase gen domain --name user --prompt "User with email"
+# Clear, specific, actionable
+"User with email, password, and profile picture. Can login and update profile."
 
-# Second call with same prompt - uses cache (~0.1s)
-anaphase gen domain --name user --prompt "User with email"
+# Includes business rules
+"Order with items and total. Status: pending, confirmed, shipped. Can be cancelled if pending."
+
+# Mentions relationships
+"Cart belongs to User. Cart has many Items. Each Item references a Product."
 ```
 
-Cache key includes:
-- Domain name
-- Prompt text
-- Temperature
+### ❌ Poor Descriptions
 
-Clear cache:
 ```bash
-rm -rf ~/.anaphase/cache
+# Too vague
+"User system"
+
+# Missing details
+"Order"
+
+# Technical implementation (not business domain)
+"Create a struct with fields id, name, email and CRUD methods"
 ```
+
+## Tips for Best Results
+
+1. **Be Specific**: Include field names, types, and business rules
+2. **Describe Behavior**: Mention what users can do (add, remove, update, etc.)
+3. **Include Validations**: Specify constraints and validations
+4. **Mention Relationships**: Describe how entities relate to each other
+5. **Use Business Language**: Focus on domain concepts, not technical implementation
+
+## Next Steps
+
+After generating domain code:
+
+1. **Review Generated Code**
+   ```bash
+   ls -la internal/core/
+   ```
+
+2. **Validate Code Quality**
+   ```bash
+   anaphase quality validate
+   ```
+
+3. **Generate Repository Implementation**
+   ```bash
+   anaphase gen repository Cart
+   ```
+
+4. **Generate HTTP Handlers**
+   ```bash
+   anaphase gen handler Cart
+   ```
+
+5. **Build and Test**
+   ```bash
+   go build ./...
+   go test ./...
+   ```
 
 ## Troubleshooting
 
-### API Quota Exceeded
-
-```
-Error: quota exceeded
-```
-
-**Solution**: Wait or use secondary API key in config.
-
-### Invalid JSON Response
-
-```
-Error: failed to parse AI response
-```
-
-**Solution**: Try again or lower temperature to 0.1.
-
-### Missing Value Objects
-
-If AI doesn't generate value objects for important concepts:
+### "No AI providers configured"
 
 ```bash
-# Add explicit hint
---prompt "Customer with email (value object), name, phone (value object)"
+# Set API key
+export GEMINI_API_KEY="your-key-here"
+
+# Verify
+anaphase config check
+```
+
+### "AI generation failed"
+
+```bash
+# Try different provider
+anaphase gen domain "User" --provider groq
+
+# Check provider health
+anaphase config check
+
+# Enable debug mode
+anaphase gen domain "User" --debug
+```
+
+### Generated code has errors
+
+```bash
+# Run quality checks
+anaphase quality lint --fix
+anaphase quality format
+anaphase quality validate
 ```
 
 ## See Also
 
-- [AI-Powered Generation](/guide/ai-generation)
-- [gen handler](/reference/gen-handler)
-- [gen repository](/reference/gen-repository)
-- [Examples](/examples/basic)
+- [anaphase gen handler](/reference/gen-handler) - Generate HTTP handlers
+- [anaphase gen repository](/reference/gen-repository) - Generate repository implementation
+- [anaphase gen middleware](/reference/gen-middleware) - Generate middleware
+- [anaphase config](/reference/config) - Configure AI providers
+- [AI Providers](/config/ai-providers) - Provider setup guide
+- [Domain-Driven Design](/guide/ddd) - DDD concepts and patterns

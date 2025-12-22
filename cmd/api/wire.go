@@ -49,8 +49,8 @@ func InitializeApp(logger *slog.Logger) (*App, error) {
 	customerHandler := handlerhttp.NewCustomerHandler(nil, logger) // Pass service when implemented
 
 	return &App{
-		logger: logger,
-		db:     db,
+		logger:          logger,
+		db:              db,
 		customerHandler: customerHandler,
 	}, nil
 }

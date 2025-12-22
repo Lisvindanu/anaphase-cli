@@ -40,12 +40,12 @@ func (g *GroqProvider) Name() string {
 
 // GroqRequest represents a request to the Groq API
 type groqRequest struct {
-	Model       string          `json:"model"`
-	Messages    []groqMessage   `json:"messages"`
-	Temperature float64         `json:"temperature"`
-	MaxTokens   int             `json:"max_tokens,omitempty"`
-	TopP        float64         `json:"top_p"`
-	Stream      bool            `json:"stream"`
+	Model       string        `json:"model"`
+	Messages    []groqMessage `json:"messages"`
+	Temperature float64       `json:"temperature"`
+	MaxTokens   int           `json:"max_tokens,omitempty"`
+	TopP        float64       `json:"top_p"`
+	Stream      bool          `json:"stream"`
 }
 
 type groqMessage struct {

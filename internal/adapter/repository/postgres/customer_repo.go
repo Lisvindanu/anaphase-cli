@@ -77,4 +77,3 @@ func (r *customerRepository) FindByEmail(ctx context.Context, email valueobject.
 	// TODO: Implement FindByEmail
 	return nil, fmt.Errorf("not implemented")
 }
-

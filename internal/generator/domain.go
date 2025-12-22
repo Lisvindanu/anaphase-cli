@@ -377,32 +377,32 @@ func isValueObjectType(typeName string) bool {
 
 	// Standard Go types that are NOT value objects
 	standardTypes := map[string]bool{
-		"string":     true,
-		"int":        true,
-		"int8":       true,
-		"int16":      true,
-		"int32":      true,
-		"int64":      true,
-		"uint":       true,
-		"uint8":      true,
-		"uint16":     true,
-		"uint32":     true,
-		"uint64":     true,
-		"float32":    true,
-		"float64":    true,
-		"bool":       true,
-		"byte":       true,
-		"rune":       true,
-		"time.Time":  true,
-		"uuid.UUID":  true,
-		"error":      true,
+		"string":    true,
+		"int":       true,
+		"int8":      true,
+		"int16":     true,
+		"int32":     true,
+		"int64":     true,
+		"uint":      true,
+		"uint8":     true,
+		"uint16":    true,
+		"uint32":    true,
+		"uint64":    true,
+		"float32":   true,
+		"float64":   true,
+		"bool":      true,
+		"byte":      true,
+		"rune":      true,
+		"time.Time": true,
+		"uuid.UUID": true,
+		"error":     true,
 	}
 
 	// Check if it starts with map, []slice, or chan (built-in types)
 	if strings.HasPrefix(typeName, "map[") ||
-	   strings.HasPrefix(typeName, "[]") ||
-	   strings.HasPrefix(typeName, "chan ") ||
-	   strings.HasPrefix(typeName, "*") {
+		strings.HasPrefix(typeName, "[]") ||
+		strings.HasPrefix(typeName, "chan ") ||
+		strings.HasPrefix(typeName, "*") {
 		return false
 	}
 

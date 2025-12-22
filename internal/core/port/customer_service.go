@@ -18,5 +18,4 @@ type CustomerService interface {
 
 	// PlaceOrder Allows a customer to place an order for specified products and quantities. Returns the new order's ID.
 	PlaceOrder(ctx context.Context, customerID uuid.UUID, productIDs []uuid.UUID, quantities []int) (uuid.UUID, error)
-
 }

@@ -72,9 +72,13 @@ export default defineConfig({
         text: 'Commands',
         items: [
           { text: 'anaphase init', link: '/reference/init' },
+          { text: 'anaphase config', link: '/reference/config' },
           { text: 'anaphase gen domain', link: '/reference/gen-domain' },
           { text: 'anaphase gen handler', link: '/reference/gen-handler' },
           { text: 'anaphase gen repository', link: '/reference/gen-repository' },
+          { text: 'anaphase gen middleware', link: '/reference/gen-middleware' },
+          { text: 'anaphase gen migration', link: '/reference/gen-migration' },
+          { text: 'anaphase quality', link: '/reference/quality' },
           { text: 'anaphase wire', link: '/reference/wire' }
         ]
       },

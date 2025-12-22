@@ -1,10 +1,12 @@
 package commands
 
 import (
+	"bufio"
 	"context"
 	"fmt"
 	"log/slog"
 	"os"
+	"strings"
 
 	"github.com/lisvindanu/anaphase-cli/internal/ai"
 	"github.com/lisvindanu/anaphase-cli/internal/generator"
@@ -13,12 +15,13 @@ import (
 )
 
 var (
-	genDomainOutput   string
-	genDomainProvider string
+	genDomainOutput      string
+	genDomainProvider    string
+	genDomainInteractive bool
 )
 
 var genDomainCmd = &cobra.Command{
-	Use:   "domain <description>",
+	Use:   "domain [description]",
 	Short: "Generate domain entities and business logic using AI",
 	Long: `Generate domain entities, value objects, repositories, and services using AI.
 
@@ -33,8 +36,8 @@ Example:
   anaphase gen domain "Cart with Items. User can add, remove, update quantity"
   anaphase gen domain "Order has ID, Total, Status. Can be cancelled if pending"
   anaphase gen domain "User with email" --provider groq
-  anaphase gen domain "Product catalog" --provider gemini`,
-	Args: cobra.MinimumNArgs(1),
+  anaphase gen domain "Product catalog" --provider gemini
+  anaphase gen domain --interactive`,
 	RunE: runGenDomain,
 }
 
@@ -43,16 +46,106 @@ func init() {
 
 	genDomainCmd.Flags().StringVar(&genDomainOutput, "output", "internal/core", "Output directory for generated files")
 	genDomainCmd.Flags().StringVar(&genDomainProvider, "provider", "", "AI provider to use (gemini, groq, openai, claude)")
+	genDomainCmd.Flags().BoolVarP(&genDomainInteractive, "interactive", "i", false, "Run in interactive mode")
+}
+
+// promptInput prompts the user for input with a message
+func promptInput(message string, defaultValue string) string {
+	reader := bufio.NewReader(os.Stdin)
+
+	if defaultValue != "" {
+		fmt.Printf("%s [%s]: ", message, ui.SubtleStyle.Render(defaultValue))
+	} else {
+		fmt.Printf("%s: ", message)
+	}
+
+	input, _ := reader.ReadString('\n')
+	input = strings.TrimSpace(input)
+
+	if input == "" && defaultValue != "" {
+		return defaultValue
+	}
+
+	return input
+}
+
+// promptChoice prompts the user to choose from options
+func promptChoice(message string, options []string, defaultIdx int) string {
+	fmt.Println(message)
+	for i, opt := range options {
+		if i == defaultIdx {
+			fmt.Printf("  %d) %s %s\n", i+1, opt, ui.SubtleStyle.Render("(default)"))
+		} else {
+			fmt.Printf("  %d) %s\n", i+1, opt)
+		}
+	}
+
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Printf("Enter choice [%d]: ", defaultIdx+1)
+
+	input, _ := reader.ReadString('\n')
+	input = strings.TrimSpace(input)
+
+	if input == "" {
+		return options[defaultIdx]
+	}
+
+	// Parse choice
+	var choice int
+	fmt.Sscanf(input, "%d", &choice)
+
+	if choice < 1 || choice > len(options) {
+		return options[defaultIdx]
+	}
+
+	return options[choice-1]
 }
 
 func runGenDomain(cmd *cobra.Command, args []string) error {
-	// Combine all args as description
-	description := ""
-	for i, arg := range args {
-		if i > 0 {
-			description += " "
+	var description string
+	var provider string
+	var output string
+
+	// Interactive mode
+	if genDomainInteractive {
+		fmt.Println(ui.RenderTitle("Interactive Domain Generation"))
+		fmt.Println()
+
+		// Prompt for description
+		description = promptInput("Enter domain description", "")
+		for description == "" {
+			ui.PrintError("Description cannot be empty")
+			description = promptInput("Enter domain description", "")
 		}
-		description += arg
+		fmt.Println()
+
+		// Prompt for AI provider
+		providers := []string{"gemini", "groq", "openai", "claude"}
+		provider = promptChoice("Select AI provider:", providers, 0)
+		fmt.Println()
+
+		// Prompt for output directory
+		output = promptInput("Output directory", "internal/core")
+		fmt.Println()
+
+	} else {
+		// Non-interactive mode - validate args
+		if len(args) == 0 {
+			ui.PrintError("Description is required. Use --interactive for guided mode.")
+			return fmt.Errorf("description required")
+		}
+
+		// Combine all args as description
+		description = ""
+		for i, arg := range args {
+			if i > 0 {
+				description += " "
+			}
+			description += arg
+		}
+
+		provider = genDomainProvider
+		output = genDomainOutput
 	}
 
 	fmt.Println(ui.RenderTitle("AI-Powered Domain Generation"))
@@ -72,10 +165,10 @@ func runGenDomain(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("load config: %w", err)
 	}
 
-	// Override provider if specified via flag
-	if genDomainProvider != "" {
-		cfg.AI.PrimaryProvider = genDomainProvider
-		ui.PrintInfo(fmt.Sprintf("Using provider: %s", genDomainProvider))
+	// Override provider if specified
+	if provider != "" {
+		cfg.AI.PrimaryProvider = provider
+		ui.PrintInfo(fmt.Sprintf("Using provider: %s", provider))
 	} else {
 		ui.PrintInfo(fmt.Sprintf("Using provider: %s", cfg.AI.PrimaryProvider))
 	}
@@ -110,7 +203,7 @@ func runGenDomain(cmd *cobra.Command, args []string) error {
 
 	// Generate code files
 	fmt.Println("📂 Step 3/3: Generating code files...")
-	domainGen := generator.NewDomainGenerator(spec, genDomainOutput)
+	domainGen := generator.NewDomainGenerator(spec, output)
 	files, err := domainGen.Generate()
 
 	if err != nil {

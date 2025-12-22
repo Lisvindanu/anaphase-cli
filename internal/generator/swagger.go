@@ -28,10 +28,10 @@ type SwaggerGenerator struct {
 
 // SwaggerEntityInfo holds entity information for Swagger
 type SwaggerEntityInfo struct {
-	EntityName           string
-	EntityNameLower      string
+	EntityName            string
+	EntityNameLower       string
 	EntityNameLowerPlural string
-	Fields               []SwaggerFieldInfo
+	Fields                []SwaggerFieldInfo
 }
 
 // SwaggerFieldInfo holds field information for Swagger

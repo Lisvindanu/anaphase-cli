@@ -21,7 +21,7 @@ type Spinner struct {
 // NewSpinner creates a new spinner
 func NewSpinner(message string) *Spinner {
 	return &Spinner{
-		frames: []string{"⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"},
+		frames:  []string{"⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"},
 		index:   0,
 		message: message,
 		active:  true,

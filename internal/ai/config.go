@@ -13,9 +13,9 @@ type Config struct {
 
 // AIConfig holds AI provider configuration
 type AIConfig struct {
-	PrimaryProvider   string             `yaml:"primary_provider"`
-	FallbackProviders []string           `yaml:"fallback_providers"`
-	Providers         ProvidersConfig    `yaml:"providers"`
+	PrimaryProvider   string          `yaml:"primary_provider"`
+	FallbackProviders []string        `yaml:"fallback_providers"`
+	Providers         ProvidersConfig `yaml:"providers"`
 }
 
 // ProvidersConfig holds individual provider configurations

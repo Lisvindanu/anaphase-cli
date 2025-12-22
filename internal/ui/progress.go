@@ -9,10 +9,10 @@ import (
 
 // ProgressBar represents a progress bar
 type ProgressBar struct {
-	width    int
-	progress float64
-	style    lipgloss.Style
-	fillChar string
+	width     int
+	progress  float64
+	style     lipgloss.Style
+	fillChar  string
 	emptyChar string
 }
 
