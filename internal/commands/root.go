@@ -40,8 +40,8 @@ func Execute() error {
 // showInteractiveMenu shows an interactive TUI menu
 func showInteractiveMenu(cmd *cobra.Command) {
 	m := ui.NewMenuModel()
-	// Use alternate screen buffer to properly manage terminal state
-	p := tea.NewProgram(m, tea.WithAltScreen())
+	// Don't use alternate screen - let menu and output share the same buffer
+	p := tea.NewProgram(m)
 
 	finalModel, err := p.Run()
 	if err != nil {
@@ -53,11 +53,14 @@ func showInteractiveMenu(cmd *cobra.Command) {
 	if menuModel, ok := finalModel.(ui.MenuModel); ok {
 		choice := menuModel.GetChoice()
 		if choice != "" {
+			// Clear the screen first to remove the menu
+			fmt.Print("\033[2J\033[H")
+
 			// Parse and execute the selected command
 			cmdParts := ui.FormatCommand(choice)
 
 			// Show info about the selected command
-			fmt.Printf("\n%s Running: anaphase %s\n\n", ui.RenderInfo("ℹ"), choice)
+			fmt.Printf("%s Running: anaphase %s\n\n", ui.RenderInfo("ℹ"), choice)
 
 			// Find and execute the subcommand
 			subCmd, _, err := cmd.Root().Find(cmdParts)
