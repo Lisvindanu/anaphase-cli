@@ -1,6 +1,8 @@
 package ui
 
 import (
+	"fmt"
+
 	"github.com/charmbracelet/lipgloss"
 )
 
@@ -108,4 +110,24 @@ func RenderListItem(text string, checked bool) string {
 		return CheckmarkStyle.Render() + " " + text
 	}
 	return "  " + text
+}
+
+// PrintSuccess prints a success message to stdout
+func PrintSuccess(msg string) {
+	fmt.Println(RenderSuccess(msg))
+}
+
+// PrintError prints an error message to stdout
+func PrintError(msg string) {
+	fmt.Println(RenderError(msg))
+}
+
+// PrintInfo prints an info message to stdout
+func PrintInfo(msg string) {
+	fmt.Println(RenderInfo(msg))
+}
+
+// PrintWarning prints a warning message to stdout
+func PrintWarning(msg string) {
+	fmt.Println(RenderWarning(msg))
 }
