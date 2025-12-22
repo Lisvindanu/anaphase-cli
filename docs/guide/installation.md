@@ -22,22 +22,39 @@ go version
 
 Use our install script that automatically configures your PATH:
 
-```bash
+::: code-group
+
+```bash [macOS/Linux]
 curl -fsSL https://raw.githubusercontent.com/lisvindanu/anaphase-cli/main/install.sh | bash
 ```
 
+```powershell [Windows]
+irm https://raw.githubusercontent.com/lisvindanu/anaphase-cli/main/install.ps1 | iex
+```
+
+:::
+
 Or download and run manually:
 
-```bash
+::: code-group
+
+```bash [macOS/Linux]
 curl -fsSL https://raw.githubusercontent.com/lisvindanu/anaphase-cli/main/install.sh -o install.sh
 chmod +x install.sh
 ./install.sh
 ```
 
+```powershell [Windows]
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/lisvindanu/anaphase-cli/main/install.ps1" -OutFile "install.ps1"
+powershell -ExecutionPolicy Bypass -File install.ps1
+```
+
+:::
+
 The script will:
 - Install the latest version via `go install`
-- Detect your shell (bash, zsh, fish)
-- Offer to add `~/go/bin` to your PATH automatically
+- Detect your shell (bash, zsh, fish) or PowerShell on Windows
+- Offer to add Go binary directory to your PATH automatically
 
 ### Option 2: Manual Install
 
@@ -63,6 +80,14 @@ source ~/.zshrc
 
 ```bash [Fish]
 set -gx PATH $HOME/go/bin $PATH
+```
+
+```powershell [Windows PowerShell]
+# Temporary (current session)
+$env:Path += ";$(go env GOPATH)\bin"
+
+# Permanent (all sessions)
+[Environment]::SetEnvironmentVariable("Path", $env:Path + ";$(go env GOPATH)\bin", "User")
 ```
 
 :::
