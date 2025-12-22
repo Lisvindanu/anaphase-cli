@@ -19,7 +19,7 @@ hero:
 features:
   - icon: 🎯
     title: Domain-Driven Design First
-    details: **Pembeda utama kami.** DDD sejati dengan Aggregates, Entities, Value Objects, dan Bounded Contexts. Bukan sekedar MVC dengan layer tambahan - tapi pola DDD taktis yang bisa scale.
+    details: "**Pembeda utama kami.** DDD sejati dengan Aggregates, Entities, Value Objects, dan Bounded Contexts. Bukan sekedar MVC dengan layer tambahan - tapi pola DDD taktis yang bisa scale."
 
   - icon: 🤖
     title: AI-Powered Generation
