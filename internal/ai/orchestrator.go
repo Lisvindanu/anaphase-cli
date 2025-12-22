@@ -34,7 +34,16 @@ func NewOrchestrator(cfg *Config, logger *slog.Logger) (*Orchestrator, error) {
 		)
 	}
 
-	// TODO: Add Groq provider
+	// Groq
+	if cfg.AI.Providers.Groq.Enabled && cfg.AI.Providers.Groq.APIKey != "" {
+		providerMap["groq"] = NewGroqProvider(
+			cfg.AI.Providers.Groq.APIKey,
+			cfg.AI.Providers.Groq.Model,
+			cfg.AI.Providers.Groq.Timeout,
+			cfg.AI.Providers.Groq.MaxRetries,
+		)
+	}
+
 	// TODO: Add OpenAI provider
 
 	// Validate at least one provider is available

@@ -4,9 +4,9 @@ Configure AI providers for domain generation.
 
 ## Supported Providers
 
-### Google Gemini (Recommended)
+### Google Gemini (Recommended for Beginners)
 
-Free tier with generous limits.
+Free tier with generous limits and excellent code generation quality.
 
 **Get API Key:**
 1. Visit [Google AI Studio](https://makersuite.google.com/app/apikey)
@@ -19,67 +19,137 @@ Free tier with generous limits.
 - Sufficient for most development
 
 **Models:**
-- `gemini-2.5-flash` (recommended) - Fast, accurate
+- `gemini-2.0-flash-exp` (recommended) - Fast, accurate
 - `gemini-pro` - More capable, slower
+
+### Groq (Recommended for Speed)
+
+**Extremely fast inference** with open-source models. Free during preview.
+
+**Get API Key:**
+1. Visit [Groq Console](https://console.groq.com/keys)
+2. Sign up for free account
+3. Create API key
+4. Copy your API key
+
+**Free Tier:**
+- Very generous rate limits
+- Faster than Gemini
+- Free during preview period
+
+**Models:**
+- `llama-3.3-70b-versatile` (default) - Fast, versatile
+- `mixtral-8x7b-32768` - Long context
+- `llama-3.1-70b-versatile` - Alternative option
 
 ## Configuration Methods
 
 ### Environment Variable (Simplest)
 
+**Gemini:**
 ```bash
-export GEMINI_API_KEY="your-api-key-here"
+export GEMINI_API_KEY="your-gemini-api-key"
 ```
 
-Add to shell profile:
+**Groq:**
+```bash
+export GROQ_API_KEY="your-groq-api-key"
+```
+
+Add to shell profile for persistence:
 ```bash
 # ~/.bashrc or ~/.zshrc
-export GEMINI_API_KEY="your-api-key-here"
+export GEMINI_API_KEY="your-gemini-api-key"
+export GROQ_API_KEY="your-groq-api-key"
 ```
 
 ### Configuration File (Recommended)
 
-Create `~/.anaphase/config.yaml`:
+Anaphase auto-creates `~/.anaphase/config.yaml` on first run. Edit to customize:
 
 ```yaml
 ai:
-  primary:
-    type: gemini
-    apiKey: YOUR_API_KEY_HERE
-    model: gemini-2.5-flash
-    timeout: 30s
-    retries: 3
-    temperature: 0.3
+  # Which provider to use first
+  primary_provider: gemini  # or: groq
+
+  # Fallback providers (tried in order if primary fails)
+  fallback_providers:
+    - groq
+    - openai
+
+  providers:
+    # Google Gemini
+    gemini:
+      enabled: true
+      api_key: ${GEMINI_API_KEY}
+      model: gemini-2.0-flash-exp
+      timeout: 30s
+      max_retries: 3
+
+    # Groq (Fast!)
+    groq:
+      enabled: true
+      api_key: ${GROQ_API_KEY}
+      model: llama-3.3-70b-versatile
+      timeout: 30s
+      max_retries: 3
+```
+
+**Quick Setup:**
+```bash
+# 1. Set API keys
+export GEMINI_API_KEY="your-key"
+export GROQ_API_KEY="your-key"
+
+# 2. Run any command to generate config
+anaphase gen domain "test"
+
+# 3. Edit config to choose provider
+vim ~/.anaphase/config.yaml
+# Change: primary_provider: groq
 ```
 
 ## Advanced Configuration
 
 ### Multiple Providers (Fallback)
 
-Set up automatic fallback:
+Anaphase automatically falls back to alternative providers if the primary fails:
 
 ```yaml
 ai:
-  # Primary provider
-  primary:
-    type: gemini
-    apiKey: PRIMARY_API_KEY
-    model: gemini-2.5-flash
-    timeout: 30s
-    retries: 3
+  # Try Gemini first
+  primary_provider: gemini
 
-  # Fallback if primary fails
-  secondary:
-    type: gemini
-    apiKey: SECONDARY_API_KEY
-    model: gemini-2.5-flash
-    timeout: 30s
-    retries: 2
+  # If Gemini fails, try Groq, then OpenAI
+  fallback_providers:
+    - groq
+    - openai
+
+  providers:
+    gemini:
+      enabled: true
+      api_key: ${GEMINI_API_KEY}
+      model: gemini-2.0-flash-exp
+
+    groq:
+      enabled: true
+      api_key: ${GROQ_API_KEY}
+      model: llama-3.3-70b-versatile
 ```
 
 **When fallback activates:**
 - Primary quota exceeded
 - Primary timeout
 - Primary network error
+- Primary API key invalid
+
+**Example fallback scenario:**
+1. Try Gemini (primary)
+2. Gemini fails with quota exceeded → Try Groq
+3. Groq succeeds ✅
+4. Generation continues with Groq
+
+**Best practice:** Set up both Gemini and Groq for maximum reliability!
 
 ### Caching
 
@@ -159,8 +229,9 @@ ai:
 Environment variables take precedence over config file:
 
 ```bash
-# Override API key
-export GEMINI_API_KEY="override-key"
+# Set provider API keys (auto-enables the provider)
+export GEMINI_API_KEY="your-gemini-key"
+export GROQ_API_KEY="your-groq-key"
 
 # Override config file path
 export ANAPHASE_CONFIG="/custom/path/config.yaml"
@@ -169,21 +240,40 @@ export ANAPHASE_CONFIG="/custom/path/config.yaml"
 export ANAPHASE_CACHE_ENABLED=false
 ```
 
+**Note:** Setting an API key via environment variable automatically enables that provider!
+
 ## Verification
 
 Test your configuration:
 
 ```bash
-# Generate a test domain
-anaphase gen domain \
-  --name test \
-  --prompt "Test entity with name field" \
-  --verbose
+# Generate a test domain with verbose logging
+anaphase gen domain "Test entity with name field" --verbose
 
-# Should see:
-# - Using provider: gemini
-# - Model: gemini-2.5-flash
-# - Cache: enabled/disabled
+# You should see output like:
+# time=... level=INFO msg="attempting generation" provider=gemini
+# time=... level=INFO msg="generation successful" provider=gemini tokens=1234 cost=$0.000000 duration=2.5s
+
+# Or if using Groq:
+# time=... level=INFO msg="attempting generation" provider=groq
+# time=... level=INFO msg="generation successful" provider=groq tokens=1915 cost=$0.000000 duration=1.6s
+```
+
+**Check which provider is being used:**
+```bash
+cat ~/.anaphase/config.yaml | grep primary_provider
+```
+
+**Test fallback:**
+```bash
+# Remove primary provider API key temporarily
+unset GEMINI_API_KEY
+
+# Generate domain - should fallback to Groq
+anaphase gen domain "Test" --verbose
+# You'll see:
+# level=WARN msg="provider not available" provider=gemini
+# level=INFO msg="attempting generation" provider=groq
 ```
 
 ## Troubleshooting
@@ -191,22 +281,25 @@ anaphase gen domain \
 ### API Key Not Found
 
 ```
-Error: GEMINI_API_KEY not set
+Error: no AI providers configured - please set at least one API key
 ```
 
 **Solution:**
-```bash
-# Set environment variable
-export GEMINI_API_KEY="your-key"
+Set at least one provider's API key:
 
-# Or create config file
-mkdir -p ~/.anaphase
-cat > ~/.anaphase/config.yaml << EOF
-ai:
-  primary:
-    type: gemini
-    apiKey: your-key
-EOF
+```bash
+# Option 1: Use Gemini
+export GEMINI_API_KEY="your-gemini-key"
+
+# Option 2: Use Groq (faster!)
+export GROQ_API_KEY="your-groq-key"
+
+# Best: Use both for fallback
+export GEMINI_API_KEY="your-gemini-key"
+export GROQ_API_KEY="your-groq-key"
+
+# Verify it works
+anaphase gen domain "Test" --verbose
 ```
 
 ### Quota Exceeded

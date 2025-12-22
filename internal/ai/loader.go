@@ -140,21 +140,25 @@ func overrideWithEnv(config *Config) {
 	// Gemini
 	if key := os.Getenv("GEMINI_API_KEY"); key != "" {
 		config.AI.Providers.Gemini.APIKey = key
+		config.AI.Providers.Gemini.Enabled = true
 	}
 
 	// Groq
 	if key := os.Getenv("GROQ_API_KEY"); key != "" {
 		config.AI.Providers.Groq.APIKey = key
+		config.AI.Providers.Groq.Enabled = true
 	}
 
 	// OpenAI
 	if key := os.Getenv("OPENAI_API_KEY"); key != "" {
 		config.AI.Providers.OpenAI.APIKey = key
+		config.AI.Providers.OpenAI.Enabled = true
 	}
 
 	// Claude
 	if key := os.Getenv("CLAUDE_API_KEY"); key != "" {
 		config.AI.Providers.Claude.APIKey = key
+		config.AI.Providers.Claude.Enabled = true
 	}
 
 	// Parse durations (viper doesn't auto-parse to time.Duration from env)
