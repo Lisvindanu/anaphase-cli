@@ -222,7 +222,7 @@ func generateCreateTable(tableName, driver string) string {
 
 	// Add trigger for updated_at (PostgreSQL)
 	if driver == "postgres" {
-		content.WriteString(fmt.Sprintf("-- Trigger to auto-update updated_at\n"))
+		content.WriteString("-- Trigger to auto-update updated_at\n")
 		content.WriteString(fmt.Sprintf("CREATE OR REPLACE FUNCTION update_%s_updated_at()\n", tableName))
 		content.WriteString("RETURNS TRIGGER AS $$\n")
 		content.WriteString("BEGIN\n")

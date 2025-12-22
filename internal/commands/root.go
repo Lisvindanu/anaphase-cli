@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 
+	tea "github.com/charmbracelet/bubbletea"
+	"github.com/lisvindanu/anaphase-cli/internal/ui"
 	"github.com/spf13/cobra"
 )
 
@@ -24,11 +26,52 @@ Features:
   - Complete test generation
   - OpenAPI/Swagger documentation`,
 	Version: version,
+	Run: func(cmd *cobra.Command, args []string) {
+		// Show interactive menu when no subcommand is provided
+		showInteractiveMenu(cmd)
+	},
 }
 
 // Execute runs the root command
 func Execute() error {
 	return rootCmd.Execute()
+}
+
+// showInteractiveMenu shows an interactive TUI menu
+func showInteractiveMenu(cmd *cobra.Command) {
+	m := ui.NewMenuModel()
+	p := tea.NewProgram(m)
+
+	finalModel, err := p.Run()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error running menu: %v\n", err)
+		os.Exit(1)
+	}
+
+	// Get the selected command
+	if menuModel, ok := finalModel.(ui.MenuModel); ok {
+		choice := menuModel.GetChoice()
+		if choice != "" {
+			// Parse and execute the selected command
+			cmdParts := ui.FormatCommand(choice)
+
+			// Show info about the selected command
+			fmt.Printf("\n%s Running: anaphase %s\n\n", ui.RenderInfo("ℹ"), choice)
+
+			// Find and execute the subcommand
+			subCmd, _, err := cmd.Root().Find(cmdParts)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Error finding command: %v\n", err)
+				return
+			}
+
+			// Set args and execute
+			subCmd.SetArgs(cmdParts[1:]) // Skip the first part which is the command name
+			if err := subCmd.Execute(); err != nil {
+				os.Exit(1)
+			}
+		}
+	}
 }
 
 func init() {

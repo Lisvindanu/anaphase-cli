@@ -173,7 +173,7 @@ func (g *RepositoryGenerator) generatePostgresSave(b *strings.Builder, entityNam
 	tableName := toSnakeCase(entityName) + "s"
 
 	b.WriteString("\tquery := `\n")
-	b.WriteString(fmt.Sprintf("\t\tINSERT INTO %s (id, created_at, updated_at)\n", tableName))
+	fmt.Fprintf(b, "\t\tINSERT INTO %s (id, created_at, updated_at)\n", tableName)
 	b.WriteString("\t\tVALUES ($1, $2, $3)\n")
 	b.WriteString("\t\tON CONFLICT (id) DO UPDATE\n")
 	b.WriteString("\t\tSET updated_at = $3\n")
@@ -186,7 +186,7 @@ func (g *RepositoryGenerator) generatePostgresSave(b *strings.Builder, entityNam
 	b.WriteString("\t)\n\n")
 
 	b.WriteString("\tif err != nil {\n")
-	b.WriteString(fmt.Sprintf("\t\treturn fmt.Errorf(\"save %s: %%w\", err)\n", g.domainName))
+	fmt.Fprintf(b, "\t\treturn fmt.Errorf(\"save %s: %%w\", err)\n", g.domainName)
 	b.WriteString("\t}\n\n")
 
 	b.WriteString("\treturn nil\n")
@@ -195,11 +195,11 @@ func (g *RepositoryGenerator) generatePostgresSave(b *strings.Builder, entityNam
 func (g *RepositoryGenerator) generatePostgresFindByID(b *strings.Builder, entityName string) {
 	tableName := toSnakeCase(entityName) + "s"
 
-	b.WriteString(fmt.Sprintf("\tvar result entity.%s\n\n", entityName))
+	fmt.Fprintf(b, "\tvar result entity.%s\n\n", entityName)
 
 	b.WriteString("\tquery := `\n")
 	b.WriteString("\t\tSELECT id, created_at, updated_at\n")
-	b.WriteString(fmt.Sprintf("\t\tFROM %s\n", tableName))
+	fmt.Fprintf(b, "\t\tFROM %s\n", tableName)
 	b.WriteString("\t\tWHERE id = $1\n")
 	b.WriteString("\t`\n\n")
 
@@ -211,9 +211,9 @@ func (g *RepositoryGenerator) generatePostgresFindByID(b *strings.Builder, entit
 
 	b.WriteString("\tif err != nil {\n")
 	b.WriteString("\t\tif err == pgx.ErrNoRows {\n")
-	b.WriteString(fmt.Sprintf("\t\t\treturn nil, fmt.Errorf(\"%s not found\")\n", g.domainName))
+	fmt.Fprintf(b, "\t\t\treturn nil, fmt.Errorf(\"%s not found\")\n", g.domainName)
 	b.WriteString("\t\t}\n")
-	b.WriteString(fmt.Sprintf("\t\treturn nil, fmt.Errorf(\"find %s: %%w\", err)\n", g.domainName))
+	fmt.Fprintf(b, "\t\treturn nil, fmt.Errorf(\"find %s: %%w\", err)\n", g.domainName)
 	b.WriteString("\t}\n\n")
 
 	b.WriteString("\treturn &result, nil\n")
@@ -249,7 +249,8 @@ func (g *RepositoryGenerator) generateSQL(outputDir string) (string, error) {
 
 	b.WriteString(fmt.Sprintf("-- Schema for %s table\n\n", tableName))
 
-	if g.config.Database == "postgres" {
+	switch g.config.Database {
+	case "postgres":
 		b.WriteString(fmt.Sprintf("CREATE TABLE IF NOT EXISTS %s (\n", tableName))
 		b.WriteString("\tid UUID PRIMARY KEY,\n")
 		b.WriteString("\tcreated_at TIMESTAMP NOT NULL DEFAULT NOW(),\n")
@@ -258,7 +259,7 @@ func (g *RepositoryGenerator) generateSQL(outputDir string) (string, error) {
 		b.WriteString(");\n\n")
 
 		b.WriteString(fmt.Sprintf("CREATE INDEX IF NOT EXISTS idx_%s_created_at ON %s(created_at);\n", tableName, tableName))
-	} else if g.config.Database == "mysql" {
+	case "mysql":
 		b.WriteString(fmt.Sprintf("CREATE TABLE IF NOT EXISTS %s (\n", tableName))
 		b.WriteString("\tid CHAR(36) PRIMARY KEY,\n")
 		b.WriteString("\tcreated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n")
