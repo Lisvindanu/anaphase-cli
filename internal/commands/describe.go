@@ -44,43 +44,25 @@ func init() {
 }
 
 func runDescribe(cmd *cobra.Command, args []string) error {
-	// Create steps for progress
-	steps := []string{
-		"Scanning project structure",
-		"Analyzing domains",
-		"Building dependency graph",
-		"Generating diagrams",
-	}
+	// Generate diagram directly without UI
+	gen := generator.NewDiagramGenerator(&generator.DiagramConfig{
+		Format: describeFormat,
+		Type:   describeType,
+	})
 
-	progress := ui.NewMultiStepProgress(steps)
-
-	// Create Bubble Tea program
-	model := &describeModel{
-		format:   describeFormat,
-		output:   describeOutput,
-		diagType: describeType,
-		progress: progress,
-	}
-
-	p := tea.NewProgram(model)
-	finalModel, err := p.Run()
+	diagram, err := gen.Generate()
 	if err != nil {
-		return fmt.Errorf("failed to run UI: %w", err)
+		return fmt.Errorf("generate diagram: %w", err)
 	}
 
-	// Check for errors
-	if m, ok := finalModel.(*describeModel); ok {
-		if m.err != nil {
-			return m.err
+	// Save to file or print to stdout
+	if describeOutput != "" {
+		if err := os.WriteFile(describeOutput, []byte(diagram), 0644); err != nil {
+			return fmt.Errorf("write output file: %w", err)
 		}
-
-		// Print or save output
-		if describeOutput != "" {
-			fmt.Println(ui.RenderSuccess("Architecture diagram saved to: " + describeOutput))
-		} else {
-			fmt.Println()
-			fmt.Println(m.diagram)
-		}
+		fmt.Println(ui.RenderSuccess("Architecture diagram saved to: " + describeOutput))
+	} else {
+		fmt.Println(diagram)
 	}
 
 	return nil
