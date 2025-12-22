@@ -1,15 +1,151 @@
 # Domain-Driven Design
 
-Understanding DDD concepts and how Anaphase implements them.
+**This is what makes Anaphase different.** While other frameworks use MVC or Active Record patterns, Anaphase enforces true Domain-Driven Design principles that keep your business logic clean, testable, and maintainable.
 
 ## What is DDD?
 
-Domain-Driven Design is an approach to software development that:
+Domain-Driven Design (DDD) is an approach to software development for **complex domains** that:
 
 1. **Focuses on the core domain** and domain logic
 2. **Uses a ubiquitous language** shared by developers and domain experts
 3. **Models complex domains** through entities, value objects, and aggregates
 4. **Isolates domain logic** from infrastructure concerns
+
+## Why DDD Over MVC?
+
+### The Problem with Traditional MVC
+
+Most Go frameworks (like Goravel) use the **MVC pattern with Active Record**:
+
+```go
+// ❌ MVC/Active Record: Business logic scattered everywhere
+type Order struct {
+    orm.Model
+    UserID      uint
+    TotalAmount float64
+    Status      string  // Just a string, no validation
+}
+
+// Logic in Controller
+func (c *OrderController) Cancel(ctx *gin.Context) {
+    order := models.Order.Find(id)
+    if order.Status != "pending" {  // Business rule in controller
+        return errors.New("cannot cancel")
+    }
+    order.Status = "cancelled"
+    order.Save()  // Coupled to database
+}
+
+// Logic in Service
+func (s *OrderService) CalculateTotal(order *Order) {
+    // More business logic scattered in services
+}
+```
+
+**Problems:**
+- ❌ Business logic scattered across controllers, services, models
+- ❌ Domain knowledge mixed with technical concerns (DB, HTTP)
+- ❌ Difficult to test (everything coupled to framework)
+- ❌ Hard to understand (where is the business logic?)
+- ❌ Cannot change (modifying one rule affects many files)
+
+### The DDD Solution
+
+Anaphase enforces **Rich Domain Models** where business logic lives in the domain:
+
+```go
+// ✅ DDD: Business logic encapsulated in domain
+type Order struct {
+    ID              uuid.UUID
+    Customer        *Customer      // Aggregate Root
+    Items           []OrderItem    // Entities
+    ShippingAddress Address        // Value Object
+    Status          OrderStatus    // Value Object (type-safe)
+    Total           Money          // Value Object (immutable)
+}
+
+// Business logic IN the domain
+func (o *Order) Cancel() error {
+    // Business rule enforced here
+    if !o.CanBeCancelled() {
+        return ErrCannotCancelOrder
+    }
+
+    o.Status = OrderCancelled
+    o.RecordEvent(OrderCancelledEvent{OrderID: o.ID})
+    return nil
+}
+
+func (o *Order) CanBeCancelled() bool {
+    // Complex business rules in one place
+    return o.Status == OrderPending || o.Status == OrderConfirmed
+}
+
+// Invariants protected
+func (o *Order) AddItem(product *Product, quantity int) error {
+    if quantity <= 0 {
+        return ErrInvalidQuantity
+    }
+
+    item := NewOrderItem(product, quantity)
+    o.Items = append(o.Items, item)
+    o.RecalculateTotal() // Aggregate maintains consistency
+    return nil
+}
+```
+
+**Benefits:**
+- ✅ All business logic in domain (easy to find and understand)
+- ✅ Pure Go (no framework dependency, easy to test)
+- ✅ Type-safe (compiler catches errors)
+- ✅ Self-documenting (code reads like business language)
+- ✅ Change-friendly (modify rules in one place)
+
+## When to Use DDD vs MVC
+
+### Use DDD (Anaphase) When:
+
+✅ **Complex Business Logic**
+- Multiple business rules per operation
+- Rules that change frequently
+- Domain experts involved in requirements
+
+✅ **Long-term Projects**
+- Enterprise applications
+- 5+ year lifecycle
+- Multiple teams working on different domains
+
+✅ **Microservices Architecture**
+- Clear bounded contexts
+- Independent deployments
+- Different teams own different services
+
+✅ **Domain Complexity**
+- E-commerce with inventory, pricing rules, promotions
+- Financial systems with complex calculations
+- Healthcare with regulatory requirements
+- Logistics with route optimization
+
+### Use MVC (Goravel) When:
+
+✅ **Simple CRUD**
+- Basic create, read, update, delete
+- Few business rules
+- Data-centric applications
+
+✅ **Rapid Prototyping**
+- MVP or proof of concept
+- Short-term projects
+- Quick demos
+
+✅ **Small Team**
+- 1-3 developers
+- Full-stack developers
+- Everyone knows everything
+
+## Key DDD Concepts
+
+Understanding these tactical patterns is crucial for using Anaphase effectively:
 
 ## Core Building Blocks
 

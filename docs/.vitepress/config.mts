@@ -3,7 +3,21 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: 'Anaphase',
   description: 'AI-Powered Golang Microservice Generator',
-  lang: 'en-US',
+
+  locales: {
+    root: {
+      label: 'English',
+      lang: 'en-US',
+      link: '/'
+    },
+    id: {
+      label: 'Bahasa Indonesia',
+      lang: 'id-ID',
+      link: '/id/',
+      title: 'Anaphase',
+      description: 'Generator Microservice Golang dengan AI'
+    }
+  },
 
   // SEO
   head: [

@@ -330,8 +330,108 @@ go mod download
 go mod tidy
 ```
 
+## Updating Anaphase
+
+Keep Anaphase up-to-date to get the latest features and bug fixes.
+
+### Check Current Version
+
+```bash
+anaphase --version
+```
+
+### Update to Latest Version
+
+::: code-group
+
+```bash [Quick Update]
+# Recommended: Use install script
+curl -fsSL https://raw.githubusercontent.com/lisvindanu/anaphase-cli/main/install.sh | bash
+```
+
+```bash [Manual Update]
+# Using go install
+go install github.com/lisvindanu/anaphase-cli/cmd/anaphase@latest
+```
+
+```bash [From Source]
+# Pull latest changes
+cd anaphase-cli
+git pull origin main
+
+# Rebuild
+go install ./cmd/anaphase
+```
+
+```bash [Docker]
+# Pull latest code
+cd /var/www/anaphase-cli
+git pull origin main
+
+# Rebuild image
+docker compose build
+
+# Or pull from registry
+docker pull ghcr.io/lisvindanu/anaphase-cli:latest
+```
+
+:::
+
+### What's New
+
+Check the [changelog](https://github.com/lisvindanu/anaphase-cli/releases) for new features:
+
+**Recent Updates:**
+- ✨ Provider Selection CLI - Choose AI provider with `--provider` flag
+- ✨ Config Management - Manage providers with `anaphase config`
+- ✨ Middleware Generator - Generate auth, rate limit, logging, CORS
+- ✨ Interactive Mode - Guided prompts with `-i` flag
+- ✨ Code Quality Tools - Lint, format, and validate code
+- ✨ Migration Generator - Database migration files with smart SQL
+
+### Verify Update
+
+```bash
+# Check new version
+anaphase --version
+
+# Test new features
+anaphase config show-providers
+anaphase gen middleware --help
+anaphase quality --help
+```
+
+### Update Configuration
+
+After updating, your configuration may need updates:
+
+```bash
+# Check current config
+anaphase config list
+
+# Update provider if needed
+anaphase config set-provider groq
+
+# Health check all providers
+anaphase config check
+```
+
+### Rollback (If Needed)
+
+If you need to rollback to a specific version:
+
+```bash
+# Install specific version
+go install github.com/lisvindanu/anaphase-cli/cmd/anaphase@v1.0.0
+
+# Or from source at specific tag
+git checkout v1.0.0
+go install ./cmd/anaphase
+```
+
 ## Next Steps
 
 - [Quick Start](/guide/quick-start) - Build your first service
 - [Architecture](/guide/architecture) - Understand the patterns
 - [AI Generation](/guide/ai-generation) - Learn about AI features
+- [Domain-Driven Design](/guide/ddd) - **Our key differentiator**
