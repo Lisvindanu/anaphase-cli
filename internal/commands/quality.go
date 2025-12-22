@@ -100,7 +100,14 @@ func runLint(cmd *cobra.Command, args []string) error {
 	// Try golangci-lint first
 	if isCommandAvailable("golangci-lint") {
 		fmt.Println("📋 Running golangci-lint...")
-		cmdArgs := []string{"run", path}
+
+		// Convert path to Go package notation if needed
+		lintPath := path
+		if path == "." {
+			lintPath = "./..."
+		}
+
+		cmdArgs := []string{"run", lintPath}
 		if lintFix {
 			cmdArgs = append(cmdArgs, "--fix")
 		}
