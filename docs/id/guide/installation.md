@@ -103,13 +103,21 @@ go mod download
 go install ./cmd/anaphase
 ```
 
-## Konfigurasi AI Provider
+## Konfigurasi AI Provider (Opsional)
 
-Anaphase membutuhkan AI provider untuk domain generation. Saat ini support:
+::: info AI Bersifat Opsional!
+**Baru di v0.4**: Anaphase bekerja langsung dengan **Template Mode** - tidak perlu AI!
 
-- **Google Gemini** (Direkomendasikan, tersedia tier gratis)
+Hanya konfigurasi AI provider jika Anda ingin **AI Mode** untuk generation yang lebih advanced.
+:::
 
-### Dapatkan Gemini API Key
+AI provider yang didukung:
+- **Google Gemini** (Direkomendasikan, tier gratis cukup generous)
+- **OpenAI** (GPT-4, GPT-3.5-turbo)
+- **Anthropic Claude** (Claude 3.5 Sonnet)
+- **Groq** (Inference cepat, tier gratis)
+
+### Dapatkan API Key (Opsional)
 
 1. Kunjungi [Google AI Studio](https://makersuite.google.com/app/apikey)
 2. Sign in dengan akun Google Anda
@@ -117,7 +125,7 @@ Anaphase membutuhkan AI provider untuk domain generation. Saat ini support:
 4. Copy API key Anda
 
 ::: tip Free Tier
-Google Gemini menawarkan free tier yang cukup generous:
+Google Gemini menawarkan tier gratis yang generous:
 - 60 requests per menit
 - Sempurna untuk development dan project kecil
 :::
@@ -237,45 +245,58 @@ docker run -d \
 
 ## Verifikasi Instalasi
 
-Test bahwa semuanya berjalan:
+Test bahwa semuanya berjalan - **tidak perlu konfigurasi**:
 
 ```bash
 # Check version
 anaphase --version
 
-# Check help
-anaphase --help
+# Coba menu interaktif
+anaphase
 
 # Initialize project test
-mkdir test-project
-cd test-project
-anaphase init
+anaphase init my-test --db sqlite
+cd my-test
 ```
 
-Anda akan melihat:
+Anda akan melihat menu interaktif atau project berhasil dibuat:
 
 ```
-✅ Project initialized successfully!
+✅ Project created with auto-generated .env and dependencies!
 
-Next steps:
-  1. Configure your AI provider (see docs)
-  2. Generate your first domain:
-     anaphase gen domain --name user --prompt "User dengan email dan nama"
-  3. Run the API:
-     go run cmd/api/main.go
+cd my-test
+anaphase  # Generate domains secara interaktif
+make run  # Langsung jalan!
 ```
+
+::: tip Coba Template Mode Dulu
+Generate domain pertama Anda tanpa AI:
+```bash
+anaphase gen domain
+# Enter: Entity name: User
+# Enter: Fields: name:string, email:string
+# ✅ Generated entity, repository, dan service!
+```
+:::
 
 ## Environment Variables
 
 Anaphase menggunakan environment variables berikut:
 
-| Variable | Deskripsi | Default |
-|----------|-------------|---------|
-| `GEMINI_API_KEY` | Google Gemini API key | Required |
-| `DATABASE_URL` | Database connection string | `postgres://...` |
-| `PORT` | HTTP server port | `8080` |
-| `LOG_LEVEL` | Logging level (`debug`, `info`, `warn`, `error`) | `info` |
-| `ANAPHASE_CONFIG` | Config file path | `~/.anaphase/config.yaml` |
+| Variable | Deskripsi | Default | Required |
+|----------|-------------|---------|----------|
+| `GEMINI_API_KEY` | Google Gemini API key (untuk AI Mode) | - | ❌ Opsional |
+| `OPENAI_API_KEY` | OpenAI API key (untuk AI Mode) | - | ❌ Opsional |
+| `ANTHROPIC_API_KEY` | Claude API key (untuk AI Mode) | - | ❌ Opsional |
+| `GROQ_API_KEY` | Groq API key (untuk AI Mode) | - | ❌ Opsional |
+| `DATABASE_URL` | Database connection string | Auto-generated | ❌ Opsional |
+| `PORT` | HTTP server port | `8080` | ❌ Opsional |
+| `LOG_LEVEL` | Logging level | `info` | ❌ Opsional |
+| `ANAPHASE_CONFIG` | Config file path | `~/.anaphase/config.yaml` | ❌ Opsional |
+
+::: info
+Semua environment variables bersifat **opsional**. Anaphase bekerja out of the box dengan Template Mode dan konfigurasi yang auto-generated.
+:::
 
 ## Troubleshooting
 
@@ -381,11 +402,18 @@ docker pull ghcr.io/lisvindanu/anaphase-cli:latest
 
 Cek [changelog](https://github.com/lisvindanu/anaphase-cli/releases) untuk fitur baru:
 
-**Update Terbaru:**
+**v0.4.0 - Rilis Terbaru:**
+- 🎨 **Menu Interaktif** - TUI cantik dengan search (Ctrl+K) dan filtering
+- 📝 **Template Mode** - Bekerja tanpa AI! Scaffolding instan untuk CRUD standar
+- 🔍 **Documentation Search** - Tekan Ctrl+K di situs docs
+- ⚙️ **Auto-Setup** - File .env dan dependencies auto-generated
+- 🗄️ **Database Selection** - Pilih database saat project init
+- 🎯 **Zero-Config** - Tidak perlu setup, langsung bisa dipakai
+
+**Update Sebelumnya:**
 - ✨ Provider Selection CLI - Pilih AI provider dengan flag `--provider`
 - ✨ Config Management - Kelola providers dengan `anaphase config`
 - ✨ Middleware Generator - Generate auth, rate limit, logging, CORS
-- ✨ Interactive Mode - Guided prompts dengan flag `-i`
 - ✨ Code Quality Tools - Lint, format, dan validasi code
 - ✨ Migration Generator - File database migration dengan smart SQL
 
@@ -431,7 +459,7 @@ go install ./cmd/anaphase
 
 ## Langkah Selanjutnya
 
-- [Mulai Cepat](/guide/quick-start) - Build service pertama Anda
+- [Quick Start](/id/guide/quick-start) - Build service pertama Anda
 - [Architecture](/guide/architecture) - Pahami pattern yang digunakan
 - [AI Generation](/guide/ai-generation) - Pelajari fitur AI
 - [Domain-Driven Design](/guide/ddd) - **Key differentiator kami**

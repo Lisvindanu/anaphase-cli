@@ -4,7 +4,7 @@ layout: home
 hero:
   name: Anaphase
   text: Generator Microservice dengan AI
-  tagline: Generate microservice Golang production-ready dengan AI. Dari ide ke deployment dalam hitungan menit.
+  tagline: CLI interaktif yang menghasilkan microservice Golang production-ready. Bisa dengan atau tanpa AI - pilihan ada di tangan Anda.
   image:
     src: /hero-image.svg
     alt: Anaphase
@@ -21,13 +21,17 @@ features:
     title: Domain-Driven Design First
     details: "**Pembeda utama kami.** DDD sejati dengan Aggregates, Entities, Value Objects, dan Bounded Contexts. Bukan sekedar MVC dengan layer tambahan - tapi pola DDD taktis yang bisa scale."
 
+  - icon: 🎨
+    title: Menu Interaktif
+    details: "**BARU di v0.4!** Menu TUI yang cantik untuk semua command. Tidak perlu hapal syntax - cukup jalankan 'anaphase' dan pilih yang Anda butuhkan. Support keyboard navigation dan filtering."
+
   - icon: 🤖
-    title: AI-Powered Generation
-    details: Gunakan berbagai AI provider (Gemini, Groq, OpenAI, Claude) untuk generate domain model lengkap dari bahasa natural. Deskripsikan logika bisnis Anda, dapat code yang sesuai DDD.
+    title: Dual Mode Generation
+    details: "**AI Mode:** Pakai Gemini, OpenAI, atau Claude untuk smart generation. **Template Mode:** Bekerja tanpa API key menggunakan intelligent templates. Pilihan ada di tangan Anda, selalu."
 
   - icon: ⚡
     title: Super Cepat
-    details: Generate CRUD API lengkap dengan handlers, repositories, dan tests dalam hitungan detik. Auto-wire dependencies dan langsung running.
+    details: Generate CRUD API lengkap dengan handlers, repositories, dan tests dalam hitungan detik. Auto-setup semua - configs, dependencies, file .env. Zero manual setup.
 
   - icon: 🎯
     title: Type-Safe
@@ -52,27 +56,70 @@ features:
 
 ## Contoh Cepat
 
-Generate microservice e-commerce lengkap dalam 3 perintah:
+Generate microservice e-commerce lengkap dengan menu interaktif:
 
 ```bash
-# Initialize project
-anaphase init my-ecommerce
+# Cukup jalankan anaphase - tidak perlu hapal command!
+anaphase
 
-# Generate domain dengan AI
-anaphase gen domain "Customer dengan email, nama, dan alamat billing"
+# Menu interaktif muncul:
+⚡ Anaphase CLI - DDD Microservice Generator
+   💡 Commands marked [AI] require API key setup
 
-# Auto-wire dan jalankan
-anaphase wire
-go run cmd/api/main.go
+▶ 🚀 Initialize Project
+  🤖 Generate Domain [AI]
+  📡 Generate Handler
+  💾 Generate Repository
+  ...
+
+# Pilih "Initialize Project"
+Project name: my-ecommerce
+Database (postgres/mysql/sqlite): postgres
+
+✅ Project created with auto-generated .env and dependencies!
+
+cd my-ecommerce
+anaphase  # Generate domains secara interaktif
+make run  # Langsung jalan!
 ```
 
 API Anda sekarang running di `http://localhost:8080` dengan:
-- ✅ CRUD endpoints untuk customers
-- ✅ PostgreSQL repository dengan migrations
+- ✅ CRUD endpoints
+- ✅ Database repository dengan schema yang proper
 - ✅ Input validation dan error handling
-- ✅ Structured logging
+- ✅ Structured logging dengan konfigurasi yang tepat
 - ✅ Graceful shutdown
 - ✅ Health checks
+- ✅ **Semua dependencies sudah terinstall dan siap pakai**
+
+## 🆕 Template Mode - Tidak Perlu AI!
+
+**v0.4.0** memperkenalkan Template Mode sebagai fallback otomatis ketika AI tidak dikonfigurasi:
+
+```bash
+anaphase
+# Pilih: Generate Domain
+# AI tidak dikonfigurasi → Fallback otomatis ke Template Mode
+
+📝 Template Mode - Domain Generation
+
+Entity name: Product
+Fields: name:string, price:float64, stock:int, sku:string
+
+✅ Generated:
+  ✓ internal/core/entity/product.go
+  ✓ internal/core/port/product_repository.go
+  ✓ internal/core/port/product_service.go
+```
+
+### Kapan Menggunakan Mode Mana
+
+| Mode | Cocok Untuk | Butuh API Key |
+|------|----------|-----------------|
+| **AI Mode** | Business logic kompleks, deskripsi bahasa natural | ✅ Ya |
+| **Template Mode** | Entity CRUD standar, scaffolding cepat | ❌ Tidak |
+
+Kedua mode menghasilkan **kode 100% DDD-compliant** - tinggal pilih yang sesuai workflow Anda!
 
 ## Kenapa Anaphase vs Goravel?
 
