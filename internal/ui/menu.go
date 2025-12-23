@@ -44,6 +44,7 @@ type MenuModel struct {
 
 func NewMenuModel() MenuModel {
 	items := []list.Item{
+		// Project Setup
 		MenuItem{
 			title:        "🚀 Initialize Project",
 			desc:         "Create a new microservice project with DDD structure",
@@ -51,63 +52,71 @@ func NewMenuModel() MenuModel {
 			needsInput:   true,
 			inputPrompts: []string{"Project name"},
 		},
+
+		// Code Generation (AI-powered)
 		MenuItem{
-			title:        "🤖 Generate Domain",
-			desc:         "AI-powered domain generation from natural language",
+			title:        "🤖 Generate Domain [AI]",
+			desc:         "⚡ AI-powered domain generation from natural language",
 			command:      "gen domain",
 			needsInput:   true,
 			inputPrompts: []string{"Domain description (e.g., 'user authentication with email and password')"},
 		},
+
+		// Code Generation (Template-based)
 		MenuItem{
 			title:        "📡 Generate Handler",
-			desc:         "Create HTTP handlers with CRUD endpoints",
+			desc:         "📝 Template-based HTTP handlers with CRUD endpoints",
 			command:      "gen handler",
 			needsInput:   true,
 			inputPrompts: []string{"Handler name (e.g., 'user', 'product')"},
 		},
 		MenuItem{
 			title:        "💾 Generate Repository",
-			desc:         "Create database repository (Postgres/MySQL/Mongo)",
+			desc:         "📝 Template-based database repository",
 			command:      "gen repository",
 			needsInput:   true,
 			inputPrompts: []string{"Repository name (e.g., 'user', 'product')"},
 		},
 		MenuItem{
 			title:        "🛡️  Generate Middleware",
-			desc:         "Create middleware (auth, ratelimit, logging, cors)",
+			desc:         "📝 Template-based middleware (auth, ratelimit, logging, cors)",
 			command:      "gen middleware",
 			needsInput:   true,
 			inputPrompts: []string{"Middleware type (auth/ratelimit/logging/cors)"},
 		},
 		MenuItem{
 			title:        "📊 Generate Migration",
-			desc:         "Create database migration files",
+			desc:         "📝 Template-based database migration files",
 			command:      "gen migration",
 			needsInput:   true,
 			inputPrompts: []string{"Migration name (e.g., 'create_users_table')"},
 		},
+
+		// Analysis & Tools
 		MenuItem{
 			title:      "🔌 Auto-Wire Dependencies",
-			desc:       "Automatic dependency injection with AST discovery",
+			desc:       "🔍 Automatic dependency injection with AST discovery",
 			command:    "wire",
 			needsInput: false,
 		},
 		MenuItem{
 			title:      "📐 Describe Architecture",
-			desc:       "Generate architecture diagrams (Mermaid/ASCII)",
+			desc:       "🔍 Generate architecture diagrams (Mermaid/ASCII)",
 			command:    "describe",
 			needsInput: false,
 		},
 		MenuItem{
 			title:       "✨ Code Quality",
-			desc:        "Lint, format, and validate code",
+			desc:        "🔍 Lint, format, and validate code",
 			command:     "quality",
 			subcommands: []string{"lint", "format", "validate"},
 			needsInput:  false,
 		},
+
+		// Configuration
 		MenuItem{
 			title:       "⚙️  Configuration",
-			desc:        "Manage AI providers and settings",
+			desc:        "⚙️  Manage AI providers and settings",
 			command:     "config",
 			subcommands: []string{"list", "set-provider", "check"},
 			needsInput:  false,
@@ -115,10 +124,10 @@ func NewMenuModel() MenuModel {
 	}
 
 	const defaultWidth = 80
-	const listHeight = 20
+	const listHeight = 22
 
 	l := list.New(items, itemDelegate{}, defaultWidth, listHeight)
-	l.Title = "🎯 Anaphase CLI - AI-Powered Microservice Generator"
+	l.Title = "⚡ Anaphase CLI - DDD Microservice Generator\n   💡 Commands marked [AI] require API key setup"
 	l.SetShowStatusBar(false)
 	l.SetFilteringEnabled(true)
 	l.Styles.Title = titleStyle
@@ -200,7 +209,9 @@ func (m MenuModel) View() string {
 		return "\n  👋 Goodbye!\n\n"
 	}
 
-	return "\n" + m.list.View() + "\n\n" + helpStyle.Render("  Press '/' to filter • ↑↓ to navigate • Enter to select • Ctrl+C to quit") + "\n"
+	helpText := "  ⌨️  Keys: ↑↓ navigate • / filter • Enter select • q/Ctrl+C quit\n" +
+		"  💡 Tip: Use 'anaphase config set-provider' to setup AI"
+	return "\n" + m.list.View() + "\n\n" + helpStyle.Render(helpText) + "\n"
 }
 
 func (m MenuModel) GetChoice() string {
