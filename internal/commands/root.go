@@ -42,13 +42,16 @@ func Execute() error {
 // showInteractiveMenu shows an interactive TUI menu
 func showInteractiveMenu(cmd *cobra.Command) {
 	m := ui.NewMenuModel()
-	p := tea.NewProgram(m, tea.WithAltScreen())
+	p := tea.NewProgram(m)
 
 	finalModel, err := p.Run()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error running menu: %v\n", err)
 		os.Exit(1)
 	}
+
+	// Clear screen after menu exits
+	fmt.Print("\033[2J\033[H")
 
 	// Get the selected command
 	if menuModel, ok := finalModel.(ui.MenuModel); ok {
@@ -98,7 +101,7 @@ func showInteractiveMenu(cmd *cobra.Command) {
 			// Find and execute the subcommand
 			subCmd, _, err := cmd.Root().Find(cmdParts)
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "Error finding command: %v\n", err)
+				fmt.Fprintf(os.Stderr, "\n%s Error finding command: %v\n\n", ui.RenderError(""), err)
 				return
 			}
 
@@ -115,6 +118,7 @@ func showInteractiveMenu(cmd *cobra.Command) {
 
 			subCmd.SetArgs(args)
 			if err := subCmd.Execute(); err != nil {
+				fmt.Fprintf(os.Stderr, "\n%s Command failed: %v\n\n", ui.RenderError(""), err)
 				os.Exit(1)
 			}
 		}
