@@ -21,8 +21,11 @@ type WireConfig struct {
 
 // WireGenerator generates dependency wiring code
 type WireGenerator struct {
-	config  *WireConfig
-	domains []string
+	config     *WireConfig
+	domains    []string
+	dbType     string // postgres, mysql, or sqlite
+	dbDriver   string // pgxpool, sql.DB, etc
+	moduleName string // detected from go.mod
 }
 
 // NewWireGenerator creates a new wire generator
@@ -36,6 +39,18 @@ func NewWireGenerator(config *WireConfig) *WireGenerator {
 // Generate creates wiring files
 func (g *WireGenerator) Generate(ctx context.Context) ([]string, error) {
 	var generatedFiles []string
+
+	// Detect module name from go.mod
+	if err := g.detectModuleName(); err != nil {
+		return nil, fmt.Errorf("detect module name: %w", err)
+	}
+
+	// Detect database type from .env
+	if err := g.detectDatabaseType(); err != nil {
+		g.config.Logger.Warn("failed to detect database type, defaulting to postgres", "error", err)
+		g.dbType = "postgres"
+		g.dbDriver = "pgxpool"
+	}
 
 	// Scan for existing domains
 	if err := g.scanDomains(); err != nil {
@@ -124,6 +139,64 @@ func (g *WireGenerator) scanDomains() error {
 	})
 
 	return err
+}
+
+// detectModuleName reads go.mod and extracts module name
+func (g *WireGenerator) detectModuleName() error {
+	goModFile := "go.mod"
+	data, err := os.ReadFile(goModFile)
+	if err != nil {
+		return fmt.Errorf("read go.mod: %w", err)
+	}
+
+	// Parse module line
+	for _, line := range strings.Split(string(data), "\n") {
+		line = strings.TrimSpace(line)
+		if strings.HasPrefix(line, "module ") {
+			g.moduleName = strings.TrimSpace(strings.TrimPrefix(line, "module"))
+			g.config.Logger.Info("detected module name", "module", g.moduleName)
+			return nil
+		}
+	}
+
+	return fmt.Errorf("module name not found in go.mod")
+}
+
+// detectDatabaseType reads .env file and detects database type
+func (g *WireGenerator) detectDatabaseType() error {
+	envFile := ".env"
+	data, err := os.ReadFile(envFile)
+	if err != nil {
+		return fmt.Errorf("read .env: %w", err)
+	}
+
+	envContent := string(data)
+
+	// Parse DATABASE_URL
+	if strings.Contains(envContent, "DATABASE_URL=") {
+		for _, line := range strings.Split(envContent, "\n") {
+			line = strings.TrimSpace(line)
+			if strings.HasPrefix(line, "DATABASE_URL=") {
+				dbURL := strings.TrimPrefix(line, "DATABASE_URL=")
+
+				if strings.HasPrefix(dbURL, "postgres://") || strings.HasPrefix(dbURL, "postgresql://") {
+					g.dbType = "postgres"
+					g.dbDriver = "pgxpool"
+				} else if strings.HasPrefix(dbURL, "mysql://") {
+					g.dbType = "mysql"
+					g.dbDriver = "sql.DB"
+				} else if strings.HasPrefix(dbURL, "sqlite://") || strings.Contains(dbURL, ".db") {
+					g.dbType = "sqlite"
+					g.dbDriver = "sql.DB"
+				}
+
+				g.config.Logger.Info("detected database type", "type", g.dbType, "driver", g.dbDriver)
+				return nil
+			}
+		}
+	}
+
+	return fmt.Errorf("DATABASE_URL not found in .env")
 }
 
 func (g *WireGenerator) generateMain() (string, error) {
@@ -240,12 +313,32 @@ func (g *WireGenerator) generateWire() (string, error) {
 	b.WriteString("\t\"log/slog\"\n")
 	b.WriteString("\t\"os\"\n\n")
 	b.WriteString("\t\"github.com/go-chi/chi/v5\"\n")
-	b.WriteString("\t\"github.com/jackc/pgx/v5/pgxpool\"\n\n")
+
+	// Database driver import based on detected type
+	switch g.dbType {
+	case "postgres":
+		b.WriteString("\t\"github.com/jackc/pgx/v5/pgxpool\"\n\n")
+	case "mysql", "sqlite":
+		b.WriteString("\t\"database/sql\"\n")
+		if g.dbType == "mysql" {
+			b.WriteString("\t_ \"github.com/go-sql-driver/mysql\"\n\n")
+		} else {
+			b.WriteString("\t_ \"github.com/mattn/go-sqlite3\"\n\n")
+		}
+	}
 
 	// Import handlers and repositories for each domain
 	if len(g.domains) > 0 {
-		b.WriteString("\thandlerhttp \"github.com/lisvindanu/anaphase-cli/internal/adapter/handler/http\"\n")
-		b.WriteString("\t\"github.com/lisvindanu/anaphase-cli/internal/adapter/repository/postgres\"\n")
+		b.WriteString(fmt.Sprintf("\thandlerhttp \"%s/internal/adapter/handler/http\"\n", g.moduleName))
+		// Repository import based on database type
+		switch g.dbType {
+		case "postgres":
+			b.WriteString(fmt.Sprintf("\t\"%s/internal/adapter/repository/postgres\"\n", g.moduleName))
+		case "mysql":
+			b.WriteString(fmt.Sprintf("\t\"%s/internal/adapter/repository/mysql\"\n", g.moduleName))
+		case "sqlite":
+			b.WriteString(fmt.Sprintf("\t\"%s/internal/adapter/repository/sqlite\"\n", g.moduleName))
+		}
 	}
 
 	b.WriteString(")\n\n")
@@ -254,7 +347,14 @@ func (g *WireGenerator) generateWire() (string, error) {
 	b.WriteString("// App holds all application dependencies\n")
 	b.WriteString("type App struct {\n")
 	b.WriteString("\tlogger *slog.Logger\n")
-	b.WriteString("\tdb     *pgxpool.Pool\n\n")
+
+	// Database field type based on driver
+	switch g.dbType {
+	case "postgres":
+		b.WriteString("\tdb     *pgxpool.Pool\n\n")
+	case "mysql", "sqlite":
+		b.WriteString("\tdb     *sql.DB\n\n")
+	}
 
 	// Handlers for each domain
 	for _, domain := range g.domains {
@@ -270,18 +370,53 @@ func (g *WireGenerator) generateWire() (string, error) {
 	b.WriteString("\t// Database connection\n")
 	b.WriteString("\tdbURL := os.Getenv(\"DATABASE_URL\")\n")
 	b.WriteString("\tif dbURL == \"\" {\n")
-	b.WriteString("\t\tdbURL = \"postgres://postgres:postgres@localhost:5432/anaphase?sslmode=disable\"\n")
+
+	// Default database URL based on type
+	switch g.dbType {
+	case "postgres":
+		b.WriteString("\t\tdbURL = \"postgres://postgres:postgres@localhost:5432/anaphase?sslmode=disable\"\n")
+	case "mysql":
+		b.WriteString("\t\tdbURL = \"mysql://root:password@localhost:3306/anaphase?parseTime=true\"\n")
+	case "sqlite":
+		b.WriteString("\t\tdbURL = \"sqlite://./anaphase.db\"\n")
+	}
+
 	b.WriteString("\t}\n\n")
 
-	b.WriteString("\tdb, err := pgxpool.New(context.Background(), dbURL)\n")
-	b.WriteString("\tif err != nil {\n")
-	b.WriteString("\t\treturn nil, fmt.Errorf(\"connect to database: %w\", err)\n")
-	b.WriteString("\t}\n\n")
-
-	b.WriteString("\t// Ping database\n")
-	b.WriteString("\tif err := db.Ping(context.Background()); err != nil {\n")
-	b.WriteString("\t\treturn nil, fmt.Errorf(\"ping database: %w\", err)\n")
-	b.WriteString("\t}\n\n")
+	// Database connection code based on type
+	switch g.dbType {
+	case "postgres":
+		b.WriteString("\tdb, err := pgxpool.New(context.Background(), dbURL)\n")
+		b.WriteString("\tif err != nil {\n")
+		b.WriteString("\t\treturn nil, fmt.Errorf(\"connect to database: %w\", err)\n")
+		b.WriteString("\t}\n\n")
+		b.WriteString("\t// Ping database\n")
+		b.WriteString("\tif err := db.Ping(context.Background()); err != nil {\n")
+		b.WriteString("\t\treturn nil, fmt.Errorf(\"ping database: %w\", err)\n")
+		b.WriteString("\t}\n\n")
+	case "mysql":
+		b.WriteString("\t// Parse MySQL DSN from URL\n")
+		b.WriteString("\tdsn := strings.TrimPrefix(dbURL, \"mysql://\")\n")
+		b.WriteString("\tdb, err := sql.Open(\"mysql\", dsn)\n")
+		b.WriteString("\tif err != nil {\n")
+		b.WriteString("\t\treturn nil, fmt.Errorf(\"open database: %w\", err)\n")
+		b.WriteString("\t}\n\n")
+		b.WriteString("\t// Ping database\n")
+		b.WriteString("\tif err := db.Ping(); err != nil {\n")
+		b.WriteString("\t\treturn nil, fmt.Errorf(\"ping database: %w\", err)\n")
+		b.WriteString("\t}\n\n")
+	case "sqlite":
+		b.WriteString("\t// Parse SQLite path from URL\n")
+		b.WriteString("\tdbPath := strings.TrimPrefix(dbURL, \"sqlite://\")\n")
+		b.WriteString("\tdb, err := sql.Open(\"sqlite3\", dbPath)\n")
+		b.WriteString("\tif err != nil {\n")
+		b.WriteString("\t\treturn nil, fmt.Errorf(\"open database: %w\", err)\n")
+		b.WriteString("\t}\n\n")
+		b.WriteString("\t// Ping database\n")
+		b.WriteString("\tif err := db.Ping(); err != nil {\n")
+		b.WriteString("\t\treturn nil, fmt.Errorf(\"ping database: %w\", err)\n")
+		b.WriteString("\t}\n\n")
+	}
 
 	b.WriteString("\tlogger.Info(\"database connected\")\n\n")
 
@@ -290,7 +425,17 @@ func (g *WireGenerator) generateWire() (string, error) {
 		entityName := toPascalCase(domain)
 
 		b.WriteString(fmt.Sprintf("\t// Initialize %s dependencies\n", domain))
-		b.WriteString(fmt.Sprintf("\t%sRepo := postgres.New%sRepository(db)\n", domain, entityName))
+
+		// Repository instantiation based on database type
+		switch g.dbType {
+		case "postgres":
+			b.WriteString(fmt.Sprintf("\t%sRepo := postgres.New%sRepository(db)\n", domain, entityName))
+		case "mysql":
+			b.WriteString(fmt.Sprintf("\t%sRepo := mysql.New%sRepository(db)\n", domain, entityName))
+		case "sqlite":
+			b.WriteString(fmt.Sprintf("\t%sRepo := sqlite.New%sRepository(db)\n", domain, entityName))
+		}
+
 		b.WriteString(fmt.Sprintf("\t// TODO: Create %s service implementation\n", domain))
 		b.WriteString(fmt.Sprintf("\t// %sService := service.New%sService(%sRepo)\n", domain, entityName, domain))
 		b.WriteString(fmt.Sprintf("\t%sHandler := handlerhttp.New%sHandler(nil, logger) // Pass service when implemented\n\n", domain, entityName))
