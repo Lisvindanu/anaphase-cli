@@ -58,6 +58,7 @@ func showInteractiveMenu(cmd *cobra.Command) {
 		if choice != "" && selectedItem != nil {
 			// Parse command parts
 			cmdParts := ui.FormatCommand(choice)
+			originalCmdLen := len(cmdParts)
 
 			// Collect inputs if needed
 			var inputs []string
@@ -83,16 +84,19 @@ func showInteractiveMenu(cmd *cobra.Command) {
 
 					inputs = append(inputs, input)
 				}
+			}
 
-				// Add inputs as arguments
-				cmdParts = append(cmdParts, inputs...)
+			// Build full command for display
+			fullCmd := choice
+			if len(inputs) > 0 {
+				fullCmd = choice + " " + strings.Join(inputs, " ")
 			}
 
 			// Show info about the selected command
-			fmt.Printf("\n%s\n\n", ui.RenderInfo(fmt.Sprintf("Running: anaphase %s", choice)))
+			fmt.Printf("\n%s\n\n", ui.RenderInfo(fmt.Sprintf("Running: anaphase %s", fullCmd)))
 
 			// Find and execute the subcommand
-			subCmd, _, err := cmd.Root().Find(cmdParts[:1]) // Just the command name
+			subCmd, _, err := cmd.Root().Find(cmdParts)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error finding command: %v\n", err)
 				return
@@ -102,8 +106,14 @@ func showInteractiveMenu(cmd *cobra.Command) {
 			subCmd.SetOut(os.Stdout)
 			subCmd.SetErr(os.Stderr)
 
-			// Set args and execute
-			subCmd.SetArgs(cmdParts[1:]) // All args after command name
+			// Set args: everything after the original command parts
+			args := inputs
+			if originalCmdLen > 1 {
+				// For nested commands like "gen domain", skip the parent command
+				args = append(cmdParts[1:], inputs...)
+			}
+
+			subCmd.SetArgs(args)
 			if err := subCmd.Execute(); err != nil {
 				os.Exit(1)
 			}
