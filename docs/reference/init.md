@@ -2,6 +2,10 @@
 
 Initialize a new microservice project with Clean Architecture structure.
 
+::: info
+**Quick Start**: Run `anaphase` (no arguments) to access the interactive menu where you can select "Initialize Project" for a guided setup experience.
+:::
+
 ## Synopsis
 
 ```bash
@@ -10,11 +14,18 @@ anaphase init [project-name] [flags]
 
 ## Description
 
-Creates a new Go project with:
+Creates a new Go project with zero-configuration setup:
 - Clean Architecture directory structure
 - Domain-Driven Design (DDD) packages
 - Go module initialization
 - Basic configuration files
+- Auto-generated `.env` file with sensible defaults
+- Automatic dependency installation
+- Interactive database selection
+
+::: info
+**Auto-Setup Features**: v0.4.0 includes automatic environment setup, dependency installation, and database configuration to get you started faster.
+:::
 
 ## Arguments
 
@@ -35,7 +46,74 @@ cd my-project
 anaphase init
 ```
 
+## Auto-Setup Features
+
+### 1. Environment File Auto-Creation
+
+The init command automatically creates a `.env` file with sensible defaults:
+
+```bash
+anaphase init my-api
+```
+
+Generated `.env`:
+```env
+# Server Configuration
+PORT=8080
+HOST=localhost
+
+# Database Configuration
+DATABASE_URL=postgres://postgres:postgres@localhost:5432/mydb?sslmode=disable
+
+# AI Provider Configuration (optional)
+# GEMINI_API_KEY=your-key-here
+# OPENAI_API_KEY=your-key-here
+# GROQ_API_KEY=your-key-here
+# CLAUDE_API_KEY=your-key-here
+```
+
+::: info
+**Ready to Run**: The generated `.env` file contains working defaults. Just update the values you need.
+:::
+
+### 2. Dependency Installation
+
+Dependencies are automatically installed during initialization:
+
+```bash
+anaphase init my-api
+# Automatically runs: go mod download
+# All dependencies are ready to use
+```
+
+### 3. Database Selection
+
+Interactive prompt for database choice:
+
+```
+Select database:
+  1) PostgreSQL (recommended)
+  2) MySQL
+  3) MongoDB
+  4) Skip database setup
+```
+
+The selected database is configured in your `.env` file automatically.
+
 ## Examples
+
+### Interactive Menu (Recommended)
+
+```bash
+# Launch the interactive menu
+anaphase
+
+# Select "Initialize Project" and follow the guided prompts:
+# - Project name
+# - Module path
+# - Database selection
+# - Environment setup
+```
 
 ### Basic Usage
 
@@ -43,6 +121,13 @@ anaphase init
 anaphase init ecommerce-api
 cd ecommerce-api
 ```
+
+The command will:
+1. Create project structure
+2. Initialize Go module
+3. Generate `.env` file with defaults
+4. Install dependencies automatically
+5. Prompt for database selection
 
 ### With Module Path
 
@@ -70,11 +155,25 @@ my-api/
 
 ## Next Steps
 
-After initialization:
+After initialization, your project is ready to use:
+
+### Option 1: Use Interactive Menu
 
 ```bash
-# 1. Generate a domain
-anaphase gen domain --name customer --prompt "Customer with email and name"
+anaphase
+
+# The menu provides easy access to:
+# - Generate Domain
+# - Generate Handler
+# - Generate Repository
+# - Quality Checks
+```
+
+### Option 2: Use CLI Commands
+
+```bash
+# 1. Generate a domain (AI optional)
+anaphase gen domain "Customer with email and name"
 
 # 2. Generate infrastructure
 anaphase gen handler --domain customer
@@ -84,6 +183,10 @@ anaphase gen repository --domain customer --db postgres
 anaphase wire
 go run cmd/api/main.go
 ```
+
+::: info
+**Zero Configuration**: All dependencies are installed and the `.env` file is ready. You can start generating code immediately.
+:::
 
 ## See Also
 

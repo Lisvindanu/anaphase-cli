@@ -1,6 +1,10 @@
 # anaphase gen domain
 
-Generate domain models (entities, value objects, repository ports, service ports) using AI.
+Generate domain models (entities, value objects, repository ports, service ports) with or without AI.
+
+::: info
+**Quick Start**: Run `anaphase` (no arguments) to access the interactive menu where you can select "Generate Domain" with a visual interface.
+:::
 
 ## Synopsis
 
@@ -11,7 +15,7 @@ anaphase gen domain --interactive
 
 ## Description
 
-Uses AI to analyze your domain description and generate:
+Generates domain-driven design components:
 
 - **Entities**: Domain entities with fields, constructors, validation, and business methods
 - **Value Objects**: Immutable objects for important concepts
@@ -20,9 +24,29 @@ Uses AI to analyze your domain description and generate:
 
 All generated code follows Domain-Driven Design (DDD) and Clean Architecture principles.
 
+::: info
+**AI is Optional**: This command works in two modes:
+- **Template Mode**: Generates clean, working code from templates (no AI required)
+- **AI Mode**: Uses AI to analyze your requirements and generate customized code
+:::
+
 ## Usage Modes
 
-### 1. Direct Mode (Default)
+### 1. Interactive Menu (Recommended)
+
+Launch the visual menu:
+
+```bash
+anaphase
+```
+
+Then select **"Generate Domain"** from the menu. The interface guides you through:
+- Domain description
+- Template vs AI mode selection
+- AI provider selection (if using AI mode)
+- Output directory configuration
+
+### 2. Direct Mode
 
 Provide description as argument:
 
@@ -30,7 +54,7 @@ Provide description as argument:
 anaphase gen domain "User with email, name, and password"
 ```
 
-### 2. Interactive Mode
+### 3. Interactive CLI Mode
 
 Use guided prompts for input:
 
@@ -63,12 +87,61 @@ Output directory [internal/core]:
 ...
 ```
 
+## Template Mode
+
+::: info
+**Zero Configuration**: Template mode generates production-ready code without requiring AI setup or API keys.
+:::
+
+Template mode creates clean, working domain code based on proven patterns:
+
+```bash
+# Template mode is the default when no AI provider is configured
+anaphase gen domain "User with email and password"
+```
+
+**What Template Mode Generates:**
+
+```go
+// Entity with validation
+type User struct {
+    ID        uuid.UUID
+    Email     string
+    Password  string
+    CreatedAt time.Time
+    UpdatedAt time.Time
+}
+
+// Constructor with validation
+func NewUser(email, password string) (*User, error) {
+    if email == "" {
+        return nil, ErrInvalidEmail
+    }
+    // ... validation logic
+}
+
+// Repository interface
+type UserRepository interface {
+    Create(ctx context.Context, user *User) error
+    FindByID(ctx context.Context, id uuid.UUID) (*User, error)
+    Update(ctx context.Context, user *User) error
+    Delete(ctx context.Context, id uuid.UUID) error
+}
+```
+
+**Benefits:**
+- No API keys required
+- Instant generation
+- Clean, predictable code structure
+- DDD and Clean Architecture principles
+- Ready to customize
+
 ## Flags
 
 | Flag | Short | Default | Description |
 |------|-------|---------|-------------|
 | `--interactive` | `-i` | `false` | Run in interactive mode with guided prompts |
-| `--provider` | | (config) | AI provider: gemini, groq, openai, claude |
+| `--provider` | | (config) | AI provider: gemini, groq, openai, claude (optional) |
 | `--output` | | `internal/core` | Output directory for generated files |
 
 ## Global Flags
@@ -80,9 +153,20 @@ Output directory [internal/core]:
 
 ## Examples
 
-### Basic Usage
+### Quick Start with Interactive Menu
 
 ```bash
+# Launch the interactive menu
+anaphase
+
+# Navigate to "Generate Domain" and follow the prompts
+# The menu provides a visual interface for all options
+```
+
+### Basic Usage (Template Mode)
+
+```bash
+# No AI required - instant generation
 anaphase gen domain "Cart with Items. User can add, remove, update quantity"
 ```
 
@@ -116,16 +200,20 @@ Generated Files:
 ✓ Domain generation complete! 🚀
 ```
 
-### With Provider Selection
+### With AI Provider (Optional)
+
+::: info
+AI providers are optional. Without configuration, the tool uses template mode.
+:::
 
 ```bash
-# Use Groq (fastest)
+# Use Groq (fastest AI option)
 anaphase gen domain "User with email" --provider groq
 
-# Use OpenAI (most accurate)
+# Use OpenAI (most accurate AI option)
 anaphase gen domain "Order processing system" --provider openai
 
-# Use Gemini (default, free)
+# Use Gemini (free AI option)
 anaphase gen domain "Product catalog" --provider gemini
 ```
 

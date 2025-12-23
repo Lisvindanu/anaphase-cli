@@ -1,6 +1,20 @@
-# AI-Powered Generation
+# AI-Powered Generation (Optional)
 
-Anaphase uses Google Gemini to understand your domain requirements and generate production-ready Go code.
+::: info AI is Optional in v0.4.0!
+Anaphase now has **two modes**:
+- **Template Mode**: Works immediately without AI - perfect for standard CRUD
+- **AI Mode**: Uses LLMs for intelligent generation - this guide covers AI Mode
+
+**You don't need AI to use Anaphase!** Template Mode works great for most use cases.
+:::
+
+When you configure an AI provider, Anaphase can understand natural language and generate intelligent, context-aware code with advanced validation and business logic.
+
+**Supported AI Providers:**
+- Google Gemini (recommended, generous free tier)
+- OpenAI (GPT-4, GPT-3.5-turbo)
+- Anthropic Claude (Claude 3.5 Sonnet)
+- Groq (fast inference, free tier)
 
 ## How It Works
 
@@ -334,7 +348,22 @@ anaphase gen domain --name order --prompt \
 
 ## AI Provider Configuration
 
-### Google Gemini (Default)
+Configure using the CLI or config file:
+
+### Using CLI (Easiest)
+
+```bash
+# Set provider interactively
+anaphase config set-provider
+
+# Or directly
+anaphase config set-provider gemini
+anaphase config set-provider openai
+anaphase config set-provider claude
+anaphase config set-provider groq
+```
+
+### Google Gemini
 
 ```yaml
 # ~/.anaphase/config.yaml
@@ -342,14 +371,50 @@ ai:
   primary:
     type: gemini
     apiKey: YOUR_API_KEY
-    model: gemini-2.5-flash
+    model: gemini-2.0-flash-exp
     timeout: 30s
-    retries: 3
 ```
 
-**Models:**
-- `gemini-2.5-flash`: Fast, cost-effective (recommended)
-- `gemini-pro`: More capable, slower
+Get API key: [Google AI Studio](https://makersuite.google.com/app/apikey)
+
+### OpenAI
+
+```yaml
+ai:
+  primary:
+    type: openai
+    apiKey: YOUR_API_KEY
+    model: gpt-4o-mini
+    timeout: 30s
+```
+
+Get API key: [OpenAI Platform](https://platform.openai.com/api-keys)
+
+### Anthropic Claude
+
+```yaml
+ai:
+  primary:
+    type: claude
+    apiKey: YOUR_API_KEY
+    model: claude-3-5-sonnet-20241022
+    timeout: 30s
+```
+
+Get API key: [Anthropic Console](https://console.anthropic.com/)
+
+### Groq
+
+```yaml
+ai:
+  primary:
+    type: groq
+    apiKey: YOUR_API_KEY
+    model: llama-3.3-70b-versatile
+    timeout: 30s
+```
+
+Get API key: [Groq Console](https://console.groq.com/)
 
 ### Fallback Configuration
 
@@ -360,12 +425,12 @@ ai:
   primary:
     type: gemini
     apiKey: PRIMARY_KEY
-    model: gemini-2.5-flash
+    model: gemini-2.0-flash-exp
 
   secondary:
-    type: gemini
+    type: openai
     apiKey: BACKUP_KEY
-    model: gemini-2.5-flash
+    model: gpt-4o-mini
 ```
 
 If primary fails (quota exceeded, network error), automatically falls back to secondary.
@@ -428,8 +493,39 @@ If generated code doesn't match your needs:
     Orders can be cancelled only when pending or confirmed."
    ```
 
+## AI Mode vs Template Mode
+
+| Feature | Template Mode | AI Mode |
+|---------|--------------|---------|
+| **Setup** | None required | API key needed |
+| **Speed** | Instant | 2-5 seconds |
+| **Input** | Entity name + fields | Natural language description |
+| **Value Objects** | ❌ Not generated | ✅ Auto-generated |
+| **Validation** | Basic (type checking) | Advanced (business rules) |
+| **Business Logic** | Standard CRUD | Domain-specific methods |
+| **Relationships** | Manual | Detected from description |
+| **Cost** | Free | Free tier available |
+| **Use Case** | Standard entities | Complex domains |
+
+### When to Use AI Mode
+
+✅ **Use AI Mode when:**
+- Complex business logic and validation rules
+- Need value objects with smart validation
+- Want business-specific method names
+- Dealing with domain-specific concepts
+- Need relationship detection
+
+✅ **Use Template Mode when:**
+- Simple CRUD entities
+- Prototyping quickly
+- Standard data models
+- Learning DDD patterns
+- No API key available
+
 ## Next Steps
 
+- [Quick Start](/guide/quick-start) - Try both modes
 - [DDD Concepts](/guide/ddd) - Learn DDD in depth
 - [Command Reference](/reference/gen-domain) - Full command options
 - [Examples](/examples/basic) - See real-world examples

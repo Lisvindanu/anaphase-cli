@@ -2,6 +2,10 @@
 
 Generate HTTP handlers with DTOs and tests for a domain.
 
+::: info
+**Quick Start**: Run `anaphase` (no arguments) to access the interactive menu where you can select "Generate Handler" with a visual interface.
+:::
+
 ## Synopsis
 
 ```bash
@@ -16,6 +20,10 @@ Generates HTTP request handlers for a domain including:
 - Request/Response DTOs
 - Route registration
 - Test scaffolding
+
+::: info
+**No AI Required**: Handler generation uses templates to create clean, working code instantly.
+:::
 
 ## Required Flags
 
@@ -52,7 +60,19 @@ Currently only HTTP is fully supported.
 
 ## Examples
 
-### Basic Usage
+### Interactive Menu (Recommended)
+
+```bash
+# Launch the interactive menu
+anaphase
+
+# Navigate to "Generate Handler" and follow the prompts:
+# - Select domain from available entities
+# - Choose protocol (HTTP, gRPC, GraphQL)
+# - Review and confirm
+```
+
+### Basic Usage (CLI)
 
 ```bash
 # Generate HTTP handlers for customer domain
@@ -66,6 +86,10 @@ internal/adapter/handler/http/
 ├── customer_dto.go           # Request/Response DTOs
 └── customer_handler_test.go  # Test scaffolding
 ```
+
+::: info
+**Instant Generation**: No AI setup required. Handlers are generated from templates immediately.
+:::
 
 ### Multiple Domains
 

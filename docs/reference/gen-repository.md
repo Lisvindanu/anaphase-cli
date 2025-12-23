@@ -2,6 +2,10 @@
 
 Generate database repository implementations with schema and tests.
 
+::: info
+**Quick Start**: Run `anaphase` (no arguments) to access the interactive menu where you can select "Generate Repository" with a visual interface.
+:::
+
 ## Synopsis
 
 ```bash
@@ -15,6 +19,10 @@ Generates database persistence layer for a domain including:
 - Database schema (SQL/migrations)
 - CRUD operations
 - Test scaffolding
+
+::: info
+**No AI Required**: Repository generation uses templates to create production-ready database code instantly.
+:::
 
 ## Required Flags
 
@@ -61,6 +69,23 @@ Caching support coming soon.
 
 ## Examples
 
+### Interactive Menu (Recommended)
+
+```bash
+# Launch the interactive menu
+anaphase
+
+# Navigate to "Generate Repository" and follow the prompts:
+# - Select domain from available entities
+# - Choose database (PostgreSQL, MySQL, MongoDB)
+# - Enable caching (optional)
+# - Review and confirm
+```
+
+::: info
+**Database Selection**: The menu makes it easy to pick your database and see all available options.
+:::
+
 ### PostgreSQL (Recommended)
 
 ```bash
@@ -74,6 +99,10 @@ internal/adapter/repository/postgres/
 ├── schema.sql              # Database schema
 └── customer_repo_test.go   # Test scaffolding
 ```
+
+::: info
+**Instant Generation**: No AI setup required. Repositories are generated from templates immediately.
+:::
 
 ### MySQL
 
