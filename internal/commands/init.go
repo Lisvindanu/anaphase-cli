@@ -177,7 +177,14 @@ LOG_LEVEL=info
 		ui.PrintWarning(fmt.Sprintf("Warning: Could not create .env.example: %v", err))
 	} else {
 		ui.PrintSuccess("✅ Created .env.example")
-		ui.PrintInfo("💡 Copy .env.example to .env and update with your credentials")
+	}
+
+	// Also create .env file with same content for immediate use
+	if err := os.WriteFile(".env", []byte(envExample), 0644); err != nil {
+		ui.PrintWarning(fmt.Sprintf("Warning: Could not create .env: %v", err))
+	} else {
+		ui.PrintSuccess("✅ Created .env with default values")
+		ui.PrintInfo("💡 Update .env with your database credentials before running")
 	}
 
 	// Run go mod tidy to download dependencies
