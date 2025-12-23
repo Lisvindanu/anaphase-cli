@@ -96,7 +96,7 @@ func showInteractiveMenu(cmd *cobra.Command) {
 			}
 
 			// Show info about the selected command
-			fmt.Printf("\n%s\n\n", ui.RenderInfo(fmt.Sprintf("Running: anaphase %s", fullCmd)))
+			fmt.Printf("\n%s\n", ui.RenderInfo(fmt.Sprintf("Running: anaphase %s", fullCmd)))
 
 			// Find and execute the subcommand
 			subCmd, _, err := cmd.Root().Find(cmdParts)
@@ -105,10 +105,6 @@ func showInteractiveMenu(cmd *cobra.Command) {
 				return
 			}
 
-			// Ensure command output goes to stdout/stderr properly
-			subCmd.SetOut(os.Stdout)
-			subCmd.SetErr(os.Stderr)
-
 			// Set args: everything after the original command parts
 			args := inputs
 			if originalCmdLen > 1 {
@@ -116,10 +112,21 @@ func showInteractiveMenu(cmd *cobra.Command) {
 				args = append(cmdParts[1:], inputs...)
 			}
 
-			subCmd.SetArgs(args)
-			if err := subCmd.Execute(); err != nil {
-				fmt.Fprintf(os.Stderr, "\n%s Command failed: %v\n\n", ui.RenderError(""), err)
-				os.Exit(1)
+			// Ensure command output goes to stdout/stderr properly
+			subCmd.SetOut(os.Stdout)
+			subCmd.SetErr(os.Stderr)
+
+			// Call RunE directly instead of Execute to avoid triggering root command
+			if subCmd.RunE != nil {
+				if err := subCmd.RunE(subCmd, args); err != nil {
+					fmt.Fprintf(os.Stderr, "\n%s Command failed: %v\n\n", ui.RenderError(""), err)
+					os.Exit(1)
+				}
+			} else if subCmd.Run != nil {
+				subCmd.Run(subCmd, args)
+			} else {
+				fmt.Fprintf(os.Stderr, "\n%s Command has no run function\n\n", ui.RenderError(""))
+				return
 			}
 		}
 	}
