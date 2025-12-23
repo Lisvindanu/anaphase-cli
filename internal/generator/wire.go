@@ -308,12 +308,24 @@ func (g *WireGenerator) generateWire() (string, error) {
 
 	// Imports
 	b.WriteString("import (\n")
-	b.WriteString("\t\"context\"\n")
+
+	// Context only needed for PostgreSQL
+	if g.dbType == "postgres" {
+		b.WriteString("\t\"context\"\n")
+	}
+
 	b.WriteString("\t\"fmt\"\n")
 	b.WriteString("\t\"log/slog\"\n")
-	b.WriteString("\t\"os\"\n\n")
-	b.WriteString("\t\"github.com/go-chi/chi/v5\"\n")
+	b.WriteString("\t\"os\"\n")
 
+	// Strings package needed for MySQL/SQLite DSN parsing
+	if g.dbType == "mysql" || g.dbType == "sqlite" {
+		b.WriteString("\t\"strings\"\n")
+	}
+
+	b.WriteString("\n\t\"github.com/go-chi/chi/v5\"\n")
+
+	
 	// Database driver import based on detected type
 	switch g.dbType {
 	case "postgres":
@@ -395,8 +407,17 @@ func (g *WireGenerator) generateWire() (string, error) {
 		b.WriteString("\t\treturn nil, fmt.Errorf(\"ping database: %w\", err)\n")
 		b.WriteString("\t}\n\n")
 	case "mysql":
-		b.WriteString("\t// Parse MySQL DSN from URL\n")
+		b.WriteString("\t// Parse MySQL DSN from URL (mysql://user:pass@host:port/db?params)\n")
+		b.WriteString("\t// Convert to MySQL driver format: user:pass@tcp(host:port)/db?params\n")
 		b.WriteString("\tdsn := strings.TrimPrefix(dbURL, \"mysql://\")\n")
+		b.WriteString("\t// Replace @host:port with @tcp(host:port)\n")
+		b.WriteString("\tif idx := strings.Index(dsn, \"@\"); idx != -1 {\n")
+		b.WriteString("\t\trest := dsn[idx+1:]\n")
+		b.WriteString("\t\tif dbIdx := strings.Index(rest, \"/\"); dbIdx != -1 {\n")
+		b.WriteString("\t\t\thost := rest[:dbIdx]\n")
+		b.WriteString("\t\t\tdsn = dsn[:idx+1] + \"tcp(\" + host + \")\" + rest[dbIdx:]\n")
+		b.WriteString("\t\t}\n")
+		b.WriteString("\t}\n\n")
 		b.WriteString("\tdb, err := sql.Open(\"mysql\", dsn)\n")
 		b.WriteString("\tif err != nil {\n")
 		b.WriteString("\t\treturn nil, fmt.Errorf(\"open database: %w\", err)\n")
