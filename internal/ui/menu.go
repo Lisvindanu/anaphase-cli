@@ -50,7 +50,10 @@ func NewMenuModel() MenuModel {
 			desc:         "Create a new microservice project with DDD structure",
 			command:      "init",
 			needsInput:   true,
-			inputPrompts: []string{"Project name"},
+			inputPrompts: []string{
+				"Project name",
+				"Database type (postgres/mysql/sqlite) [postgres]",
+			},
 		},
 
 		// Code Generation (AI-powered)

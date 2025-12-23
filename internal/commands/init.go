@@ -141,8 +141,24 @@ func runInit(cmd *cobra.Command, args []string) error {
 
 	// Create .env.example file
 	ui.PrintInfo("📝 Creating .env.example...")
+
+	// Generate DATABASE_URL based on selected database type
+	var dbURL string
+	switch initDB {
+	case "postgres":
+		dbURL = "postgresql://username:password@localhost:5432/" + projectName + "?sslmode=disable"
+	case "mysql":
+		dbURL = "mysql://username:password@localhost:3306/" + projectName + "?parseTime=true"
+	case "sqlite":
+		dbURL = "sqlite://./data/" + projectName + ".db"
+	case "mongodb":
+		dbURL = "mongodb://localhost:27017/" + projectName
+	default:
+		dbURL = "postgresql://username:password@localhost:5432/" + projectName + "?sslmode=disable"
+	}
+
 	envExample := `# Database Configuration
-DATABASE_URL=postgresql://username:password@localhost:5432/` + projectName + `?sslmode=disable
+DATABASE_URL=` + dbURL + `
 
 # Server Configuration
 PORT=8080

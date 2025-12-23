@@ -108,6 +108,29 @@ func showInteractiveMenu(cmd *cobra.Command) {
 			// The subcommand is already found, we just need to pass the inputs
 			args := inputs
 
+			// Handle special cases for commands with flags
+			if choice == "init" && len(inputs) >= 2 {
+				// For init: inputs[0] = project name, inputs[1] = database type
+				projectName := inputs[0]
+				dbType := strings.ToLower(strings.TrimSpace(inputs[1]))
+
+				// Default to postgres if empty
+				if dbType == "" {
+					dbType = "postgres"
+				}
+
+				// Validate database type
+				validDBs := map[string]bool{"postgres": true, "mysql": true, "sqlite": true, "mongodb": true}
+				if !validDBs[dbType] {
+					fmt.Fprintf(os.Stderr, "\n%s Invalid database type '%s'. Valid types: postgres, mysql, sqlite, mongodb\n\n", ui.RenderError(""), dbType)
+					return
+				}
+
+				// Set args: project name only, database as flag
+				args = []string{projectName}
+				subCmd.Flags().Set("db", dbType)
+			}
+
 			// Ensure command output goes to stdout/stderr properly
 			subCmd.SetOut(os.Stdout)
 			subCmd.SetErr(os.Stderr)
