@@ -176,8 +176,13 @@ func runGenDomain(cmd *cobra.Command, args []string) error {
 	// Create orchestrator
 	orchestrator, err := ai.NewOrchestrator(cfg, logger)
 	if err != nil {
-		ui.PrintError(fmt.Sprintf("Failed to create orchestrator: %v", err))
-		return fmt.Errorf("create orchestrator: %w", err)
+		// AI not configured - offer template mode
+		ui.PrintWarning("AI provider not configured")
+		fmt.Println()
+		ui.PrintInfo("💡 Falling back to Template Mode (no AI required)")
+		fmt.Println()
+
+		return runTemplateDomain(description, output)
 	}
 
 	// Generate domain spec using AI
@@ -226,4 +231,190 @@ func runGenDomain(cmd *cobra.Command, args []string) error {
 	fmt.Println("  3. Generate handler: anaphase gen handler " + spec.DomainName)
 
 	return nil
+}
+
+// runTemplateDomain generates domain using templates (no AI)
+func runTemplateDomain(description, output string) error {
+	fmt.Println(ui.RenderTitle("📝 Template Mode - Domain Generation"))
+	fmt.Println()
+
+	ui.PrintInfo("Template mode generates basic domain structure without AI")
+	ui.PrintInfo("Perfect for simple entities with standard CRUD operations")
+	fmt.Println()
+
+	// Parse entity name from description or ask
+	reader := bufio.NewReader(os.Stdin)
+
+	ui.PrintInfo("Entity name (e.g., User, Product, Order):")
+	fmt.Print("  > ")
+	entityName, _ := reader.ReadString('\n')
+	entityName = strings.TrimSpace(entityName)
+
+	if entityName == "" {
+		return fmt.Errorf("entity name is required")
+	}
+
+	// Make first letter uppercase
+	entityName = strings.ToUpper(string(entityName[0])) + entityName[1:]
+
+	fmt.Println()
+	ui.PrintInfo("Fields (format: name:type, separated by comma)")
+	ui.PrintInfo("Example: name:string, email:string, age:int, created_at:time")
+	ui.PrintInfo("Supported types: string, int, int64, float64, bool, time, uuid")
+	fmt.Print("  > ")
+	fieldsInput, _ := reader.ReadString('\n')
+	fieldsInput = strings.TrimSpace(fieldsInput)
+
+	var fields []Field
+	if fieldsInput != "" {
+		fieldPairs := strings.Split(fieldsInput, ",")
+		for _, pair := range fieldPairs {
+			parts := strings.Split(strings.TrimSpace(pair), ":")
+			if len(parts) == 2 {
+				fields = append(fields, Field{
+					Name: strings.TrimSpace(parts[0]),
+					Type: strings.TrimSpace(parts[1]),
+				})
+			}
+		}
+	}
+
+	// Add default ID and timestamps if not provided
+	hasID := false
+	hasCreatedAt := false
+	hasUpdatedAt := false
+
+	for _, f := range fields {
+		if f.Name == "id" || f.Name == "ID" {
+			hasID = true
+		}
+		if f.Name == "created_at" || f.Name == "createdAt" {
+			hasCreatedAt = true
+		}
+		if f.Name == "updated_at" || f.Name == "updatedAt" {
+			hasUpdatedAt = true
+		}
+	}
+
+	if !hasID {
+		fields = append([]Field{{Name: "ID", Type: "uuid"}}, fields...)
+	}
+	if !hasCreatedAt {
+		fields = append(fields, Field{Name: "CreatedAt", Type: "time"})
+	}
+	if !hasUpdatedAt {
+		fields = append(fields, Field{Name: "UpdatedAt", Type: "time"})
+	}
+
+	fmt.Println()
+	ui.PrintSuccess(fmt.Sprintf("Generating domain: %s with %d fields", entityName, len(fields)))
+	fmt.Println()
+
+	// Create spec for template generation
+	spec := &ai.DomainSpec{
+		DomainName: strings.ToLower(entityName),
+		Entities: []ai.EntitySpec{
+			{
+				Name:   entityName,
+				Fields: convertFieldsToSpecFields(fields),
+			},
+		},
+		RepositoryInterface: ai.RepositorySpec{
+			Name: entityName + "Repository",
+			Methods: []ai.InterfaceMethod{
+				{Name: "Create", Signature: "Create(" + strings.ToLower(entityName) + " *" + entityName + ") error"},
+				{Name: "GetByID", Signature: "GetByID(id string) (*" + entityName + ", error)"},
+				{Name: "Update", Signature: "Update(" + strings.ToLower(entityName) + " *" + entityName + ") error"},
+				{Name: "Delete", Signature: "Delete(id string) error"},
+				{Name: "List", Signature: "List() ([]" + entityName + ", error)"},
+			},
+		},
+		ServiceInterface: ai.ServiceSpec{
+			Name: entityName + "Service",
+			Methods: []ai.InterfaceMethod{
+				{Name: "Create", Signature: "Create(" + strings.ToLower(entityName) + " *" + entityName + ") error"},
+				{Name: "Get", Signature: "Get(id string) (*" + entityName + ", error)"},
+				{Name: "Update", Signature: "Update(" + strings.ToLower(entityName) + " *" + entityName + ") error"},
+				{Name: "Delete", Signature: "Delete(id string) error"},
+				{Name: "ListAll", Signature: "ListAll() ([]" + entityName + ", error)"},
+			},
+		},
+	}
+
+	// Generate code files
+	fmt.Println("📂 Generating code files...")
+	domainGen := generator.NewDomainGenerator(spec, output)
+	files, err := domainGen.Generate()
+
+	if err != nil {
+		ui.PrintError(fmt.Sprintf("Code generation failed: %v", err))
+		return fmt.Errorf("generate files: %w", err)
+	}
+
+	// Show generated files
+	fmt.Println(ui.SuccessStyle.Render("\nGenerated Files:"))
+	for _, file := range files {
+		fmt.Println(ui.RenderListItem(file, true))
+	}
+
+	fmt.Println()
+	ui.PrintSuccess("✅ Template domain generation complete!")
+
+	fmt.Println(ui.RenderSubtle("\nNext Steps:"))
+	fmt.Println("  1. Review generated files in", output)
+	fmt.Println("  2. Customize business logic in service implementation")
+	fmt.Println("  3. Generate handler: anaphase gen handler " + strings.ToLower(entityName))
+	fmt.Println("  4. Run: go build ./...")
+
+	return nil
+}
+
+// Field represents a template field definition
+type Field struct {
+	Name string
+	Type string
+}
+
+// convertFieldsToSpecFields converts template fields to AI spec fields
+func convertFieldsToSpecFields(fields []Field) []ai.FieldSpec {
+	result := make([]ai.FieldSpec, len(fields))
+	for i, f := range fields {
+		goType := mapTypeToGo(f.Type)
+		result[i] = ai.FieldSpec{
+			Name: f.Name,
+			Type: goType,
+		}
+	}
+	return result
+}
+
+// mapTypeToGo maps simple type names to Go types
+func mapTypeToGo(t string) string {
+	typeMap := map[string]string{
+		"string":  "string",
+		"int":     "int",
+		"int64":   "int64",
+		"float":   "float64",
+		"float64": "float64",
+		"bool":    "bool",
+		"time":    "time.Time",
+		"uuid":    "string", // UUID as string for simplicity
+	}
+
+	if goType, ok := typeMap[strings.ToLower(t)]; ok {
+		return goType
+	}
+	return "string" // default to string
+}
+
+// toSnakeCase converts camelCase/PascalCase to snake_case
+func toSnakeCase(s string) string {
+	var result []rune
+	for i, r := range s {
+		if i > 0 && r >= 'A' && r <= 'Z' {
+			result = append(result, '_')
+		}
+		result = append(result, r)
+	}
+	return strings.ToLower(string(result))
 }
