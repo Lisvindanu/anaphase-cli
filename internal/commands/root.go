@@ -61,7 +61,6 @@ func showInteractiveMenu(cmd *cobra.Command) {
 		if choice != "" && selectedItem != nil {
 			// Parse command parts
 			cmdParts := ui.FormatCommand(choice)
-			originalCmdLen := len(cmdParts)
 
 			// Collect inputs if needed
 			var inputs []string
@@ -105,12 +104,9 @@ func showInteractiveMenu(cmd *cobra.Command) {
 				return
 			}
 
-			// Set args: everything after the original command parts
+			// Set args: only the user inputs
+			// The subcommand is already found, we just need to pass the inputs
 			args := inputs
-			if originalCmdLen > 1 {
-				// For nested commands like "gen domain", skip the parent command
-				args = append(cmdParts[1:], inputs...)
-			}
 
 			// Ensure command output goes to stdout/stderr properly
 			subCmd.SetOut(os.Stdout)
@@ -125,7 +121,22 @@ func showInteractiveMenu(cmd *cobra.Command) {
 			} else if subCmd.Run != nil {
 				subCmd.Run(subCmd, args)
 			} else {
-				fmt.Fprintf(os.Stderr, "\n%s Command has no run function\n\n", ui.RenderError(""))
+				// Command has subcommands - show help
+				if subCmd.HasSubCommands() {
+					fmt.Println()
+					ui.PrintInfo(fmt.Sprintf("'%s' has subcommands. Available subcommands:", choice))
+					fmt.Println()
+					for _, subcmd := range subCmd.Commands() {
+						if !subcmd.Hidden {
+							fmt.Printf("  • %s - %s\n", subcmd.Name(), subcmd.Short)
+						}
+					}
+					fmt.Println()
+					ui.PrintInfo(fmt.Sprintf("Run: anaphase %s <subcommand>", choice))
+					fmt.Println()
+				} else {
+					fmt.Fprintf(os.Stderr, "\n%s Command has no run function\n\n", ui.RenderError(""))
+				}
 				return
 			}
 		}

@@ -139,6 +139,31 @@ func runInit(cmd *cobra.Command, args []string) error {
 		fmt.Printf("Warning: Could not update .gitignore: %v\n", err)
 	}
 
+	// Create .env.example file
+	ui.PrintInfo("📝 Creating .env.example...")
+	envExample := `# Database Configuration
+DATABASE_URL=postgresql://username:password@localhost:5432/` + projectName + `?sslmode=disable
+
+# Server Configuration
+PORT=8080
+ENV=development
+
+# JWT Configuration (if using auth)
+JWT_SECRET=your-secret-key-change-this
+
+# Redis Configuration (if using cache)
+REDIS_URL=redis://localhost:6379
+
+# Logging
+LOG_LEVEL=info
+`
+	if err := os.WriteFile(".env.example", []byte(envExample), 0644); err != nil {
+		ui.PrintWarning(fmt.Sprintf("Warning: Could not create .env.example: %v", err))
+	} else {
+		ui.PrintSuccess("✅ Created .env.example")
+		ui.PrintInfo("💡 Copy .env.example to .env and update with your credentials")
+	}
+
 	// Run go mod tidy to download dependencies
 	fmt.Println()
 	ui.PrintInfo("📦 Installing dependencies (go mod tidy)...")
