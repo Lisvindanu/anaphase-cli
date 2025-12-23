@@ -1,34 +1,34 @@
 # anaphase quality
 
-Code quality tools for linting, formatting, and validating generated code.
+Code quality tools untuk linting, formatting, dan validasi kode yang dihasilkan.
 
 ::: info
-**Quick Access**: Run `anaphase` (no arguments) to access the interactive menu and select "Quality Tools" for a visual interface.
+**Akses Cepat**: Jalankan `anaphase` (tanpa argumen) untuk mengakses menu interaktif dan pilih "Quality Tools" untuk interface visual.
 :::
 
 ## Overview
 
-The `quality` command provides integrated tools to maintain code quality, ensure consistency, and catch errors early. It works with both generated and hand-written code.
+Command `quality` menyediakan tools terintegrasi untuk menjaga kualitas kode, memastikan konsistensi, dan menangkap error lebih awal. Command ini bekerja dengan kode yang dihasilkan maupun yang ditulis manual.
 
 ::: info
-**Auto-Install**: The interactive menu detects missing quality tools (golangci-lint, goimports) and offers to install them automatically.
+**Auto-Install**: Menu interaktif mendeteksi quality tools yang hilang (golangci-lint, goimports) dan menawarkan untuk menginstalnya secara otomatis.
 :::
 
-## Usage
+## Penggunaan
 
-### Interactive Menu (Recommended)
+### Menu Interaktif (Disarankan)
 
 ```bash
 anaphase
 ```
 
-Select **"Quality Tools"** from the menu. The interface shows:
-- Run Linter (golangci-lint or go vet)
+Pilih **"Quality Tools"** dari menu. Interface menampilkan:
+- Run Linter (golangci-lint atau go vet)
 - Format Code (gofmt + goimports)
 - Validate Code (syntax, vet, build)
-- Auto-install missing tools
+- Auto-install tools yang hilang
 
-### CLI Direct Mode
+### Mode CLI Langsung
 
 ```bash
 anaphase quality lint [path]
@@ -36,40 +36,40 @@ anaphase quality format [path]
 anaphase quality validate
 ```
 
-## Subcommands
+## Subcommand
 
 ### lint
 
-Run linters on your codebase to catch potential issues.
+Jalankan linter pada codebase Anda untuk menangkap potential issue.
 
 ```bash
 anaphase quality lint [path] [flags]
 ```
 
-**Features:**
-- Automatic tool selection (golangci-lint or go vet)
-- Auto-install prompt if golangci-lint is missing
-- Multiple linter support (50+ with golangci-lint)
-- Auto-fix capability
-- Detailed error reports
+**Fitur:**
+- Pemilihan tool otomatis (golangci-lint atau go vet)
+- Prompt auto-install jika golangci-lint hilang
+- Dukungan multiple linter (50+ dengan golangci-lint)
+- Kemampuan auto-fix
+- Laporan error detail
 
-**Examples:**
+**Contoh:**
 
 ```bash
-# Interactive menu (recommended)
+# Menu interaktif (disarankan)
 anaphase
-# Select "Quality Tools" → "Run Linter"
+# Pilih "Quality Tools" → "Run Linter"
 
-# CLI: Lint entire project
+# CLI: Lint seluruh proyek
 anaphase quality lint
 
-# Lint specific directory
+# Lint direktori tertentu
 anaphase quality lint ./internal/core
 
 # Lint single file
 anaphase quality lint ./internal/core/entity/user.go
 
-# Auto-fix issues
+# Auto-fix issue
 anaphase quality lint --fix
 ```
 
@@ -89,43 +89,43 @@ internal/core/service/user.go:42:1: errcheck: error return value not checked
 ℹ Run with --fix to automatically fix some issues
 ```
 
-**Flags:**
+**Flag:**
 
-| Flag | Description |
+| Flag | Deskripsi |
 |------|-------------|
-| `--fix` | Automatically fix issues when possible |
+| `--fix` | Otomatis fix issue jika memungkinkan |
 
 ### format
 
-Format code using gofmt and organize imports.
+Format kode menggunakan gofmt dan organize import.
 
 ```bash
 anaphase quality format [path] [flags]
 ```
 
-**Features:**
-- Code formatting with gofmt
-- Import organization with goimports
+**Fitur:**
+- Code formatting dengan gofmt
+- Import organization dengan goimports
 - Batch processing
-- Show diff or write in-place
+- Tampilkan diff atau tulis in-place
 
-**Examples:**
+**Contoh:**
 
 ```bash
-# Interactive menu (recommended)
+# Menu interaktif (disarankan)
 anaphase
-# Select "Quality Tools" → "Format Code"
+# Pilih "Quality Tools" → "Format Code"
 
-# CLI: Format entire project
+# CLI: Format seluruh proyek
 anaphase quality format
 
-# Format specific directory
+# Format direktori tertentu
 anaphase quality format ./internal/core
 
 # Format single file
 anaphase quality format ./internal/core/entity/user.go
 
-# Show diff without writing
+# Tampilkan diff tanpa menulis
 anaphase quality format --write=false
 ```
 
@@ -142,34 +142,34 @@ anaphase quality format --write=false
 ✓ Organized imports in 8 file(s)
 ```
 
-**Flags:**
+**Flag:**
 
-| Flag | Short | Default | Description |
+| Flag | Short | Default | Deskripsi |
 |------|-------|---------|-------------|
-| `--write` | `-w` | `true` | Write result to source file |
+| `--write` | `-w` | `true` | Tulis hasil ke source file |
 
 ### validate
 
-Comprehensive validation: syntax check, go vet, and build test.
+Validasi komprehensif: syntax check, go vet, dan build test.
 
 ```bash
 anaphase quality validate
 ```
 
-**Features:**
-- 3-step validation process
+**Fitur:**
+- Proses validasi 3 langkah
 - Syntax checking
 - Static analysis (go vet)
 - Build verification
 
-**Examples:**
+**Contoh:**
 
 ```bash
-# Interactive menu (recommended)
+# Menu interaktif (disarankan)
 anaphase
-# Select "Quality Tools" → "Validate Code"
+# Pilih "Quality Tools" → "Validate Code"
 
-# CLI: Validate entire project
+# CLI: Validasi seluruh proyek
 anaphase quality validate
 ```
 
@@ -189,17 +189,17 @@ anaphase quality validate
 ✓ Validation complete! Code is ready to use.
 ```
 
-## Linters
+## Linter
 
-### golangci-lint (Recommended)
+### golangci-lint (Disarankan)
 
-If installed, Anaphase uses golangci-lint which includes 50+ linters.
+Jika terinstal, Anaphase menggunakan golangci-lint yang mencakup 50+ linter.
 
 ::: tip
-**Auto-Install**: The interactive menu (`anaphase`) detects if golangci-lint is missing and offers to install it automatically.
+**Auto-Install**: Menu interaktif (`anaphase`) mendeteksi jika golangci-lint hilang dan menawarkan untuk menginstalnya secara otomatis.
 :::
 
-**Manual Install:**
+**Install Manual:**
 ```bash
 # macOS
 brew install golangci-lint
@@ -211,7 +211,7 @@ curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/insta
 go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 ```
 
-**Configuration (.golangci.yml):**
+**Konfigurasi (.golangci.yml):**
 ```yaml
 linters:
   enable:
@@ -237,20 +237,20 @@ linters-settings:
 
 ### go vet (Fallback)
 
-If golangci-lint is not installed, Anaphase automatically falls back to go vet:
+Jika golangci-lint tidak terinstal, Anaphase secara otomatis fallback ke go vet:
 
-**Features:**
-- Built-in Go tool (always available)
-- No installation required
-- Catches common mistakes
-- Fast and reliable
-- Works immediately out of the box
+**Fitur:**
+- Built-in Go tool (selalu tersedia)
+- Tidak perlu instalasi
+- Menangkap kesalahan umum
+- Cepat dan andal
+- Bekerja langsung out of the box
 
-## Workflow Integration
+## Integrasi Workflow
 
 ### Pre-Commit Hook
 
-Create `.git/hooks/pre-commit`:
+Buat `.git/hooks/pre-commit`:
 
 ```bash
 #!/bin/bash
@@ -272,12 +272,12 @@ fi
 echo "✅ Quality checks passed!"
 ```
 
-Make executable:
+Buat executable:
 ```bash
 chmod +x .git/hooks/pre-commit
 ```
 
-### CI/CD Integration
+### Integrasi CI/CD
 
 **GitHub Actions (.github/workflows/quality.yml):**
 
@@ -332,7 +332,7 @@ quality:
     - anaphase quality validate
 ```
 
-### VS Code Integration
+### Integrasi VS Code
 
 **settings.json:**
 
@@ -369,7 +369,7 @@ quality:
 }
 ```
 
-## Common Issues & Fixes
+## Masalah Umum & Fix
 
 ### 1. Unused Variables
 
@@ -386,7 +386,7 @@ func GetUser(id int) (*User, error) {
 anaphase quality lint --fix
 ```
 
-Or manually:
+Atau manual:
 ```go
 func GetUser(id int) (*User, error) {
     user, err := repo.FindByID(id)
@@ -411,7 +411,7 @@ return &User{ID:id},nil
 anaphase quality format
 ```
 
-Result:
+Hasil:
 ```go
 func GetUser(id int) (*User, error) {
     return &User{ID: id}, nil
@@ -435,7 +435,7 @@ import (
 anaphase quality format
 ```
 
-Result:
+Hasil:
 ```go
 import (
     "fmt"
@@ -454,17 +454,17 @@ import (
 file, _ := os.Open("config.yaml")
 ```
 
-**Fix (with golangci-lint):**
+**Fix (dengan golangci-lint):**
 ```bash
 anaphase quality lint
 ```
 
-Shows:
+Menampilkan:
 ```
 file.go:10:7: Error return value not checked
 ```
 
-Correct code:
+Kode yang benar:
 ```go
 file, err := os.Open("config.yaml")
 if err != nil {
@@ -473,28 +473,28 @@ if err != nil {
 defer file.Close()
 ```
 
-## Best Practices
+## Best Practice
 
-### 1. Run Quality Checks Often
+### 1. Jalankan Quality Check Sering
 
 ```bash
-# Before committing
+# Sebelum commit
 anaphase quality validate
 
-# During development
+# Selama development
 anaphase quality format
 anaphase quality lint
 ```
 
 ### 2. Format on Save
 
-Configure your editor to format automatically:
+Konfigurasi editor Anda untuk format otomatis:
 - VS Code: `"editor.formatOnSave": true`
 - GoLand: Settings → Tools → File Watchers
 
-### 3. Use in CI/CD
+### 3. Gunakan di CI/CD
 
-Always run quality checks in your CI/CD pipeline:
+Selalu jalankan quality check di CI/CD pipeline Anda:
 ```yaml
 - name: Quality
   run: |
@@ -503,25 +503,25 @@ Always run quality checks in your CI/CD pipeline:
     anaphase quality validate
 ```
 
-### 4. Fix Issues Immediately
+### 4. Fix Issue Segera
 
-Don't accumulate technical debt:
+Jangan akumulasi technical debt:
 ```bash
-# After generating code
+# Setelah generate kode
 anaphase gen domain "User"
 anaphase quality validate
 
-# Fix any issues immediately
+# Fix issue segera
 anaphase quality lint --fix
 ```
 
-### 5. Configure Linters
+### 5. Konfigurasi Linter
 
-Create `.golangci.yml` for consistent team standards:
+Buat `.golangci.yml` untuk standar tim yang konsisten:
 ```yaml
 linters:
   disable:
-    - exhaustruct  # Too strict for generated code
+    - exhaustruct  # Terlalu strict untuk generated code
   enable:
     - errcheck
     - gosimple
@@ -534,34 +534,34 @@ issues:
         - errcheck
 ```
 
-## Tools Comparison
+## Perbandingan Tools
 
-| Tool | Speed | Features | Auto-Fix | Install |
+| Tool | Kecepatan | Fitur | Auto-Fix | Install |
 |------|-------|----------|----------|---------|
 | **gofmt** | ⚡⚡⚡⚡⚡ | Format only | ✅ | Built-in |
 | **goimports** | ⚡⚡⚡⚡ | Format + imports | ✅ | go install |
 | **go vet** | ⚡⚡⚡⚡ | Static analysis | ❌ | Built-in |
-| **golangci-lint** | ⚡⚡⚡ | 50+ linters | ✅ Partial | External |
+| **golangci-lint** | ⚡⚡⚡ | 50+ linter | ✅ Partial | External |
 
-## Quick Reference
+## Referensi Cepat
 
 ```bash
-# Daily workflow
-anaphase quality format          # Format code
-anaphase quality lint --fix      # Fix simple issues
+# Workflow harian
+anaphase quality format          # Format kode
+anaphase quality lint --fix      # Fix issue sederhana
 anaphase quality validate        # Full validation
 
-# Before commit
+# Sebelum commit
 anaphase quality validate
 
 # CI/CD
-anaphase quality format --write=false  # Check format
-anaphase quality lint                  # Check issues
+anaphase quality format --write=false  # Cek format
+anaphase quality lint                  # Cek issue
 anaphase quality validate              # Full check
 ```
 
-## See Also
+## Lihat Juga
 
-- [anaphase gen domain](/reference/gen-domain) - Generate domain code
+- [anaphase gen domain](/reference/gen-domain) - Generate kode domain
 - [Installation](/guide/installation) - Install quality tools
-- [Troubleshooting](/guide/troubleshooting) - Common issues
+- [Troubleshooting](/guide/troubleshooting) - Masalah umum

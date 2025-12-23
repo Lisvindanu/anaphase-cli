@@ -2,17 +2,39 @@
 
 Generate production-ready HTTP middleware for your microservice.
 
+::: info
+**Quick Start**: Run `anaphase` (no arguments) to access the interactive menu and select "Generate Middleware" for a guided experience.
+:::
+
 ## Overview
 
 The `gen middleware` command generates common HTTP middleware patterns with best practices and configuration options. All middleware is framework-agnostic and works with the standard `net/http` package.
 
+::: info
+**Template-Based**: Middleware generation uses proven templates - no AI configuration required. Fast, reliable, and production-ready.
+:::
+
 ## Usage
+
+### Interactive Menu (Recommended)
+
+```bash
+anaphase
+```
+
+Select **"Generate Middleware"** from the menu and choose your middleware type from the visual interface.
+
+### CLI Direct Mode
 
 ```bash
 anaphase gen middleware --type <type> [flags]
 ```
 
 ## Available Middleware Types
+
+::: tip
+All middleware types are generated from templates - no AI or API keys needed.
+:::
 
 ### 1. Authentication (JWT)
 
@@ -157,7 +179,23 @@ router.Use(middleware.CORSMiddleware(config))
 
 ## Examples
 
-### Generate Auth Middleware
+### Using Interactive Menu
+
+```bash
+# Launch menu
+anaphase
+
+# Select "Generate Middleware"
+# Choose middleware type visually:
+# → Authentication (JWT)
+# → Rate Limiting
+# → Logging
+# → CORS
+```
+
+### Using CLI Directly
+
+**Generate Auth Middleware:**
 
 ```bash
 anaphase gen middleware --type auth
@@ -168,7 +206,7 @@ Output:
 ✓ /internal/middleware/auth.go
 ```
 
-### Generate Multiple Middleware
+**Generate Multiple Middleware:**
 
 ```bash
 anaphase gen middleware --type auth
@@ -177,7 +215,7 @@ anaphase gen middleware --type logging
 anaphase gen middleware --type cors
 ```
 
-### Custom Output Directory
+**Custom Output Directory:**
 
 ```bash
 anaphase gen middleware --type auth --output pkg/middleware

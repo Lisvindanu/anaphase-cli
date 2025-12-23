@@ -1,42 +1,42 @@
-# Database Configuration
+# Konfigurasi Database
 
-::: info Auto-Setup in v0.4.0
-Database configuration is now **automated**! During `anaphase init`, you'll be prompted to select your database, and Anaphase will automatically:
-- Generate a `.env` file with connection strings
-- Create example DATABASE_URL values
-- Set up repository code for your chosen database
+::: info Auto-Setup di v0.4.0
+Konfigurasi database sekarang **otomatis**! Saat `anaphase init`, Anda akan diminta memilih database, dan Anaphase akan otomatis:
+- Membuat file `.env` dengan connection string
+- Membuat contoh nilai DATABASE_URL
+- Setup kode repository untuk database yang dipilih
 
-No manual configuration needed to get started!
+Tidak perlu konfigurasi manual untuk memulai!
 :::
 
-Configure database connections for your microservice.
+Konfigurasi koneksi database untuk microservice Anda.
 
-## Supported Databases
+## Database yang Didukung
 
-- **PostgreSQL** (Recommended)
+- **PostgreSQL** (Direkomendasikan)
 - **MySQL** / MariaDB
 - **MongoDB**
 
-## Interactive Database Selection
+## Pemilihan Database Interaktif
 
-::: info New in v0.4.0
-When you run `anaphase init`, you'll see an interactive database selection menu:
+::: info Baru di v0.4.0
+Saat Anda menjalankan `anaphase init`, Anda akan melihat menu pemilihan database interaktif:
 
 ```bash
 anaphase init my-project
 
-# Interactive prompts:
+# Prompt interaktif:
 ? Select database:
   > PostgreSQL (recommended)
     MySQL
     MongoDB
     Skip (configure later)
 
-# Anaphase automatically:
-# 1. Creates .env file with DATABASE_URL
-# 2. Generates repository code for selected database
-# 3. Sets up connection pooling
-# 4. Includes schema files
+# Anaphase otomatis:
+# 1. Membuat file .env dengan DATABASE_URL
+# 2. Generate kode repository untuk database yang dipilih
+# 3. Setup connection pooling
+# 4. Menyertakan file schema
 ```
 :::
 
@@ -44,29 +44,29 @@ anaphase init my-project
 
 ### Environment Variable (Auto-Generated)
 
-After `anaphase init`, check your `.env` file for the auto-generated DATABASE_URL:
+Setelah `anaphase init`, cek file `.env` Anda untuk DATABASE_URL yang auto-generated:
 
 ```bash
-# .env (auto-created by Anaphase v0.4.0)
+# .env (auto-created oleh Anaphase v0.4.0)
 DATABASE_URL="postgres://user:password@localhost:5432/mydb?sslmode=disable"
 ```
 
-You can also set it manually:
+Anda juga bisa set secara manual:
 
 ```bash
 export DATABASE_URL="postgres://user:password@host:port/database"
 ```
 
-### Configuration File
+### File Konfigurasi
 
-The generated `cmd/api/wire.go` reads from DATABASE_URL:
+`cmd/api/wire.go` yang dihasilkan membaca dari DATABASE_URL:
 
 ```go
 func InitializeApp(logger *slog.Logger) (*App, error) {
-    // Automatically reads from .env file (created by anaphase init)
+    // Otomatis membaca dari file .env (dibuat oleh anaphase init)
     dbURL := os.Getenv("DATABASE_URL")
     if dbURL == "" {
-        // Fallback default
+        // Default fallback
         dbURL = "postgres://postgres:postgres@localhost:5432/mydb?sslmode=disable"
     }
 
@@ -75,42 +75,42 @@ func InitializeApp(logger *slog.Logger) (*App, error) {
 }
 ```
 
-::: tip Auto-Generated Configuration
-The `.env` file is automatically created when you run `anaphase init` and select a database. You can customize the connection string by editing this file.
+::: tip Konfigurasi Auto-Generated
+File `.env` otomatis dibuat saat Anda menjalankan `anaphase init` dan memilih database. Anda bisa kustomisasi connection string dengan mengedit file ini.
 :::
 
 ## PostgreSQL
 
-::: info Auto-Setup in v0.4.0
-When you select PostgreSQL during `anaphase init`, your `.env` file will contain:
+::: info Auto-Setup di v0.4.0
+Saat Anda memilih PostgreSQL selama `anaphase init`, file `.env` Anda akan berisi:
 ```bash
 DATABASE_URL="postgres://postgres:postgres@localhost:5432/mydb?sslmode=disable"
 ```
-Edit this file to match your database credentials.
+Edit file ini untuk menyesuaikan kredensial database Anda.
 :::
 
-### Connection String Format
+### Format Connection String
 
 ```
 postgres://username:password@hostname:port/database?options
 ```
 
-**Example:**
+**Contoh:**
 ```bash
-# .env file (auto-generated, then customized)
+# File .env (auto-generated, lalu dikustomisasi)
 DATABASE_URL="postgres://myuser:mypass@localhost:5432/mydb?sslmode=disable"
 ```
 
-### Common Options
+### Opsi Umum
 
-| Option | Values | Description |
-|--------|--------|-------------|
-| `sslmode` | `disable`, `require`, `verify-full` | SSL mode |
-| `pool_max_conns` | number | Max connections |
-| `pool_min_conns` | number | Min connections |
-| `pool_max_conn_lifetime` | duration | Max conn lifetime |
+| Opsi | Nilai | Deskripsi |
+|------|-------|-----------|
+| `sslmode` | `disable`, `require`, `verify-full` | Mode SSL |
+| `pool_max_conns` | number | Koneksi maksimal |
+| `pool_min_conns` | number | Koneksi minimal |
+| `pool_max_conn_lifetime` | duration | Lifetime koneksi maks |
 
-**Production example:**
+**Contoh production:**
 ```bash
 DATABASE_URL="postgres://user:pass@prod-db.example.com:5432/mydb?\
 sslmode=require&\
@@ -119,7 +119,7 @@ pool_min_conns=5&\
 pool_max_conn_lifetime=1h"
 ```
 
-### Docker Setup
+### Setup Docker
 
 ```bash
 docker run -d \
@@ -131,7 +131,7 @@ docker run -d \
   postgres:16-alpine
 ```
 
-### Local Installation
+### Instalasi Lokal
 
 ::: code-group
 
@@ -148,8 +148,8 @@ sudo -u postgres createdb mydb
 ```
 
 ```bash [Windows]
-# Download from postgresql.org
-# Or use Docker
+# Download dari postgresql.org
+# Atau gunakan Docker
 ```
 
 :::
@@ -162,35 +162,35 @@ psql $DATABASE_URL -f internal/adapter/repository/postgres/schema.sql
 
 ## MySQL
 
-::: info Auto-Setup in v0.4.0
-When you select MySQL during `anaphase init`, your `.env` file will contain:
+::: info Auto-Setup di v0.4.0
+Saat Anda memilih MySQL selama `anaphase init`, file `.env` Anda akan berisi:
 ```bash
 DATABASE_URL="root:password@tcp(localhost:3306)/mydb?parseTime=true"
 ```
-Edit this file to match your MySQL credentials.
+Edit file ini untuk menyesuaikan kredensial MySQL Anda.
 :::
 
-### Connection String Format
+### Format Connection String
 
 ```
 username:password@tcp(hostname:port)/database?options
 ```
 
-**Example:**
+**Contoh:**
 ```bash
-# .env file (auto-generated, then customized)
+# File .env (auto-generated, lalu dikustomisasi)
 DATABASE_URL="myuser:mypass@tcp(localhost:3306)/mydb?parseTime=true"
 ```
 
-### Common Options
+### Opsi Umum
 
-| Option | Values | Description |
-|--------|--------|-------------|
-| `parseTime` | `true`, `false` | Parse TIME values |
+| Opsi | Nilai | Deskripsi |
+|------|-------|-----------|
+| `parseTime` | `true`, `false` | Parse nilai TIME |
 | `charset` | `utf8mb4` | Character set |
 | `collation` | `utf8mb4_unicode_ci` | Collation |
 
-**Production example:**
+**Contoh production:**
 ```bash
 DATABASE_URL="user:pass@tcp(prod-db:3306)/mydb?\
 parseTime=true&\
@@ -199,7 +199,7 @@ collation=utf8mb4_unicode_ci&\
 maxAllowedPacket=67108864"
 ```
 
-### Docker Setup
+### Setup Docker
 
 ```bash
 docker run -d \
@@ -220,35 +220,35 @@ mysql -h localhost -u myuser -p mydb < internal/adapter/repository/mysql/schema.
 
 ## MongoDB
 
-::: info Auto-Setup in v0.4.0
-When you select MongoDB during `anaphase init`, your `.env` file will contain:
+::: info Auto-Setup di v0.4.0
+Saat Anda memilih MongoDB selama `anaphase init`, file `.env` Anda akan berisi:
 ```bash
 DATABASE_URL="mongodb://localhost:27017/mydb"
 ```
-Edit this file to add authentication and other options.
+Edit file ini untuk menambahkan autentikasi dan opsi lainnya.
 :::
 
-### Connection String Format
+### Format Connection String
 
 ```
 mongodb://username:password@hostname:port/database?options
 ```
 
-**Example:**
+**Contoh:**
 ```bash
-# .env file (auto-generated, then customized)
+# File .env (auto-generated, lalu dikustomisasi)
 DATABASE_URL="mongodb://myuser:mypass@localhost:27017/mydb"
 ```
 
-### Common Options
+### Opsi Umum
 
-| Option | Values | Description |
-|--------|--------|-------------|
-| `authSource` | database | Auth database |
+| Opsi | Nilai | Deskripsi |
+|------|-------|-----------|
+| `authSource` | database | Database auth |
 | `replicaSet` | name | Replica set |
-| `ssl` | `true`, `false` | Use SSL |
+| `ssl` | `true`, `false` | Gunakan SSL |
 
-**Production example:**
+**Contoh production:**
 ```bash
 DATABASE_URL="mongodb://user:pass@mongo1:27017,mongo2:27017,mongo3:27017/mydb?\
 replicaSet=rs0&\
@@ -256,7 +256,7 @@ ssl=true&\
 authSource=admin"
 ```
 
-### Docker Setup
+### Setup Docker
 
 ```bash
 docker run -d \
@@ -268,15 +268,15 @@ docker run -d \
   mongo:7
 ```
 
-### Collections
+### Collection
 
-MongoDB collections are created automatically on first insert.
+Collection MongoDB dibuat otomatis saat insert pertama.
 
 ## Connection Pooling
 
 ### PostgreSQL (pgxpool)
 
-Configure in code:
+Konfigurasi di kode:
 
 ```go
 import "github.com/jackc/pgx/v5/pgxpool"
@@ -286,7 +286,7 @@ if err != nil {
     return err
 }
 
-// Connection pool settings
+// Pengaturan connection pool
 config.MaxConns = 20
 config.MinConns = 5
 config.MaxConnLifetime = time.Hour
@@ -295,7 +295,7 @@ config.MaxConnIdleTime = 30 * time.Minute
 db, err := pgxpool.NewWithConfig(context.Background(), config)
 ```
 
-Or via connection string:
+Atau via connection string:
 ```bash
 DATABASE_URL="postgres://...?pool_max_conns=20&pool_min_conns=5"
 ```
@@ -307,65 +307,65 @@ import "database/sql"
 
 db, err := sql.Open("mysql", dbURL)
 
-// Connection pool settings
+// Pengaturan connection pool
 db.SetMaxOpenConns(20)
 db.SetMaxIdleConns(5)
 db.SetConnMaxLifetime(time.Hour)
 db.SetConnMaxIdleTime(30 * time.Minute)
 ```
 
-## Environment-Specific Configuration
+## Konfigurasi Per-Environment
 
-::: tip v0.4.0 Feature
-The `.env` file auto-generated by `anaphase init` is perfect for development. Create additional `.env` files for different environments.
+::: tip Fitur v0.4.0
+File `.env` yang auto-generated oleh `anaphase init` sempurna untuk development. Buat file `.env` tambahan untuk environment berbeda.
 :::
 
 ### Development
 
 ```bash
-# .env (auto-created by anaphase init)
+# .env (auto-created oleh anaphase init)
 DATABASE_URL="postgres://postgres:postgres@localhost:5432/myapp_dev?sslmode=disable"
 ```
 
 ### Testing
 
 ```bash
-# .env.test (create manually)
+# .env.test (buat manual)
 DATABASE_URL="postgres://postgres:postgres@localhost:5432/myapp_test?sslmode=disable"
 ```
 
 ### Production
 
 ```bash
-# .env.production (create manually)
+# .env.production (buat manual)
 DATABASE_URL="postgres://user:pass@prod-db:5432/myapp?sslmode=require&pool_max_conns=50"
 ```
 
-## Migrations
+## Migrasi
 
-### Initial Schema
+### Schema Awal
 
-Generated with repository:
+Dihasilkan bersama repository:
 
 ```bash
 anaphase gen repository --domain customer --db postgres
-# Creates: internal/adapter/repository/postgres/schema.sql
+# Membuat: internal/adapter/repository/postgres/schema.sql
 
 psql $DATABASE_URL -f internal/adapter/repository/postgres/schema.sql
 ```
 
-### Migration Tools
+### Tool Migrasi
 
-Use migration tool for production:
+Gunakan tool migrasi untuk production:
 
 **golang-migrate:**
 ```bash
 go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
 
-# Create migration
+# Buat migrasi
 migrate create -ext sql -dir db/migrations -seq add_customers
 
-# Run migrations
+# Jalankan migrasi
 migrate -database $DATABASE_URL -path db/migrations up
 ```
 
@@ -373,15 +373,15 @@ migrate -database $DATABASE_URL -path db/migrations up
 ```bash
 go install github.com/pressly/goose/v3/cmd/goose@latest
 
-# Run migrations
+# Jalankan migrasi
 goose -dir db/migrations postgres $DATABASE_URL up
 ```
 
-## Health Checks
+## Health Check
 
-Verify database connectivity:
+Verifikasi konektivitas database:
 
-### In Code
+### Di Kode
 
 ```go
 // Ping database
@@ -393,11 +393,11 @@ if err := db.Ping(context.Background()); err != nil {
 
 ### Endpoint
 
-Generated main.go includes health check:
+main.go yang dihasilkan menyertakan health check:
 
 ```bash
 curl http://localhost:8080/health
-# Returns: OK (if database connected)
+# Return: OK (jika database terhubung)
 ```
 
 ## Troubleshooting
@@ -408,8 +408,8 @@ curl http://localhost:8080/health
 Error: connection refused
 ```
 
-**Solutions:**
-1. Check database is running:
+**Solusi:**
+1. Cek apakah database berjalan:
    ```bash
    # PostgreSQL
    docker ps | grep postgres
@@ -420,8 +420,8 @@ Error: connection refused
    mysqladmin ping -h localhost
    ```
 
-2. Check port is correct
-3. Check firewall rules
+2. Cek apakah port benar
+3. Cek aturan firewall
 
 ### Authentication Failed
 
@@ -429,26 +429,26 @@ Error: connection refused
 Error: authentication failed
 ```
 
-**Solutions:**
-1. Verify username/password
-2. Check database exists:
+**Solusi:**
+1. Verifikasi username/password
+2. Cek apakah database ada:
    ```bash
    psql -h localhost -U postgres -l
    ```
-3. Verify user permissions
+3. Verifikasi permission user
 
-### Too Many Connections
+### Too Many Connection
 
 ```
 Error: sorry, too many clients already
 ```
 
-**Solutions:**
-1. Reduce pool size:
+**Solusi:**
+1. Kurangi ukuran pool:
    ```bash
    DATABASE_URL="...?pool_max_conns=10"
    ```
-2. Increase database max connections:
+2. Tingkatkan max connection database:
    ```sql
    ALTER SYSTEM SET max_connections = 200;
    ```
@@ -459,44 +459,44 @@ Error: sorry, too many clients already
 Error: SSL required
 ```
 
-**Solution:**
+**Solusi:**
 ```bash
 DATABASE_URL="...?sslmode=require"
 ```
 
-## Best Practices
+## Best Practice
 
-### Security
+### Keamanan
 
-- **Never commit credentials** to git
-- Use environment variables
-- Rotate passwords regularly
-- Use SSL in production
-- Limit user permissions
+- **Jangan commit kredensial** ke git
+- Gunakan environment variable
+- Rotasi password secara berkala
+- Gunakan SSL di production
+- Batasi permission user
 
 ```sql
--- Create app user with limited permissions
+-- Buat app user dengan permission terbatas
 CREATE USER myapp WITH PASSWORD 'secure_password';
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO myapp;
 ```
 
-### Performance
+### Performa
 
-- Use connection pooling
-- Set appropriate pool size
-- Monitor slow queries
-- Add indexes for frequent queries
-- Use prepared statements
+- Gunakan connection pooling
+- Set ukuran pool yang sesuai
+- Monitor query lambat
+- Tambahkan index untuk query sering
+- Gunakan prepared statement
 
-### Reliability
+### Reliabilitas
 
-- Enable automatic reconnection
-- Set connection timeouts
+- Aktifkan automatic reconnection
+- Set connection timeout
 - Monitor connection pool
-- Use read replicas for scaling
+- Gunakan read replica untuk scaling
 
-## See Also
+## Lihat Juga
 
 - [gen repository](/reference/gen-repository)
-- [Architecture](/guide/architecture)
-- [Examples](/examples/basic)
+- [Arsitektur](/guide/architecture)
+- [Contoh](/examples/basic)

@@ -8,6 +8,121 @@ If this is your first time using Anaphase or Go, read the [Common Issues](#commo
 
 ## Common Issues
 
+### Interactive Menu Issues
+
+**Problem:**
+```bash
+$ anaphase
+# Menu appears but commands don't work as expected
+```
+
+**What it means:**
+As of v0.4.0, running `anaphase` without arguments launches an interactive TUI menu. If you experience issues, you can always fall back to direct commands.
+
+**Fix:**
+
+**If menu is unresponsive:**
+```bash
+# Use direct commands instead
+anaphase init my-project
+anaphase gen domain --name user
+
+# Or check terminal compatibility
+echo $TERM
+# Should show something like "xterm-256color"
+```
+
+**If menu doesn't display correctly:**
+```bash
+# Update your terminal or use commands directly
+# The menu requires a terminal that supports escape sequences
+
+# Bypass menu entirely
+anaphase --help  # Shows all available commands
+```
+
+**Navigation tips:**
+- Use arrow keys or j/k to navigate
+- Press Enter to select
+- Press ESC or q to go back/quit
+- Press Ctrl+C to exit immediately
+
+---
+
+### Template Mode vs AI Mode Issues
+
+**Problem:**
+```bash
+$ anaphase gen domain --name user --prompt "User with email"
+Error: GEMINI_API_KEY environment variable not set
+```
+
+**What it means:**
+You're trying to use AI mode without an API key. As of v0.4.0, you can choose between Template and AI modes.
+
+**Fix:**
+
+**Option 1: Use Template Mode (no API key needed)**
+```bash
+# Template mode is fast and requires no API key
+anaphase gen domain --name user --template
+
+# Or use the interactive menu and select Template Mode
+anaphase
+```
+
+**Option 2: Set up AI Mode**
+```bash
+# Get API key from https://makersuite.google.com/app/apikey
+export GEMINI_API_KEY="your-key-here"
+
+# Now you can use AI mode
+anaphase gen domain --name user --prompt "User with email and profile"
+```
+
+**When to use each mode:**
+- **Template Mode**: Quick scaffolding, simple domains, no API key available
+- **AI Mode**: Complex business logic, advanced DDD patterns, domain events
+
+---
+
+### Auto-Setup Issues
+
+**Problem:**
+```bash
+$ anaphase init my-project
+# Dependencies not automatically installed
+```
+
+**What it means:**
+As of v0.4.0, auto-setup features attempt to run `go mod download` automatically, but may fail if Go is not properly configured.
+
+**Fix:**
+
+**If auto-setup fails:**
+```bash
+# Manually complete the setup
+cd my-project
+go mod download
+go mod tidy
+
+# Verify Go is configured
+go version
+go env GOPATH
+```
+
+**Disable auto-setup if causing issues:**
+```bash
+# Generate without auto-setup
+anaphase init my-project --no-auto-setup
+
+# Then manually run
+cd my-project
+go mod download
+```
+
+---
+
 ### "missing go.sum entry" Error
 
 **Problem:**
@@ -78,9 +193,21 @@ Error: GEMINI_API_KEY environment variable not set
 ```
 
 **What it means:**
-Anaphase needs a Gemini API key to generate code with AI.
+The `--prompt` flag requires AI mode, which needs a Gemini API key. However, AI is optional in v0.4.0.
 
 **Fix:**
+
+**Option 1: Use Template Mode (recommended for most cases)**
+```bash
+# No API key needed - uses templates
+anaphase gen domain --name user --template
+
+# Or use the interactive menu
+anaphase
+# Select "Template Mode" when prompted
+```
+
+**Option 2: Set up AI Mode (for advanced features)**
 
 1. **Get API key:**
    - Go to https://makersuite.google.com/app/apikey
@@ -102,7 +229,14 @@ source ~/.zshrc
 ```bash
 echo $GEMINI_API_KEY
 # Should print your key
+
+# Now use AI mode with prompts
+anaphase gen domain --name user --prompt "User with email and profile"
 ```
+
+::: tip AI is Optional
+You don't need an API key to use Anaphase! Template mode provides all core functionality without external dependencies. Use AI mode only when you need advanced domain modeling.
+:::
 
 ---
 
@@ -328,7 +462,21 @@ curl -fsSL https://raw.githubusercontent.com/lisvindanu/anaphase-cli/main/instal
 anaphase --version
 ```
 
-### 3. Get Gemini API Key
+### 3. Choose Your Mode
+
+::: tip New in v0.4.0
+You can now choose between Template Mode (no setup needed) and AI Mode (requires API key).
+
+**Start with Template Mode** - it's simpler and doesn't require any API keys!
+:::
+
+**Option A: Template Mode (Recommended for Beginners)**
+```bash
+# No additional setup needed!
+# Skip to Step 4
+```
+
+**Option B: AI Mode (Optional)**
 
 1. Go to https://makersuite.google.com/app/apikey
 2. Create API key
@@ -358,16 +506,25 @@ source ~/.zshrc
 
 ### 5. Create Your First Project
 
+::: tip Use the Interactive Menu
+As of v0.4.0, you can use the interactive menu for easier project creation:
+```bash
+anaphase  # Launches interactive menu
+```
+Or continue with commands as shown below.
+:::
+
+**Using Template Mode (No API Key Needed):**
 ```bash
 # Create project
 anaphase init my-api
 cd my-api
 
-# Download dependencies (IMPORTANT!)
-go mod download
+# Auto-setup will run go mod download for you
+# If it fails, run manually: go mod download
 
-# Generate a domain
-anaphase gen domain --name user --prompt "User with email and name"
+# Generate a domain using templates
+anaphase gen domain --name user --template
 
 # Download new dependencies
 go mod tidy
@@ -385,6 +542,24 @@ anaphase wire
 go mod tidy
 
 # Run!
+make run
+```
+
+**Using AI Mode (Requires API Key):**
+```bash
+# Create project
+anaphase init my-api
+cd my-api
+
+# Generate a domain with AI
+anaphase gen domain --name user --prompt "User with email, name, and optional profile picture URL"
+
+# Rest is the same
+go mod tidy
+anaphase gen handler --domain user
+anaphase gen repository --domain user --db postgres
+anaphase wire
+go mod tidy
 make run
 ```
 
@@ -527,8 +702,17 @@ go mod download
 **Q: Do I need to know Go?**
 A: Basic Go knowledge helps, but Anaphase generates most code for you.
 
+**Q: Do I need a Gemini API key?**
+A: No! As of v0.4.0, Template Mode requires no API key. AI mode is completely optional.
+
+**Q: What's the difference between Template and AI mode?**
+A: Template mode uses predefined scaffolding (fast, deterministic). AI mode generates more sophisticated domain models based on natural language prompts.
+
 **Q: Is Gemini API free?**
-A: Yes! Free tier includes 60 requests/minute.
+A: Yes! Free tier includes 60 requests/minute. But remember, you can use Template Mode without any API key.
+
+**Q: Can I use the interactive menu on any terminal?**
+A: The menu works on most modern terminals. If you have issues, use direct commands instead.
 
 **Q: Can I use MySQL instead of PostgreSQL?**
 A: Yes! Use `--db mysql` when generating repositories.
@@ -538,6 +722,9 @@ A: Edit the generated service layer files. See [Custom Handlers](/examples/custo
 
 **Q: Can I run without Docker?**
 A: Yes, install PostgreSQL natively for your OS.
+
+**Q: Can I switch between Template and AI mode?**
+A: Yes! Use Template mode for basic scaffolding, then manually enhance or use AI mode for complex additions.
 
 ---
 
@@ -628,9 +815,13 @@ make clean   # Clean everything
 
 ---
 
-::: tip Remember
-1. Always run `go mod tidy` after generating code
-2. Set environment variables before running
-3. Check database is running
-4. Read error messages - they usually tell you what's wrong!
+::: tip Remember (v0.4.0+)
+1. Try the interactive menu: `anaphase` (no arguments)
+2. Use Template Mode first - no API key needed!
+3. Always run `go mod tidy` after generating code
+4. Auto-setup runs `go mod download` automatically, but verify it worked
+5. AI Mode is optional - Template Mode covers most use cases
+6. Set environment variables before running
+7. Check database is running
+8. Read error messages - they usually tell you what's wrong!
 :::

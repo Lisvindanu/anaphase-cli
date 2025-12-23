@@ -1,25 +1,25 @@
-# Custom Handlers and Middleware
+# Custom Handler dan Middleware
 
-Learn how to customize generated handlers and add middleware for authentication, validation, logging, and more.
+Pelajari cara mengkustomisasi handler yang dihasilkan dan menambahkan middleware untuk authentication, validation, logging, dan lainnya.
 
-::: info v0.4.0 Features
-This guide works with both **Template Mode** and **AI Mode**. Use the **Interactive Menu** (`anaphase`) for easier navigation through generation options. All handlers are generated with best practices and can be easily extended!
+::: info Fitur v0.4.0
+Panduan ini bekerja dengan **Template Mode** dan **AI Mode**. Gunakan **Interactive Menu** (`anaphase`) untuk navigasi yang lebih mudah melalui opsi generasi. Semua handler dihasilkan dengan best practice dan dapat dengan mudah diperluas!
 :::
 
-## Overview
+## Gambaran Umum
 
-Anaphase generates basic CRUD handlers, but real applications need:
+Anaphase menghasilkan handler CRUD dasar, tetapi aplikasi nyata membutuhkan:
 
-- **Authentication** - JWT, OAuth, API keys
+- **Authentication** - JWT, OAuth, API key
 - **Authorization** - Role-based access control
-- **Validation** - Request validation and sanitization
-- **Rate Limiting** - Protect against abuse
-- **Logging** - Structured logging with correlation IDs
-- **Error Handling** - Consistent error responses
+- **Validation** - Validasi dan sanitasi request
+- **Rate Limiting** - Perlindungan terhadap penyalahgunaan
+- **Logging** - Structured logging dengan correlation ID
+- **Error Handling** - Response error yang konsisten
 - **Caching** - Response caching
 - **CORS** - Cross-origin resource sharing
 
-This guide shows how to extend generated handlers with these features.
+Panduan ini menunjukkan cara memperluas handler yang dihasilkan dengan fitur-fitur ini.
 
 ## Authentication Middleware
 
@@ -51,7 +51,7 @@ type Claims struct {
 func JWTAuth(jwtSecret string) func(http.Handler) http.Handler {
     return func(next http.Handler) http.Handler {
         return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-            // Extract token from header
+            // Ekstrak token dari header
             authHeader := r.Header.Get("Authorization")
             if authHeader == "" {
                 http.Error(w, "unauthorized", http.StatusUnauthorized)
@@ -60,7 +60,7 @@ func JWTAuth(jwtSecret string) func(http.Handler) http.Handler {
 
             tokenString := strings.TrimPrefix(authHeader, "Bearer ")
 
-            // Parse and validate token
+            // Parse dan validasi token
             claims := &Claims{}
             token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
                 return []byte(jwtSecret), nil
@@ -71,27 +71,27 @@ func JWTAuth(jwtSecret string) func(http.Handler) http.Handler {
                 return
             }
 
-            // Add user info to context
+            // Tambahkan info user ke context
             ctx := context.WithValue(r.Context(), UserContextKey, claims)
             next.ServeHTTP(w, r.WithContext(ctx))
         })
     }
 }
 
-// Helper to get user from context
+// Helper untuk mendapatkan user dari context
 func GetUser(ctx context.Context) (*Claims, bool) {
     user, ok := ctx.Value(UserContextKey).(*Claims)
     return user, ok
 }
 ```
 
-### Apply to Routes
+### Terapkan ke Route
 
 ```go
 // internal/adapter/handler/http/customer_handler.go
 func (h *CustomerHandler) RegisterRoutes(r chi.Router) {
     r.Group(func(r chi.Router) {
-        // Apply auth middleware
+        // Terapkan auth middleware
         r.Use(middleware.JWTAuth(os.Getenv("JWT_SECRET")))
 
         r.Post("/customers", h.Create)
@@ -102,25 +102,25 @@ func (h *CustomerHandler) RegisterRoutes(r chi.Router) {
 }
 ```
 
-### Use in Handler
+### Gunakan di Handler
 
 ```go
 func (h *CustomerHandler) GetByID(w http.ResponseWriter, r *http.Request) {
-    // Get authenticated user
+    // Dapatkan authenticated user
     user, ok := middleware.GetUser(r.Context())
     if !ok {
         h.respondError(w, http.StatusUnauthorized, "unauthorized")
         return
     }
 
-    // Check authorization
+    // Cek authorization
     customerID := chi.URLParam(r, "id")
     if user.UserID != customerID && user.Role != "admin" {
         h.respondError(w, http.StatusForbidden, "forbidden")
         return
     }
 
-    // Continue with normal logic
+    // Lanjutkan dengan logika normal
     customer, err := h.service.GetCustomer(r.Context(), customerID)
     if err != nil {
         h.respondError(w, http.StatusNotFound, "customer not found")
@@ -133,7 +133,7 @@ func (h *CustomerHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 
 ## Request Validation
 
-### Using go-playground/validator
+### Menggunakan go-playground/validator
 
 ```go
 // internal/adapter/handler/http/customer_handler.go
@@ -156,14 +156,14 @@ func (h *CustomerHandler) Create(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    // Validate request
+    // Validasi request
     if err := validate.Struct(req); err != nil {
         validationErrors := err.(validator.ValidationErrors)
         h.respondValidationError(w, validationErrors)
         return
     }
 
-    // Process request...
+    // Proses request...
 }
 
 func (h *CustomerHandler) respondValidationError(w http.ResponseWriter, errors validator.ValidationErrors) {
@@ -181,22 +181,22 @@ func (h *CustomerHandler) respondValidationError(w http.ResponseWriter, errors v
 func formatValidationError(err validator.FieldError) string {
     switch err.Tag() {
     case "required":
-        return "this field is required"
+        return "kolom ini wajib diisi"
     case "email":
-        return "invalid email format"
+        return "format email tidak valid"
     case "min":
-        return fmt.Sprintf("must be at least %s characters", err.Param())
+        return fmt.Sprintf("minimal %s karakter", err.Param())
     case "max":
-        return fmt.Sprintf("must be at most %s characters", err.Param())
+        return fmt.Sprintf("maksimal %s karakter", err.Param())
     default:
-        return "invalid value"
+        return "nilai tidak valid"
     }
 }
 ```
 
 ## Rate Limiting
 
-### Using golang.org/x/time/rate
+### Menggunakan golang.org/x/time/rate
 
 ```go
 // internal/middleware/ratelimit.go
@@ -279,23 +279,23 @@ func (rl *RateLimiter) Limit(next http.Handler) http.Handler {
 }
 ```
 
-### Apply Rate Limiting
+### Terapkan Rate Limiting
 
 ```go
 func main() {
-    // 10 requests per second with burst of 20
+    // 10 request per detik dengan burst 20
     rateLimiter := middleware.NewRateLimiter(10, 20)
 
     r := chi.NewRouter()
     r.Use(rateLimiter.Limit)
 
-    // Register routes...
+    // Register route...
 }
 ```
 
 ## Structured Logging
 
-### Request Logging with Correlation IDs
+### Request Logging dengan Correlation ID
 
 ```go
 // internal/middleware/logging.go
@@ -342,7 +342,7 @@ func RequestLogger(logger *slog.Logger) func(http.Handler) http.Handler {
                 status:         http.StatusOK,
             }
 
-            // Add correlation ID to context
+            // Tambahkan correlation ID ke context
             ctx := r.Context()
             logger := logger.With(
                 "correlation_id", correlationID,
@@ -351,7 +351,7 @@ func RequestLogger(logger *slog.Logger) func(http.Handler) http.Handler {
                 "remote_addr", r.RemoteAddr,
             )
 
-            // Process request
+            // Proses request
             next.ServeHTTP(rw, r)
 
             // Log request
@@ -367,7 +367,7 @@ func RequestLogger(logger *slog.Logger) func(http.Handler) http.Handler {
 
 ## Error Handling
 
-### Consistent Error Responses
+### Response Error yang Konsisten
 
 ```go
 // internal/adapter/handler/http/errors.go
@@ -409,7 +409,7 @@ func (h *BaseHandler) respondValidationError(w http.ResponseWriter, r *http.Requ
 
     resp := ErrorResponse{
         Error:            "validation_failed",
-        Message:          "request validation failed",
+        Message:          "validasi request gagal",
         CorrelationID:    correlationID,
         ValidationErrors: errors,
     }
@@ -457,7 +457,7 @@ func NewCacheMiddleware(redisURL string, ttl time.Duration) (*CacheMiddleware, e
 
 func (c *CacheMiddleware) Cache(next http.Handler) http.Handler {
     return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-        // Only cache GET requests
+        // Hanya cache GET request
         if r.Method != http.MethodGet {
             next.ServeHTTP(w, r)
             return
@@ -466,7 +466,7 @@ func (c *CacheMiddleware) Cache(next http.Handler) http.Handler {
         // Generate cache key
         key := c.cacheKey(r)
 
-        // Try to get from cache
+        // Coba ambil dari cache
         cached, err := c.redis.Get(r.Context(), key).Result()
         if err == nil {
             w.Header().Set("X-Cache", "HIT")
@@ -482,7 +482,7 @@ func (c *CacheMiddleware) Cache(next http.Handler) http.Handler {
 
         next.ServeHTTP(rw, r)
 
-        // Cache successful responses
+        // Cache response yang sukses
         if rw.status >= 200 && rw.status < 300 {
             c.redis.Set(r.Context(), key, rw.body, c.ttl)
             w.Header().Set("X-Cache", "MISS")
@@ -498,7 +498,7 @@ func (c *CacheMiddleware) cacheKey(r *http.Request) string {
 }
 ```
 
-## CORS Configuration
+## Konfigurasi CORS
 
 ```go
 // cmd/api/main.go
@@ -517,24 +517,24 @@ func main() {
         MaxAge:           300,
     }))
 
-    // Register routes...
+    // Register route...
 }
 ```
 
-## Complete Example
+## Contoh Lengkap
 
-::: info Getting Started
-Generate your initial handlers using **Template Mode** via the interactive menu, then customize them with the middleware patterns shown here!
+::: info Memulai
+Generate handler awal Anda menggunakan **Template Mode** via interactive menu, kemudian kustomisasi dengan pattern middleware yang ditunjukkan di sini!
 :::
 
-**Step 1: Generate base handlers using Interactive Menu**
+**Langkah 1: Generate handler dasar menggunakan Interactive Menu**
 ```bash
 anaphase
 # Select: Generate Handler
 # Choose your domain
 ```
 
-**Step 2: Add custom middleware**
+**Langkah 2: Tambahkan custom middleware**
 
 ```go
 // cmd/api/main.go
@@ -577,11 +577,11 @@ func main() {
         MaxAge:           300,
     }))
 
-    // Public routes
+    // Public route
     r.Post("/auth/login", loginHandler)
     r.Post("/auth/register", registerHandler)
 
-    // Protected routes
+    // Protected route
     r.Group(func(r chi.Router) {
         r.Use(middleware.JWTAuth(os.Getenv("JWT_SECRET")))
 
@@ -603,11 +603,11 @@ func main() {
 }
 ```
 
-::: info Zero-Config Setup
-Anaphase automatically creates your `.env` file with sensible defaults. Just update `JWT_SECRET` and other production values when ready!
+::: info Setup Tanpa Konfigurasi
+Anaphase secara otomatis membuat file `.env` Anda dengan nilai default yang masuk akal. Tinggal update `JWT_SECRET` dan nilai production lainnya saat siap!
 :::
 
-## Testing Custom Handlers
+## Testing Custom Handler
 
 ```go
 // internal/adapter/handler/http/customer_handler_test.go
@@ -638,12 +638,12 @@ func TestCustomerHandler_Create_WithAuth(t *testing.T) {
         })
     }
 
-    // Setup router with middleware
+    // Setup router dengan middleware
     r := chi.NewRouter()
     r.Use(authMiddleware)
     handler.RegisterRoutes(r)
 
-    // Create request
+    // Buat request
     req := httptest.NewRequest("POST", "/customers", strings.NewReader(`{
         "email": "test@example.com",
         "firstName": "John",
@@ -661,8 +661,8 @@ func TestCustomerHandler_Create_WithAuth(t *testing.T) {
 }
 ```
 
-## See Also
+## Lihat Juga
 
-- [Basic Example](/examples/basic)
-- [Multi-Domain Service](/examples/multi-domain)
-- [Architecture Guide](/guide/architecture)
+- [Contoh Dasar](/examples/basic)
+- [Service Multi-Domain](/examples/multi-domain)
+- [Panduan Arsitektur](/guide/architecture)

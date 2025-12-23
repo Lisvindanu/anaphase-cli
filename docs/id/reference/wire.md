@@ -1,9 +1,9 @@
 # anaphase wire
 
-Auto-wire dependencies and generate application entry point.
+Auto-wire dependencies dan generate application entry point.
 
 ::: info
-**Quick Access**: Run `anaphase` (no arguments) to access the interactive menu and select "Wire Dependencies" for a visual interface.
+**Akses Cepat**: Jalankan `anaphase` (tanpa argumen) untuk mengakses menu interaktif dan pilih "Wire Dependencies" untuk interface visual.
 :::
 
 ## Synopsis
@@ -12,62 +12,62 @@ Auto-wire dependencies and generate application entry point.
 anaphase wire [flags]
 ```
 
-## Description
+## Deskripsi
 
-Automatically discovers all domains in your project and generates:
+Secara otomatis menemukan semua domain di proyek Anda dan generate:
 
-- **main.go**: HTTP server with graceful shutdown
-- **wire.go**: Dependency injection code
+- **main.go**: HTTP server dengan graceful shutdown
+- **wire.go**: Kode dependency injection
 
-Uses AST (Abstract Syntax Tree) analysis to scan your codebase and detect entities, then wires all components together.
+Menggunakan analisis AST (Abstract Syntax Tree) untuk scan codebase Anda dan mendeteksi entity, kemudian menyambungkan semua komponen.
 
 ::: info
-**Auto-Wiring**: In v0.4.0, wiring happens automatically after generating handlers and repositories. You rarely need to run this command manually.
+**Auto-Wiring**: Di v0.4.0, wiring terjadi secara otomatis setelah generate handler dan repository. Anda jarang perlu menjalankan command ini secara manual.
 :::
 
-## Usage
+## Penggunaan
 
-### Interactive Menu (Recommended)
+### Menu Interaktif (Disarankan)
 
 ```bash
 anaphase
 ```
 
-Select **"Wire Dependencies"** from the menu. The interface:
-- Automatically detects all domains
-- Shows what will be wired
-- Allows custom output directory
-- Displays progress
+Pilih **"Wire Dependencies"** dari menu. Interface:
+- Secara otomatis mendeteksi semua domain
+- Menampilkan apa yang akan di-wire
+- Memungkinkan direktori output kustom
+- Menampilkan progress
 
-### CLI Direct Mode
+### Mode CLI Langsung
 
 ```bash
 anaphase wire [flags]
 ```
 
 ::: tip
-**Usually Automatic**: After running `anaphase gen handler` or `anaphase gen repository`, wiring happens automatically. You only need to run this manually when adding custom components.
+**Biasanya Otomatis**: Setelah menjalankan `anaphase gen handler` atau `anaphase gen repository`, wiring terjadi secara otomatis. Anda hanya perlu menjalankan ini secara manual ketika menambahkan komponen kustom.
 :::
 
-## How It Works
+## Cara Kerja
 
 ### 1. Domain Discovery
 
-Scans `internal/core/entity/` directory:
+Scan direktori `internal/core/entity/`:
 
 ```go
-// Finds all struct declarations
-type Customer struct { ... }  // Discovered: "customer"
-type Product struct { ... }   // Discovered: "product"
-type Order struct { ... }     // Discovered: "order"
+// Menemukan semua struct declaration
+type Customer struct { ... }  // Ditemukan: "customer"
+type Product struct { ... }   // Ditemukan: "product"
+type Order struct { ... }     // Ditemukan: "order"
 ```
 
 ### 2. Code Generation
 
-Generates wiring code for each discovered domain:
+Generate kode wiring untuk setiap domain yang ditemukan:
 
 ```go
-// App struct
+// Struct App
 type App struct {
     logger          *slog.Logger
     db              *pgxpool.Pool
@@ -76,19 +76,19 @@ type App struct {
     orderHandler    *handlerhttp.OrderHandler
 }
 
-// InitializeApp function
+// Fungsi InitializeApp
 func InitializeApp(logger *slog.Logger) (*App, error) {
-    // Database connection
+    // Koneksi database
     db, err := pgxpool.New(context.Background(), dbURL)
 
-    // Initialize each domain
+    // Inisialisasi setiap domain
     customerRepo := postgres.NewCustomerRepository(db)
     customerHandler := handlerhttp.NewCustomerHandler(nil, logger)
 
     productRepo := postgres.NewProductRepository(db)
     productHandler := handlerhttp.NewProductHandler(nil, logger)
 
-    // ... etc
+    // ... dst
 
     return &App{
         logger:          logger,
@@ -99,9 +99,9 @@ func InitializeApp(logger *slog.Logger) (*App, error) {
 }
 ```
 
-### 3. Route Registration
+### 3. Registrasi Route
 
-Generates route registration:
+Generate registrasi route:
 
 ```go
 func (a *App) RegisterRoutes(r chi.Router) {
@@ -111,11 +111,11 @@ func (a *App) RegisterRoutes(r chi.Router) {
 }
 ```
 
-## Flags
+## Flag
 
 ### `--output` (string)
 
-Output directory for generated files.
+Direktori output untuk file yang dihasilkan.
 
 - **Default**: `cmd/api`
 
@@ -123,16 +123,16 @@ Output directory for generated files.
 anaphase wire --output cmd/server
 ```
 
-## Generated Files
+## File yang Dihasilkan
 
 ### main.go
 
-Complete HTTP server with:
+HTTP server lengkap dengan:
 
-- Logger setup (JSON structured logging)
-- Context with cancellation
-- Database connection
-- Router setup (Chi)
+- Setup logger (JSON structured logging)
+- Context dengan cancellation
+- Koneksi database
+- Setup router (Chi)
 - Middleware (logger, recoverer, request ID, timeout)
 - Health check endpoint
 - Graceful shutdown
@@ -160,11 +160,11 @@ func main() {
     }))
     slog.SetDefault(logger)
 
-    // Create context with cancellation
+    // Buat context dengan cancellation
     ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
     defer cancel()
 
-    // Initialize dependencies
+    // Inisialisasi dependencies
     app, err := InitializeApp(logger)
     if err != nil {
         logger.Error("failed to initialize app", "error", err)
@@ -201,7 +201,7 @@ func main() {
         Handler: r,
     }
 
-    // Start server in goroutine
+    // Start server di goroutine
     go func() {
         logger.Info("starting server", "port", port)
         if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
@@ -209,7 +209,7 @@ func main() {
         }
     }()
 
-    // Wait for interrupt signal
+    // Tunggu interrupt signal
     <-ctx.Done()
     logger.Info("shutting down gracefully...")
 
@@ -227,12 +227,12 @@ func main() {
 
 ### wire.go
 
-Dependency injection with:
+Dependency injection dengan:
 
-- App struct holding all dependencies
-- InitializeApp function
-- RegisterRoutes method
-- Cleanup method
+- Struct App yang menyimpan semua dependency
+- Fungsi InitializeApp
+- Metode RegisterRoutes
+- Metode Cleanup
 
 ```go
 package main
@@ -250,7 +250,7 @@ import (
     "github.com/lisvindanu/anaphase-cli/internal/adapter/repository/postgres"
 )
 
-// App holds all application dependencies
+// App menyimpan semua application dependency
 type App struct {
     logger *slog.Logger
     db     *pgxpool.Pool
@@ -258,9 +258,9 @@ type App struct {
     customerHandler *handlerhttp.CustomerHandler
 }
 
-// InitializeApp initializes all application dependencies
+// InitializeApp menginisialisasi semua application dependency
 func InitializeApp(logger *slog.Logger) (*App, error) {
-    // Database connection
+    // Koneksi database
     dbURL := os.Getenv("DATABASE_URL")
     if dbURL == "" {
         dbURL = "postgres://postgres:postgres@localhost:5432/anaphase?sslmode=disable"
@@ -278,10 +278,10 @@ func InitializeApp(logger *slog.Logger) (*App, error) {
 
     logger.Info("database connected")
 
-    // Initialize customer dependencies
+    // Inisialisasi customer dependency
     customerRepo := postgres.NewCustomerRepository(db)
     _ = customerRepo // TODO: Pass to service when implemented
-    // TODO: Create customer service implementation
+    // TODO: Buat customer service implementation
     // customerService := service.NewCustomerService(customerRepo)
     customerHandler := handlerhttp.NewCustomerHandler(nil, logger)
 
@@ -292,12 +292,12 @@ func InitializeApp(logger *slog.Logger) (*App, error) {
     }, nil
 }
 
-// RegisterRoutes registers all HTTP routes
+// RegisterRoutes mendaftarkan semua HTTP route
 func (a *App) RegisterRoutes(r chi.Router) {
     a.customerHandler.RegisterRoutes(r)
 }
 
-// Cleanup cleans up application resources
+// Cleanup membersihkan application resource
 func (a *App) Cleanup() {
     if a.db != nil {
         a.db.Close()
@@ -306,54 +306,54 @@ func (a *App) Cleanup() {
 }
 ```
 
-## Examples
+## Contoh
 
-### Using Interactive Menu
+### Menggunakan Menu Interaktif
 
 ```bash
-# Launch menu
+# Luncurkan menu
 anaphase
 
-# Follow the workflow:
-# 1. Generate Domain (auto-wires)
-# 2. Generate Handler (auto-wires)
-# 3. Generate Repository (auto-wires)
-# → Wiring happens automatically!
+# Ikuti workflow:
+# 1. Generate Domain (auto-wire)
+# 2. Generate Handler (auto-wire)
+# 3. Generate Repository (auto-wire)
+# → Wiring terjadi secara otomatis!
 
-# Or manually select "Wire Dependencies" to rewire
+# Atau pilih manual "Wire Dependencies" untuk rewire
 ```
 
-### Using CLI (Auto-Wiring)
+### Menggunakan CLI (Auto-Wiring)
 
 ```bash
-# Generate domains and infrastructure
+# Generate domain dan infrastructure
 anaphase gen domain "Customer with email and name"
 anaphase gen handler --domain customer
 anaphase gen repository --domain customer
-# → Auto-wiring happens after each command
+# → Auto-wiring terjadi setelah setiap command
 
 anaphase gen domain "Product with SKU and price"
 anaphase gen handler --domain product
 anaphase gen repository --domain product
-# → Auto-wiring happens again
+# → Auto-wiring terjadi lagi
 
-# Already wired! No need to run `anaphase wire`
+# Sudah ter-wire! Tidak perlu menjalankan `anaphase wire`
 ```
 
-### Manual Wiring (When Needed)
+### Manual Wiring (Ketika Diperlukan)
 
 ```bash
-# Only needed when adding custom components or troubleshooting
+# Hanya diperlukan ketika menambahkan komponen kustom atau troubleshooting
 anaphase wire
 ```
 
-### Custom Output
+### Output Kustom
 
 ```bash
-# Generate to custom directory
+# Generate ke direktori kustom
 anaphase wire --output cmd/server
 
-# Files created:
+# File yang dibuat:
 # - cmd/server/main.go
 # - cmd/server/wire.go
 ```
@@ -371,72 +371,72 @@ anaphase wire --output cmd/worker
 anaphase wire --output cmd/admin
 ```
 
-## What Gets Wired
+## Yang Di-wire
 
 ### Database
 
 - PostgreSQL connection pool (pgxpool)
-- Connection from `DATABASE_URL` env var
+- Connection dari env var `DATABASE_URL`
 - Default: `postgres://postgres:postgres@localhost:5432/anaphase?sslmode=disable`
-- Ping check on startup
+- Ping check saat startup
 
-### Repositories
+### Repository
 
-For each domain:
+Untuk setiap domain:
 ```go
 customerRepo := postgres.NewCustomerRepository(db)
 ```
 
 ::: tip Service Layer
-Repository is created but service layer is left for you to implement:
+Repository dibuat tetapi service layer ditinggalkan untuk Anda implementasikan:
 ```go
-// TODO: Create customer service implementation
+// TODO: Buat customer service implementation
 // customerService := service.NewCustomerService(customerRepo)
 ```
 :::
 
-### Handlers
+### Handler
 
-For each domain:
+Untuk setiap domain:
 ```go
 customerHandler := handlerhttp.NewCustomerHandler(nil, logger)
 ```
 
-Nil passed for service (implement service layer to use).
+Nil diteruskan untuk service (implementasikan service layer untuk digunakan).
 
-### Routes
+### Route
 
-All handlers registered under `/api/v1`:
+Semua handler didaftarkan di bawah `/api/v1`:
 
 ```
 GET  /health                    → Health check
-POST /api/v1/customers          → Create customer
-GET  /api/v1/customers/:id      → Get customer
+POST /api/v1/customers          → Buat customer
+GET  /api/v1/customers/:id      → Dapatkan customer
 PUT  /api/v1/customers/:id      → Update customer
-DELETE /api/v1/customers/:id    → Delete customer
+DELETE /api/v1/customers/:id    → Hapus customer
 ```
 
-## Environment Variables
+## Environment Variable
 
-The generated app uses:
+Aplikasi yang dihasilkan menggunakan:
 
-| Variable | Description | Default |
+| Variable | Deskripsi | Default |
 |----------|-------------|---------|
-| `DATABASE_URL` | PostgreSQL connection | `postgres://...` |
-| `PORT` | HTTP server port | `8080` |
+| `DATABASE_URL` | Koneksi PostgreSQL | `postgres://...` |
+| `PORT` | Port HTTP server | `8080` |
 
-## Running the App
+## Menjalankan Aplikasi
 
-After wiring:
+Setelah wiring:
 
 ```bash
-# Set up database
+# Setup database
 export DATABASE_URL="postgres://postgres:postgres@localhost:5432/anaphase"
 
-# Apply migrations
+# Terapkan migration
 psql $DATABASE_URL -f internal/adapter/repository/postgres/schema.sql
 
-# Run
+# Jalankan
 go run cmd/api/main.go
 ```
 
@@ -446,82 +446,82 @@ Output:
 {"time":"...","level":"INFO","msg":"starting server","port":"8080"}
 ```
 
-## Regenerating
+## Regenerasi
 
-Safe to run multiple times:
+Aman untuk dijalankan berkali-kali:
 
 ```bash
-# Add new domain
+# Tambahkan domain baru
 anaphase gen domain "Order with items and total"
 anaphase gen handler --domain order
-# → Auto-wiring happens automatically
+# → Auto-wiring terjadi secara otomatis
 
-# Or manually rewire if needed
+# Atau rewire manual jika diperlukan
 anaphase wire
 ```
 
-Existing `main.go` and `wire.go` will be overwritten.
+`main.go` dan `wire.go` yang sudah ada akan ditimpa.
 
-::: warning Custom Changes
-Don't manually edit generated `main.go` or `wire.go` - changes will be lost on rewire.
+::: warning Perubahan Kustom
+Jangan edit manual `main.go` atau `wire.go` yang dihasilkan - perubahan akan hilang saat rewire.
 
-For customizations:
-- Extend handlers
-- Create middleware files (see `anaphase gen middleware`)
-- Modify in service layer
+Untuk kustomisasi:
+- Extend handler
+- Buat file middleware (lihat `anaphase gen middleware`)
+- Modifikasi di service layer
 :::
 
-::: tip Auto-Wiring in v0.4.0
-Auto-wiring happens automatically after generating handlers and repositories. The system detects changes and rewires dependencies without manual intervention.
+::: tip Auto-Wiring di v0.4.0
+Auto-wiring terjadi secara otomatis setelah generate handler dan repository. Sistem mendeteksi perubahan dan rewire dependency tanpa intervensi manual.
 :::
 
 ## Troubleshooting
 
-### No Domains Found
+### Tidak Ada Domain yang Ditemukan
 
 ```
 discovered domains: count=0
 ```
 
-**Cause**: No entities in `internal/core/entity/`
+**Penyebab**: Tidak ada entity di `internal/core/entity/`
 
-**Solution**: Generate a domain first:
+**Solusi**: Generate domain terlebih dahulu:
 ```bash
-# Interactive menu (recommended)
+# Menu interaktif (disarankan)
 anaphase
-# Select "Generate Domain"
+# Pilih "Generate Domain"
 
-# Or CLI
+# Atau CLI
 anaphase gen domain "Customer with email and name"
 ```
 
-### Import Errors
+### Error Import
 
 ```
 could not import github.com/lisvindanu/anaphase-cli/internal/adapter/handler/http
 ```
 
-**Cause**: Handlers not generated yet
+**Penyebab**: Handler belum dihasilkan
 
-**Solution**: Generate handlers:
+**Solusi**: Generate handler:
 ```bash
 anaphase gen handler --domain customer
 ```
 
-### Database Connection Failed
+### Koneksi Database Gagal
 
 ```
 Error: connect to database: connection refused
 ```
 
-**Cause**: Database not running
+**Penyebab**: Database tidak berjalan
 
-**Solution**: Start database:
+**Solusi**: Start database:
 ```bash
 docker run -d -p 5432:5432 -e POSTGRES_PASSWORD=postgres postgres:16
 ```
 
-## See Also
+## Lihat Juga
 
 - [gen domain](/reference/gen-domain)
 - [gen handler](/reference/gen-handler)

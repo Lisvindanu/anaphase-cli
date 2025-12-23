@@ -1,19 +1,19 @@
 # Architecture
 
-::: tip Interactive Menu Available
-As of v0.4.0, Anaphase includes an interactive TUI menu for easier project management. Run `anaphase` without arguments to access the menu, or continue using individual commands as shown in this guide.
+::: tip Menu Interaktif Tersedia
+Sejak v0.4.0, Anaphase menyediakan menu TUI interaktif untuk memudahkan pengelolaan proyek. Jalankan `anaphase` tanpa argumen untuk mengakses menu, atau lanjutkan menggunakan perintah individual seperti yang ditunjukkan dalam panduan ini.
 :::
 
-Anaphase generates code following Clean Architecture, Hexagonal Architecture, and Domain-Driven Design (DDD) principles. Code generation is available in two modes:
+Anaphase menghasilkan kode yang mengikuti prinsip Clean Architecture, Hexagonal Architecture, dan Domain-Driven Design (DDD). Generasi kode tersedia dalam dua mode:
 
-- **Template Mode**: Fast, deterministic scaffolding using predefined templates (no API key required)
-- **AI Mode**: Advanced generation using Gemini AI for complex domain modeling (requires GEMINI_API_KEY)
+- **Template Mode**: Scaffolding cepat dan deterministik menggunakan template yang sudah disiapkan (tidak memerlukan API key)
+- **AI Mode**: Generasi tingkat lanjut menggunakan Gemini AI untuk pemodelan domain yang kompleks (memerlukan GEMINI_API_KEY)
 
-Both modes follow the same architectural patterns and generate DDD-compliant code. AI mode can generate more sophisticated domain patterns and business logic.
+Kedua mode mengikuti pola arsitektur yang sama dan menghasilkan kode yang sesuai dengan DDD. AI mode dapat menghasilkan pola domain dan logika bisnis yang lebih canggih.
 
 ## Overview
 
-The generated project structure enforces separation of concerns:
+Struktur proyek yang dihasilkan memaksakan pemisahan concern:
 
 ```
 my-app/
@@ -39,11 +39,11 @@ my-app/
 
 ### 1. Domain Layer (`internal/core/`)
 
-The heart of your application. Contains business logic and is independent of any framework or infrastructure.
+Inti dari aplikasi Anda. Berisi logika bisnis dan independen dari framework atau infrastruktur apapun.
 
 #### Entities (`entity/`)
 
-Objects with identity that persist over time:
+Objek dengan identitas yang persisten dari waktu ke waktu:
 
 ```go
 // internal/core/entity/customer.go
@@ -68,15 +68,15 @@ func (c *Customer) UpdateEmail(email *valueobject.Email) error {
 }
 ```
 
-**Key characteristics:**
-- Has unique identity (ID)
-- Contains business rules
-- Mutable state
-- Lifecycle tracked (CreatedAt, UpdatedAt)
+**Karakteristik utama:**
+- Memiliki identitas unik (ID)
+- Berisi aturan bisnis
+- State yang dapat berubah (mutable)
+- Lifecycle yang dilacak (CreatedAt, UpdatedAt)
 
 #### Value Objects (`valueobject/`)
 
-Immutable objects without identity, defined by their attributes:
+Objek immutable tanpa identitas, didefinisikan berdasarkan atributnya:
 
 ```go
 // internal/core/valueobject/email.go
@@ -98,15 +98,15 @@ func (e *Email) String() string {
 }
 ```
 
-**Key characteristics:**
-- No identity, compared by value
+**Karakteristik utama:**
+- Tidak memiliki identitas, dibandingkan berdasarkan nilai
 - Immutable
-- Self-validating
-- Can be shared
+- Validasi mandiri (self-validating)
+- Dapat dibagikan (shared)
 
 #### Ports (`port/`)
 
-Interfaces defining contracts between layers:
+Interface yang mendefinisikan kontrak antar layer:
 
 ```go
 // internal/core/port/customer_repo.go
@@ -124,18 +124,18 @@ type CustomerService interface {
 }
 ```
 
-**Benefits:**
+**Keuntungan:**
 - Dependency inversion
-- Easy testing with mocks
-- Swap implementations
+- Mudah untuk testing dengan mocks
+- Swap implementasi dengan mudah
 
 ### 2. Adapter Layer (`internal/adapter/`)
 
-Implements the ports and handles external concerns.
+Mengimplementasikan ports dan menangani concern eksternal.
 
 #### Handlers (`handler/http/`)
 
-HTTP request/response handling:
+Penanganan HTTP request/response:
 
 ```go
 // internal/adapter/handler/http/customer_handler.go
@@ -163,16 +163,16 @@ func (h *CustomerHandler) Create(w http.ResponseWriter, r *http.Request) {
 }
 ```
 
-**Responsibilities:**
+**Tanggung jawab:**
 - Parse HTTP requests
-- Validate input
-- Call service layer
+- Validasi input
+- Memanggil service layer
 - Format responses
-- Handle HTTP errors
+- Menangani HTTP errors
 
 #### Repositories (`repository/postgres/`)
 
-Database implementations:
+Implementasi database:
 
 ```go
 // internal/adapter/repository/postgres/customer_repo.go
@@ -194,7 +194,7 @@ func (r *customerRepository) Save(ctx context.Context, c *entity.Customer) error
 }
 ```
 
-**Responsibilities:**
+**Tanggung jawab:**
 - SQL queries
 - Data mapping (DB ↔ Entity)
 - Transaction management
@@ -202,7 +202,7 @@ func (r *customerRepository) Save(ctx context.Context, c *entity.Customer) error
 
 ### 3. Application Layer (`cmd/api/`)
 
-Wires everything together and starts the application.
+Menyatukan semua komponen dan menjalankan aplikasi.
 
 #### Main (`main.go`)
 
@@ -270,7 +270,7 @@ func InitializeApp(logger *slog.Logger) (*App, error) {
 
 ### Repository Pattern
 
-Abstracts data access:
+Abstraksi akses data:
 
 ```
 ┌──────────────┐
@@ -288,14 +288,14 @@ Abstracts data access:
 └──────────────────┘
 ```
 
-**Benefits:**
-- Swap databases easily
-- Test without database
-- Centralize data access logic
+**Keuntungan:**
+- Ganti database dengan mudah
+- Test tanpa database
+- Sentralisasi logika akses data
 
 ### Dependency Injection
 
-All dependencies injected via constructors:
+Semua dependency di-inject melalui constructor:
 
 ```go
 // Handler depends on Service
@@ -314,14 +314,14 @@ func NewCustomerService(repo port.CustomerRepository) *CustomerService {
 }
 ```
 
-**Benefits:**
-- Explicit dependencies
-- Easy testing
+**Keuntungan:**
+- Dependency yang eksplisit
+- Mudah untuk testing
 - Loose coupling
 
 ### Factory Pattern
 
-Constructors validate and construct objects:
+Constructor memvalidasi dan membuat objek:
 
 ```go
 func NewEmail(value string) (*Email, error) {
@@ -349,16 +349,16 @@ func NewCustomer(email *Email, name string) (*Customer, error) {
 
 ### Single Responsibility
 
-Each component has one reason to change:
+Setiap komponen memiliki satu alasan untuk berubah:
 
-- **Entity**: Business rules for domain object
+- **Entity**: Aturan bisnis untuk domain object
 - **Repository**: Data persistence
 - **Handler**: HTTP concerns
-- **Service**: Business logic orchestration
+- **Service**: Orkestrasi logika bisnis
 
 ### Open/Closed
 
-Open for extension, closed for modification:
+Terbuka untuk ekstensi, tertutup untuk modifikasi:
 
 ```go
 // Add new handler without modifying existing code
@@ -372,7 +372,7 @@ func (a *App) RegisterRoutes(r chi.Router) {
 
 ### Liskov Substitution
 
-Interfaces can be swapped:
+Interface dapat ditukar:
 
 ```go
 // Can swap implementations
@@ -385,7 +385,7 @@ repo = redis.NewCustomerRepository(cache)  // Caching
 
 ### Interface Segregation
 
-Small, focused interfaces:
+Interface yang kecil dan fokus:
 
 ```go
 // Not this:
@@ -410,7 +410,7 @@ type OrderRepository interface {
 
 ### Dependency Inversion
 
-Depend on abstractions, not concretions:
+Bergantung pada abstraksi, bukan implementasi konkret:
 
 ```go
 // Service depends on interface, not concrete implementation
@@ -462,7 +462,7 @@ Client receives structured error response
 
 ### Unit Tests
 
-Test each layer independently:
+Test setiap layer secara independen:
 
 ```go
 // Entity tests - pure logic
@@ -490,7 +490,7 @@ func TestCustomerHandler_Create(t *testing.T) {
 
 ### Integration Tests
 
-Test with real database:
+Test dengan database real:
 
 ```go
 func TestCustomerRepository_Save(t *testing.T) {
@@ -509,6 +509,6 @@ func TestCustomerRepository_Save(t *testing.T) {
 
 ## Next Steps
 
-- [AI-Powered Generation](/guide/ai-generation) - How AI generates this structure
-- [DDD Concepts](/guide/ddd) - Deep dive into Domain-Driven Design
-- [Command Reference](/reference/commands) - CLI commands
+- [AI-Powered Generation](/guide/ai-generation) - Bagaimana AI menghasilkan struktur ini
+- [DDD Concepts](/guide/ddd) - Deep dive ke Domain-Driven Design
+- [Command Reference](/reference/commands) - Perintah CLI

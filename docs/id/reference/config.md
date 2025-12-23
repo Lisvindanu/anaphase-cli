@@ -1,24 +1,24 @@
 # anaphase config
 
-Manage Anaphase configuration including AI providers, cache settings, and more.
+Kelola konfigurasi Anaphase termasuk AI provider, cache settings, dan lainnya.
 
 ::: info
-**Quick Access**: Run `anaphase` (no arguments) to access the interactive menu and select "Configuration" for a visual interface to manage settings.
+**Akses Cepat**: Jalankan `anaphase` (tanpa argumen) untuk mengakses menu interaktif dan pilih "Configuration" untuk interface visual mengelola setting.
 :::
 
 ## Overview
 
-The `config` command provides tools to view and manage your Anaphase CLI configuration. It supports multiple AI providers, fallback chains, and health monitoring.
+Command `config` menyediakan tools untuk melihat dan mengelola konfigurasi CLI Anaphase Anda. Command ini mendukung multiple AI provider, fallback chain, dan health monitoring.
 
 ::: info
-**AI is Optional**: Anaphase works without AI configuration using template mode. AI providers are only needed if you want AI-powered code generation.
+**AI Bersifat Opsional**: Anaphase bekerja tanpa konfigurasi AI menggunakan template mode. AI provider hanya diperlukan jika Anda ingin code generation berbasis AI.
 :::
 
-## Subcommands
+## Subcommand
 
 ### list
 
-Display current Anaphase configuration.
+Tampilkan konfigurasi Anaphase saat ini.
 
 ```bash
 anaphase config list
@@ -55,19 +55,19 @@ anaphase config list
 
 ### set-provider
 
-Set the default AI provider for code generation.
+Set AI provider default untuk code generation.
 
 ```bash
 anaphase config set-provider <provider>
 ```
 
-**Available Providers:**
-- `gemini` - Google Gemini (free tier available)
-- `groq` - Groq (fastest inference, free)
-- `openai` - OpenAI GPT models (paid)
-- `claude` - Anthropic Claude (paid)
+**Provider yang Tersedia:**
+- `gemini` - Google Gemini (tier gratis tersedia)
+- `groq` - Groq (inference tercepat, gratis)
+- `openai` - OpenAI GPT models (berbayar)
+- `claude` - Anthropic Claude (berbayar)
 
-**Example:**
+**Contoh:**
 ```bash
 anaphase config set-provider groq
 ```
@@ -80,7 +80,7 @@ anaphase config set-provider groq
 
 ### check
 
-Health check all configured AI providers.
+Health check semua AI provider yang dikonfigurasi.
 
 ```bash
 anaphase config check
@@ -99,15 +99,15 @@ anaphase config check
 ℹ Template mode is always available (no AI required)
 ```
 
-**Use Cases:**
-- Verify API keys are working
-- Check network connectivity
-- Diagnose provider issues
-- Validate configuration before generation
+**Use Case:**
+- Verifikasi API key berfungsi
+- Cek konektivitas network
+- Diagnosa masalah provider
+- Validasi konfigurasi sebelum generation
 
 ### show-providers
 
-List all available AI providers with details.
+List semua AI provider yang tersedia dengan detail.
 
 ```bash
 anaphase config show-providers
@@ -144,9 +144,9 @@ anaphase config show-providers
 ℹ Template mode is always available without any AI provider
 ```
 
-## Configuration File
+## File Konfigurasi
 
-Anaphase reads configuration from `~/.anaphase/config.yaml`:
+Anaphase membaca konfigurasi dari `~/.anaphase/config.yaml`:
 
 ```yaml
 ai:
@@ -194,9 +194,9 @@ generator:
   code_style: standard
 ```
 
-## Environment Variables
+## Environment Variable
 
-API keys can be set via environment variables:
+API key dapat diset via environment variable:
 
 ```bash
 # Gemini (Google AI)
@@ -212,27 +212,27 @@ export OPENAI_API_KEY="your-openai-api-key"
 export ANTHROPIC_API_KEY="your-anthropic-api-key"
 ```
 
-**Auto-Enable:** When an API key is set via environment variable, the provider is automatically enabled.
+**Auto-Enable:** Ketika API key diset via environment variable, provider secara otomatis diaktifkan.
 
-## Provider Selection
+## Pemilihan Provider
 
-### Command-Line Flag
+### Flag Command-Line
 
-Override the default provider for a single command:
+Override provider default untuk single command:
 
 ```bash
 anaphase gen domain "User with email" --provider groq
 ```
 
-### Interactive Mode
+### Mode Interaktif
 
-Select provider interactively:
+Pilih provider secara interaktif:
 
 ```bash
 anaphase gen domain --interactive
 ```
 
-Prompts:
+Prompt:
 ```
 Select AI provider:
   1) gemini (default)
@@ -242,18 +242,18 @@ Select AI provider:
 Enter choice [1]:
 ```
 
-### Configuration File
+### File Konfigurasi
 
-Set default in `~/.anaphase/config.yaml`:
+Set default di `~/.anaphase/config.yaml`:
 
 ```yaml
 ai:
   primary_provider: groq
 ```
 
-### Temporary Override
+### Override Sementara
 
-Set for current session:
+Set untuk sesi saat ini:
 
 ```bash
 anaphase config set-provider groq
@@ -261,7 +261,7 @@ anaphase config set-provider groq
 
 ## Fallback Chain
 
-Anaphase automatically tries fallback providers if the primary fails:
+Anaphase secara otomatis mencoba fallback provider jika primary gagal:
 
 ```yaml
 ai:
@@ -271,65 +271,65 @@ ai:
     - openai
 ```
 
-**Behavior:**
-1. Try `gemini` first
-2. If fails (rate limit, error, timeout), try `groq`
-3. If still fails, try `openai`
-4. If all fail, return error
+**Perilaku:**
+1. Coba `gemini` terlebih dahulu
+2. Jika gagal (rate limit, error, timeout), coba `groq`
+3. Jika masih gagal, coba `openai`
+4. Jika semua gagal, return error
 
-**Use Cases:**
+**Use Case:**
 - **Reliability:** Automatic failover
-- **Rate Limits:** Switch when quota exceeded
-- **Cost Optimization:** Use free tier first, paid as backup
+- **Rate Limit:** Switch ketika quota terlampaui
+- **Optimisasi Biaya:** Gunakan tier gratis dahulu, berbayar sebagai backup
 
-## Provider Comparison
+## Perbandingan Provider
 
-| Provider | Speed | Cost | Free Tier | Best For |
+| Provider | Kecepatan | Biaya | Tier Gratis | Terbaik Untuk |
 |----------|-------|------|-----------|----------|
-| **Template Mode** | ⚡⚡⚡⚡⚡ | Free | ✅ Always | Quick generation, no setup |
-| **Gemini** | ⚡⚡⚡⚡ | Free | ✅ Generous | General use, high quality |
-| **Groq** | ⚡⚡⚡⚡⚡ | Free | ✅ Limited | Speed-critical, real-time |
-| **OpenAI** | ⚡⚡⚡ | $$$ | ❌ Paid | Complex domains, accuracy |
-| **Claude** | ⚡⚡⚡ | $$$ | ❌ Paid | Large contexts, analysis |
+| **Template Mode** | ⚡⚡⚡⚡⚡ | Gratis | ✅ Selalu | Quick generation, no setup |
+| **Gemini** | ⚡⚡⚡⚡ | Gratis | ✅ Generous | Penggunaan umum, kualitas tinggi |
+| **Groq** | ⚡⚡⚡⚡⚡ | Gratis | ✅ Limited | Kecepatan kritis, real-time |
+| **OpenAI** | ⚡⚡⚡ | $$$ | ❌ Berbayar | Domain kompleks, akurasi |
+| **Claude** | ⚡⚡⚡ | $$$ | ❌ Berbayar | Konteks besar, analisis |
 
-## Examples
+## Contoh
 
-### Setup Gemini (Free)
+### Setup Gemini (Gratis)
 
-1. Get API key from [Google AI Studio](https://makersuite.google.com/app/apikey)
+1. Dapatkan API key dari [Google AI Studio](https://makersuite.google.com/app/apikey)
 2. Set environment variable:
    ```bash
    export GEMINI_API_KEY="your-key-here"
    ```
-3. Verify:
+3. Verifikasi:
    ```bash
    anaphase config check
    ```
 
-### Setup Groq (Fast & Free)
+### Setup Groq (Cepat & Gratis)
 
-1. Get API key from [Groq Console](https://console.groq.com/)
+1. Dapatkan API key dari [Groq Console](https://console.groq.com/)
 2. Set environment variable:
    ```bash
    export GROQ_API_KEY="your-key-here"
    ```
-3. Set as default:
+3. Set sebagai default:
    ```bash
    anaphase config set-provider groq
    ```
 
-### Multi-Provider Setup
+### Setup Multi-Provider
 
 ```bash
-# Set all API keys
+# Set semua API key
 export GEMINI_API_KEY="gemini-key"
 export GROQ_API_KEY="groq-key"
 export OPENAI_API_KEY="openai-key"
 
-# Check all providers
+# Cek semua provider
 anaphase config check
 
-# Use Groq as primary, Gemini as fallback
+# Gunakan Groq sebagai primary, Gemini sebagai fallback
 anaphase config set-provider groq
 ```
 
@@ -341,97 +341,97 @@ ai:
     - gemini
 ```
 
-### No AI Setup Required
+### Tidak Perlu Setup AI
 
-Use template mode without any configuration:
+Gunakan template mode tanpa konfigurasi apapun:
 
 ```bash
-# Works immediately without API keys
+# Bekerja langsung tanpa API key
 anaphase gen domain "User with email and password"
 
-# Template mode is fast and reliable
+# Template mode cepat dan andal
 anaphase gen handler --domain user
 anaphase gen repository --domain user --db postgres
 ```
 
 ::: tip
-Template mode generates production-ready code based on proven patterns. You don't need AI for most use cases.
+Template mode generate kode production-ready berdasarkan pattern yang sudah terbukti. Anda tidak perlu AI untuk kebanyakan use case.
 :::
 
 ## Troubleshooting
 
-### Provider Not Working
+### Provider Tidak Bekerja
 
 ```bash
-# Check configuration
+# Cek konfigurasi
 anaphase config list
 
-# Test provider health
+# Test kesehatan provider
 anaphase config check
 
-# Verify API key is set
+# Verifikasi API key sudah diset
 echo $GEMINI_API_KEY
 ```
 
-### Rate Limit Errors
+### Error Rate Limit
 
 ```bash
-# Switch to different provider
+# Ganti ke provider berbeda
 anaphase config set-provider groq
 
-# Or use fallback chain
+# Atau gunakan fallback chain
 # Edit ~/.anaphase/config.yaml
 ```
 
-### Invalid API Key
+### API Key Tidak Valid
 
 ```bash
-# Re-export with correct key
+# Re-export dengan key yang benar
 export GEMINI_API_KEY="correct-key-here"
 
-# Verify
+# Verifikasi
 anaphase config check
 ```
 
-### Slow Generation
+### Generasi Lambat
 
 ```bash
-# Switch to Groq (fastest)
+# Ganti ke Groq (tercepat)
 anaphase config set-provider groq
 
-# Or use faster model
+# Atau gunakan model lebih cepat
 # Edit config.yaml:
 # model: gemini-2.0-flash-exp
 ```
 
-## Best Practices
+## Best Practice
 
-1. **Use Free Tiers First**
-   - Start with Gemini or Groq
-   - Only use paid providers when needed
+1. **Gunakan Tier Gratis Terlebih Dahulu**
+   - Mulai dengan Gemini atau Groq
+   - Hanya gunakan provider berbayar ketika diperlukan
 
-2. **Set Up Fallbacks**
-   - Configure multiple providers
-   - Automatic failover for reliability
+2. **Setup Fallback**
+   - Konfigurasi multiple provider
+   - Automatic failover untuk reliability
 
-3. **Secure API Keys**
-   - Use environment variables
-   - Never commit keys to git
-   - Rotate keys regularly
+3. **Amankan API Key**
+   - Gunakan environment variable
+   - Jangan commit key ke git
+   - Rotasi key secara berkala
 
-4. **Monitor Usage**
-   - Check provider dashboards
-   - Watch for rate limits
-   - Track costs (for paid providers)
+4. **Monitor Penggunaan**
+   - Cek dashboard provider
+   - Perhatikan rate limit
+   - Track biaya (untuk provider berbayar)
 
-5. **Test Before Production**
+5. **Test Sebelum Production**
    ```bash
    anaphase config check
    anaphase gen domain "Test" --provider gemini
    ```
 
-## See Also
+## Lihat Juga
 
-- [AI Providers Configuration](/config/ai-providers) - Detailed provider setup
+- [AI Providers Configuration](/config/ai-providers) - Setup provider detail
 - [anaphase gen domain](/reference/gen-domain) - AI-powered domain generation
-- [Troubleshooting](/guide/troubleshooting) - Common issues
+- [Troubleshooting](/guide/troubleshooting) - Masalah umum

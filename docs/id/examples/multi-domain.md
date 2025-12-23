@@ -1,30 +1,30 @@
-# Multi-Domain E-commerce Service
+# Service E-commerce Multi-Domain
 
-Build a complete e-commerce microservice with multiple domains using Anaphase.
+Bangun microservice e-commerce lengkap dengan multiple domain menggunakan Anaphase.
 
-::: info v0.4.0 Features
-This example showcases the **Interactive Menu** workflow and **Template Mode** for rapid development. Build a complete e-commerce API in minutes with zero manual configuration!
+::: info Fitur v0.4.0
+Contoh ini menampilkan workflow **Interactive Menu** dan **Template Mode** untuk pengembangan cepat. Bangun API e-commerce lengkap dalam hitungan menit tanpa konfigurasi manual!
 :::
 
-## Overview
+## Gambaran Umum
 
-This example demonstrates how to generate and wire multiple domains together to create a full-featured e-commerce API with:
+Contoh ini mendemonstrasikan cara generate dan wire multiple domain bersama-sama untuk membuat API e-commerce berfitur lengkap dengan:
 
-- **Customer** domain - User management and authentication
-- **Product** domain - Product catalog with inventory
-- **Order** domain - Order processing and fulfillment
-- **Payment** domain - Payment processing integration
+- **Customer** domain - Manajemen user dan authentication
+- **Product** domain - Katalog product dengan inventory
+- **Order** domain - Pemrosesan dan pemenuhan order
+- **Payment** domain - Integrasi pemrosesan payment
 
-## Prerequisites
+## Prasyarat
 
 - Go 1.21+
-- PostgreSQL (or Docker)
-- **No API key required** for Template Mode (or Gemini API key for AI Mode)
+- PostgreSQL (atau Docker)
+- **Tidak perlu API key** untuk Template Mode (atau Gemini API key untuk AI Mode)
 
-## Step 1: Initialize Project
+## Langkah 1: Inisialisasi Project
 
 ::: info Interactive Menu
-For the best experience, use `anaphase` without arguments to access the interactive menu throughout this tutorial!
+Untuk pengalaman terbaik, gunakan `anaphase` tanpa argumen untuk mengakses interactive menu di seluruh tutorial ini!
 :::
 
 ```bash
@@ -33,20 +33,20 @@ cd ecommerce-api
 anaphase init
 ```
 
-Anaphase automatically:
-- Creates project structure
-- Initializes `go.mod`
-- Sets up `.env` with defaults
-- Installs dependencies
+Anaphase secara otomatis:
+- Membuat struktur project
+- Menginisialisasi `go.mod`
+- Menyiapkan `.env` dengan nilai default
+- Menginstal dependensi
 
-## Step 2: Generate Customer Domain (Template Mode)
+## Langkah 2: Generate Domain Customer (Template Mode)
 
 ::: info Template Mode vs AI Mode
-**Template Mode** (recommended): Use pre-built templates for common domains - instant, no API key needed.
-**AI Mode**: Describe custom requirements in natural language - requires Gemini API key.
+**Template Mode** (direkomendasikan): Gunakan template yang sudah dibuat untuk domain umum - instan, tanpa perlu API key.
+**AI Mode**: Deskripsikan kebutuhan khusus dalam bahasa natural - memerlukan Gemini API key.
 :::
 
-**Using Interactive Menu (Recommended):**
+**Menggunakan Interactive Menu (Direkomendasikan):**
 ```bash
 anaphase
 # Select: Generate Domain
@@ -55,21 +55,21 @@ anaphase
 # Enter domain name: customer
 ```
 
-**Or using CLI:**
+**Atau menggunakan CLI:**
 ```bash
 anaphase gen domain --name customer --template user
 ```
 
-**Alternative: AI Mode**
+**Alternatif: AI Mode**
 ```bash
 anaphase gen domain \
   --name customer \
-  --prompt "Customer with email (validated), full name (first and last),
-            phone number in E.164 format, billing address, shipping address,
-            and loyalty points balance. Email must be unique."
+  --prompt "Customer dengan email (tervalidasi), nama lengkap (depan dan belakang),
+            nomor telepon dalam format E.164, alamat billing, alamat shipping,
+            dan saldo poin loyalitas. Email harus unik."
 ```
 
-**Generated files:**
+**File yang dihasilkan:**
 - `internal/core/entity/customer.go`
 - `internal/core/valueobject/email.go`
 - `internal/core/valueobject/phone.go`
@@ -77,9 +77,9 @@ anaphase gen domain \
 - `internal/core/port/customer_repo.go`
 - `internal/core/port/customer_service.go`
 
-## Step 3: Generate Product Domain (Template Mode)
+## Langkah 3: Generate Domain Product (Template Mode)
 
-**Using Interactive Menu:**
+**Menggunakan Interactive Menu:**
 ```bash
 anaphase
 # Select: Generate Domain
@@ -88,21 +88,21 @@ anaphase
 # Enter domain name: product
 ```
 
-**Or using CLI:**
+**Atau menggunakan CLI:**
 ```bash
 anaphase gen domain --name product --template product
 ```
 
-**Generated files:**
+**File yang dihasilkan:**
 - `internal/core/entity/product.go`
 - `internal/core/valueobject/sku.go`
 - `internal/core/valueobject/money.go`
 - `internal/core/port/product_repo.go`
 - `internal/core/port/product_service.go`
 
-## Step 4: Generate Order Domain (Template Mode)
+## Langkah 4: Generate Domain Order (Template Mode)
 
-**Using Interactive Menu:**
+**Menggunakan Interactive Menu:**
 ```bash
 anaphase
 # Select: Generate Domain
@@ -111,21 +111,21 @@ anaphase
 # Enter domain name: order
 ```
 
-**Or using CLI:**
+**Atau menggunakan CLI:**
 ```bash
 anaphase gen domain --name order --template order
 ```
 
-**Generated files:**
+**File yang dihasilkan:**
 - `internal/core/entity/order.go`
 - `internal/core/entity/line_item.go`
 - `internal/core/valueobject/order_number.go`
 - `internal/core/port/order_repo.go`
 - `internal/core/port/order_service.go`
 
-## Step 5: Generate Payment Domain (Template Mode)
+## Langkah 5: Generate Domain Payment (Template Mode)
 
-**Using Interactive Menu:**
+**Menggunakan Interactive Menu:**
 ```bash
 anaphase
 # Select: Generate Domain
@@ -134,28 +134,28 @@ anaphase
 # Enter domain name: payment
 ```
 
-**Or using CLI:**
+**Atau menggunakan CLI:**
 ```bash
 anaphase gen domain --name payment --template payment
 ```
 
-**Generated files:**
+**File yang dihasilkan:**
 - `internal/core/entity/payment.go`
 - `internal/core/valueobject/transaction_id.go`
 - `internal/core/port/payment_repo.go`
 - `internal/core/port/payment_service.go`
 
-## Step 6: Generate HTTP Handlers
+## Langkah 6: Generate HTTP Handler
 
-**Using Interactive Menu (Easiest):**
+**Menggunakan Interactive Menu (Paling Mudah):**
 ```bash
 anaphase
 # Select: Generate Handler
 # Select domain: customer
-# Repeat for product, order, and payment
+# Ulangi untuk product, order, dan payment
 ```
 
-**Or using CLI:**
+**Atau menggunakan CLI:**
 ```bash
 anaphase gen handler --domain customer
 anaphase gen handler --domain product
@@ -163,23 +163,23 @@ anaphase gen handler --domain order
 anaphase gen handler --domain payment
 ```
 
-Each generates:
-- Handler implementation
-- DTOs for requests/responses
-- Route registration
-- Test scaffolding
+Setiap domain menghasilkan:
+- Implementasi handler
+- DTO untuk request/response
+- Registrasi route
+- Scaffolding test
 
-## Step 7: Generate Repositories
+## Langkah 7: Generate Repository
 
-**Using Interactive Menu:**
+**Menggunakan Interactive Menu:**
 ```bash
 anaphase
 # Select: Generate Repository
 # Select domain and database type (PostgreSQL)
-# Repeat for all domains
+# Ulangi untuk semua domain
 ```
 
-**Or using CLI:**
+**Atau menggunakan CLI:**
 ```bash
 anaphase gen repository --domain customer --db postgres
 anaphase gen repository --domain product --db postgres
@@ -187,29 +187,29 @@ anaphase gen repository --domain order --db postgres
 anaphase gen repository --domain payment --db postgres
 ```
 
-Each generates:
-- Repository implementation
-- SQL schema with indexes
-- CRUD operations
+Setiap domain menghasilkan:
+- Implementasi repository
+- SQL schema dengan index
+- Operasi CRUD
 
-## Step 8: Auto-wire Dependencies
+## Langkah 8: Auto-wire Dependencies
 
-**Using Interactive Menu:**
+**Menggunakan Interactive Menu:**
 ```bash
 anaphase
 # Select: Wire Dependencies
 ```
 
-**Or using CLI:**
+**Atau menggunakan CLI:**
 ```bash
 anaphase wire
 ```
 
 ::: info Auto-Install
-The wire command automatically installs missing dependencies and validates your project structure!
+Command wire secara otomatis menginstal dependensi yang hilang dan memvalidasi struktur project Anda!
 :::
 
-This generates `cmd/api/main.go` with all dependencies wired:
+Ini menghasilkan `cmd/api/main.go` dengan semua dependencies yang sudah di-wire:
 
 ```go
 package main
@@ -237,26 +237,26 @@ import (
 func main() {
     logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 
-    // Database connection
+    // Koneksi database
     db, err := pgxpool.New(context.Background(), os.Getenv("DATABASE_URL"))
     if err != nil {
         log.Fatal(err)
     }
     defer db.Close()
 
-    // Initialize repositories
+    // Inisialisasi repository
     customerRepository := customerRepo.NewCustomerRepository(db)
     productRepository := productRepo.NewProductRepository(db)
     orderRepository := orderRepo.NewOrderRepository(db)
     paymentRepository := paymentRepo.NewPaymentRepository(db)
 
-    // Initialize handlers
+    // Inisialisasi handler
     customerHTTPHandler := customerHandler.NewCustomerHandler(customerRepository, logger)
     productHTTPHandler := productHandler.NewProductHandler(productRepository, logger)
     orderHTTPHandler := orderHandler.NewOrderHandler(orderRepository, logger)
     paymentHTTPHandler := paymentHandler.NewPaymentHandler(paymentRepository, logger)
 
-    // Setup routes
+    // Setup route
     r := chi.NewRouter()
     customerHTTPHandler.RegisterRoutes(r)
     productHTTPHandler.RegisterRoutes(r)
@@ -269,16 +269,16 @@ func main() {
 }
 ```
 
-## Step 9: Apply Database Schema
+## Langkah 9: Terapkan Database Schema
 
 ```bash
 export DATABASE_URL="postgres://postgres:postgres@localhost:5432/ecommerce"
 
-# Apply all schemas
+# Terapkan semua schema
 psql $DATABASE_URL -f internal/adapter/repository/postgres/schema.sql
 ```
 
-## Step 10: Run the Service
+## Langkah 10: Jalankan Service
 
 ```bash
 export DATABASE_URL="postgres://postgres:postgres@localhost:5432/ecommerce"
@@ -287,48 +287,48 @@ export GEMINI_API_KEY="your-api-key"
 go run cmd/api/main.go
 ```
 
-## Generated API Endpoints
+## Endpoint API yang Dihasilkan
 
 ### Customer API
 
-| Method | Endpoint | Description |
+| Method | Endpoint | Deskripsi |
 |--------|----------|-------------|
-| POST | `/customers` | Create customer |
-| GET | `/customers/:id` | Get customer |
+| POST | `/customers` | Buat customer |
+| GET | `/customers/:id` | Dapatkan customer |
 | PUT | `/customers/:id` | Update customer |
-| DELETE | `/customers/:id` | Delete customer |
+| DELETE | `/customers/:id` | Hapus customer |
 
 ### Product API
 
-| Method | Endpoint | Description |
+| Method | Endpoint | Deskripsi |
 |--------|----------|-------------|
-| POST | `/products` | Create product |
-| GET | `/products/:id` | Get product |
-| GET | `/products/sku/:sku` | Get by SKU |
+| POST | `/products` | Buat product |
+| GET | `/products/:id` | Dapatkan product |
+| GET | `/products/sku/:sku` | Dapatkan berdasarkan SKU |
 | PUT | `/products/:id` | Update product |
-| DELETE | `/products/:id` | Delete product |
+| DELETE | `/products/:id` | Hapus product |
 
 ### Order API
 
-| Method | Endpoint | Description |
+| Method | Endpoint | Deskripsi |
 |--------|----------|-------------|
-| POST | `/orders` | Create order |
-| GET | `/orders/:id` | Get order |
+| POST | `/orders` | Buat order |
+| GET | `/orders/:id` | Dapatkan order |
 | PUT | `/orders/:id/status` | Update status |
-| GET | `/orders/customer/:customerId` | Customer orders |
+| GET | `/orders/customer/:customerId` | Order customer |
 
 ### Payment API
 
-| Method | Endpoint | Description |
+| Method | Endpoint | Deskripsi |
 |--------|----------|-------------|
-| POST | `/payments` | Process payment |
-| GET | `/payments/:id` | Get payment |
-| GET | `/payments/order/:orderId` | Order payments |
+| POST | `/payments` | Proses payment |
+| GET | `/payments/:id` | Dapatkan payment |
+| GET | `/payments/order/:orderId` | Payment order |
 | POST | `/payments/:id/refund` | Refund payment |
 
-## Example Requests
+## Contoh Request
 
-### Create Customer
+### Buat Customer
 
 ```bash
 curl -X POST http://localhost:8080/customers \
@@ -348,7 +348,7 @@ curl -X POST http://localhost:8080/customers \
   }'
 ```
 
-### Create Product
+### Buat Product
 
 ```bash
 curl -X POST http://localhost:8080/products \
@@ -365,7 +365,7 @@ curl -X POST http://localhost:8080/products \
   }'
 ```
 
-### Create Order
+### Buat Order
 
 ```bash
 curl -X POST http://localhost:8080/orders \
@@ -389,7 +389,7 @@ curl -X POST http://localhost:8080/orders \
   }'
 ```
 
-### Process Payment
+### Proses Payment
 
 ```bash
 curl -X POST http://localhost:8080/payments \
@@ -403,13 +403,13 @@ curl -X POST http://localhost:8080/payments \
   }'
 ```
 
-## Project Structure
+## Struktur Project
 
 ```
 ecommerce-api/
 ├── cmd/
 │   └── api/
-│       ├── main.go              # Auto-generated entrypoint
+│       ├── main.go              # Entrypoint yang di-generate otomatis
 │       └── wire.go              # Dependency wiring
 ├── internal/
 │   ├── core/
@@ -458,26 +458,26 @@ ecommerce-api/
 └── go.sum
 ```
 
-## Quick Start Summary
+## Ringkasan Quick Start
 
-::: info Complete Workflow
-The entire multi-domain service can be built using just the interactive menu:
+::: info Workflow Lengkap
+Seluruh service multi-domain dapat dibangun hanya menggunakan interactive menu:
 ```bash
-anaphase  # Run for each step:
+anaphase  # Jalankan untuk setiap langkah:
 # 1. Initialize Project
 # 2. Generate Domain (customer, product, order, payment)
-# 3. Generate Handlers (for each domain)
-# 4. Generate Repositories (for each domain)
+# 3. Generate Handlers (untuk setiap domain)
+# 4. Generate Repositories (untuk setiap domain)
 # 5. Wire Dependencies
 ```
-Total time: ~5 minutes using Template Mode!
+Total waktu: ~5 menit menggunakan Template Mode!
 :::
 
-## Next Steps
+## Langkah Selanjutnya
 
-### Add Business Logic
+### Tambahkan Business Logic
 
-Implement service layer with business rules:
+Implementasi service layer dengan business rule:
 
 ```go
 // internal/service/order_service.go
@@ -488,7 +488,7 @@ type orderService struct {
 }
 
 func (s *orderService) CreateOrder(ctx context.Context, req *CreateOrderRequest) (*entity.Order, error) {
-    // Validate inventory
+    // Validasi inventory
     for _, item := range req.Items {
         product, err := s.productRepo.FindByID(ctx, item.ProductID)
         if err != nil {
@@ -500,7 +500,7 @@ func (s *orderService) CreateOrder(ctx context.Context, req *CreateOrderRequest)
         }
     }
 
-    // Create order
+    // Buat order
     order := entity.NewOrder(req.CustomerID, req.Items)
 
     // Reserve inventory
@@ -510,7 +510,7 @@ func (s *orderService) CreateOrder(ctx context.Context, req *CreateOrderRequest)
         }
     }
 
-    // Save order
+    // Simpan order
     if err := s.orderRepo.Save(ctx, order); err != nil {
         return nil, err
     }
@@ -519,16 +519,16 @@ func (s *orderService) CreateOrder(ctx context.Context, req *CreateOrderRequest)
 }
 ```
 
-### Add Tests
+### Tambahkan Test
 
-**Using Interactive Menu:**
+**Menggunakan Interactive Menu:**
 ```bash
 anaphase
 # Select: Generate Tests
 # Select domains to test
 ```
 
-**Or using CLI:**
+**Atau menggunakan CLI:**
 ```bash
 anaphase gen test --domain customer
 anaphase gen test --domain product
@@ -536,23 +536,23 @@ anaphase gen test --domain order
 anaphase gen test --domain payment
 ```
 
-### Add API Documentation
+### Tambahkan Dokumentasi API
 
-**Using Interactive Menu:**
+**Menggunakan Interactive Menu:**
 ```bash
 anaphase
 # Select: Generate Documentation
 # Choose: Swagger/OpenAPI
 ```
 
-**Or using CLI:**
+**Atau menggunakan CLI:**
 ```bash
 anaphase gen swagger
 ```
 
-### Add Metrics and Monitoring
+### Tambahkan Metrics dan Monitoring
 
-Integrate Prometheus metrics:
+Integrasikan Prometheus metrics:
 
 ```go
 import "github.com/prometheus/client_golang/prometheus"
@@ -568,11 +568,11 @@ var (
 ```
 
 ::: info Pro Tip
-Use Template Mode for standard domains and AI Mode only when you need highly custom business logic. This saves time and API costs!
+Gunakan Template Mode untuk domain standar dan AI Mode hanya ketika Anda memerlukan business logic yang sangat khusus. Ini menghemat waktu dan biaya API!
 :::
 
-## See Also
+## Lihat Juga
 
-- [Basic Example](/examples/basic)
-- [Custom Handlers](/examples/custom-handlers)
-- [Architecture Guide](/guide/architecture)
+- [Contoh Dasar](/examples/basic)
+- [Custom Handler](/examples/custom-handlers)
+- [Panduan Arsitektur](/guide/architecture)

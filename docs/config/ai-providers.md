@@ -1,8 +1,39 @@
 # AI Provider Configuration
 
-Configure AI providers for domain generation.
+::: info AI is OPTIONAL in v0.4.0
+**Template Mode is now the default!** Anaphase works perfectly without any AI provider. AI-powered generation is an optional enhancement for custom domain modeling. You can start building immediately using built-in templates.
+:::
 
-## Supported Providers
+Configure AI providers for AI-powered domain generation.
+
+## Template Mode (Default)
+
+::: info New in v0.4.0
+**No AI provider needed!** Anaphase now includes Template Mode that generates production-ready code using built-in templates. This is perfect for:
+- Getting started quickly
+- Standard CRUD operations
+- Learning DDD patterns
+- Building MVPs
+:::
+
+Simply run commands without setting up any API keys:
+
+```bash
+anaphase gen domain --name customer --template
+anaphase gen handler --domain customer
+anaphase gen repository --domain customer --db postgres
+```
+
+Template Mode generates clean, idiomatic Go code following DDD best practices.
+
+## Supported AI Providers
+
+Anaphase supports **4 major AI providers** for custom domain generation:
+
+1. **Google Gemini** - Recommended for beginners (free tier)
+2. **OpenAI** - GPT-4 and GPT-3.5 models
+3. **Claude** - Anthropic's Claude models
+4. **Groq** - Blazing fast inference (free preview)
 
 ### Google Gemini (Recommended for Beginners)
 
@@ -19,8 +50,9 @@ Free tier with generous limits and excellent code generation quality.
 - Sufficient for most development
 
 **Models:**
-- `gemini-2.0-flash-exp` (recommended) - Fast, accurate
-- `gemini-pro` - More capable, slower
+- `gemini-2.0-flash-exp` (recommended) - Latest, fast, accurate
+- `gemini-1.5-pro` - More capable, longer context
+- `gemini-1.5-flash` - Fast and efficient
 
 ### Groq (Recommended for Speed)
 
@@ -38,17 +70,79 @@ Free tier with generous limits and excellent code generation quality.
 - Free during preview period
 
 **Models:**
-- `llama-3.3-70b-versatile` (default) - Fast, versatile
-- `mixtral-8x7b-32768` - Long context
-- `llama-3.1-70b-versatile` - Alternative option
+- `llama-3.3-70b-versatile` (recommended) - Latest, fast, versatile
+- `llama-3.1-70b-versatile` - Stable alternative
+- `mixtral-8x7b-32768` - Long context window
+
+### OpenAI
+
+Industry-leading models with excellent code generation.
+
+**Get API Key:**
+1. Visit [OpenAI Platform](https://platform.openai.com/api-keys)
+2. Sign up or log in
+3. Create API key
+4. Copy your API key
+
+**Models:**
+- `gpt-4o` (recommended) - Latest, most capable
+- `gpt-4-turbo` - Fast and efficient
+- `gpt-3.5-turbo` - Budget-friendly option
+
+**Pricing:** Pay-per-use (check [OpenAI Pricing](https://openai.com/pricing))
+
+### Claude (Anthropic)
+
+Advanced reasoning and code generation capabilities.
+
+**Get API Key:**
+1. Visit [Anthropic Console](https://console.anthropic.com/)
+2. Sign up for account
+3. Create API key
+4. Copy your API key
+
+**Models:**
+- `claude-opus-4-5` (recommended) - Most capable
+- `claude-sonnet-4-5` - Balanced performance
+- `claude-3-5-sonnet` - Fast and efficient
+
+**Pricing:** Pay-per-use (check [Anthropic Pricing](https://www.anthropic.com/pricing))
 
 ## Configuration Methods
+
+::: info New in v0.4.0: CLI Configuration Commands
+Use `anaphase config` commands to manage AI providers interactively:
+
+```bash
+# Set provider API keys
+anaphase config set gemini.api_key "your-key"
+anaphase config set openai.api_key "your-key"
+anaphase config set claude.api_key "your-key"
+anaphase config set groq.api_key "your-key"
+
+# View current configuration
+anaphase config show
+
+# List available providers
+anaphase config list-providers
+```
+:::
 
 ### Environment Variable (Simplest)
 
 **Gemini:**
 ```bash
 export GEMINI_API_KEY="your-gemini-api-key"
+```
+
+**OpenAI:**
+```bash
+export OPENAI_API_KEY="your-openai-api-key"
+```
+
+**Claude:**
+```bash
+export CLAUDE_API_KEY="your-claude-api-key"
 ```
 
 **Groq:**
@@ -60,6 +154,8 @@ Add to shell profile for persistence:
 ```bash
 # ~/.bashrc or ~/.zshrc
 export GEMINI_API_KEY="your-gemini-api-key"
+export OPENAI_API_KEY="your-openai-api-key"
+export CLAUDE_API_KEY="your-claude-api-key"
 export GROQ_API_KEY="your-groq-api-key"
 ```
 
@@ -70,12 +166,13 @@ Anaphase auto-creates `~/.anaphase/config.yaml` on first run. Edit to customize:
 ```yaml
 ai:
   # Which provider to use first
-  primary_provider: gemini  # or: groq
+  primary_provider: gemini  # or: openai, claude, groq
 
   # Fallback providers (tried in order if primary fails)
   fallback_providers:
     - groq
     - openai
+    - claude
 
   providers:
     # Google Gemini
@@ -83,6 +180,22 @@ ai:
       enabled: true
       api_key: ${GEMINI_API_KEY}
       model: gemini-2.0-flash-exp
+      timeout: 30s
+      max_retries: 3
+
+    # OpenAI
+    openai:
+      enabled: true
+      api_key: ${OPENAI_API_KEY}
+      model: gpt-4o
+      timeout: 30s
+      max_retries: 3
+
+    # Claude (Anthropic)
+    claude:
+      enabled: true
+      api_key: ${CLAUDE_API_KEY}
+      model: claude-opus-4-5
       timeout: 30s
       max_retries: 3
 
@@ -97,16 +210,18 @@ ai:
 
 **Quick Setup:**
 ```bash
-# 1. Set API keys
+# 1. Set API keys (choose one or more)
 export GEMINI_API_KEY="your-key"
+export OPENAI_API_KEY="your-key"
+export CLAUDE_API_KEY="your-key"
 export GROQ_API_KEY="your-key"
 
-# 2. Run any command to generate config
-anaphase gen domain "test"
+# 2. Or use CLI commands
+anaphase config set gemini.api_key "your-key"
+anaphase config set openai.api_key "your-key"
 
-# 3. Edit config to choose provider
-vim ~/.anaphase/config.yaml
-# Change: primary_provider: groq
+# 3. View configuration
+anaphase config show
 ```
 
 ## Advanced Configuration
@@ -120,10 +235,11 @@ ai:
   # Try Gemini first
   primary_provider: gemini
 
-  # If Gemini fails, try Groq, then OpenAI
+  # If Gemini fails, try Groq, then OpenAI, then Claude
   fallback_providers:
     - groq
     - openai
+    - claude
 
   providers:
     gemini:
@@ -135,6 +251,16 @@ ai:
       enabled: true
       api_key: ${GROQ_API_KEY}
       model: llama-3.3-70b-versatile
+
+    openai:
+      enabled: true
+      api_key: ${OPENAI_API_KEY}
+      model: gpt-4o
+
+    claude:
+      enabled: true
+      api_key: ${CLAUDE_API_KEY}
+      model: claude-opus-4-5
 ```
 
 **When fallback activates:**
@@ -146,10 +272,10 @@ ai:
 **Example fallback scenario:**
 1. Try Gemini (primary)
 2. Gemini fails with quota exceeded → Try Groq
-3. Groq succeeds ✅
+3. Groq succeeds
 4. Generation continues with Groq
 
-**Best practice:** Set up both Gemini and Groq for maximum reliability!
+**Best practice:** Set up multiple providers for maximum reliability! All 4 providers work seamlessly together.
 
 ### Caching
 
@@ -208,9 +334,9 @@ ai:
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `type` | string | - | Provider type (`gemini`) |
+| `type` | string | - | Provider type (`gemini`, `openai`, `claude`, `groq`) |
 | `apiKey` | string | - | API key |
-| `model` | string | `gemini-2.5-flash` | Model to use |
+| `model` | string | varies | Model to use (see provider-specific defaults) |
 | `timeout` | duration | `30s` | Request timeout |
 | `retries` | int | `3` | Retry attempts |
 | `temperature` | float | `0.3` | AI creativity (0.0-1.0) |
@@ -231,6 +357,8 @@ Environment variables take precedence over config file:
 ```bash
 # Set provider API keys (auto-enables the provider)
 export GEMINI_API_KEY="your-gemini-key"
+export OPENAI_API_KEY="your-openai-key"
+export CLAUDE_API_KEY="your-claude-key"
 export GROQ_API_KEY="your-groq-key"
 
 # Override config file path
@@ -278,6 +406,20 @@ anaphase gen domain "Test" --verbose
 
 ## Troubleshooting
 
+### No AI Provider (Not an Error!)
+
+::: info Template Mode Available
+If you see messages about missing AI providers, don't worry! Anaphase v0.4.0 includes Template Mode that works without any AI provider. Simply use the `--template` flag or skip AI generation entirely.
+
+```bash
+# Use Template Mode instead
+anaphase gen domain --name customer --template
+
+# Or use the interactive menu
+anaphase menu
+```
+:::
+
 ### API Key Not Found
 
 ```
@@ -288,18 +430,24 @@ Error: no AI providers configured - please set at least one API key
 Set at least one provider's API key:
 
 ```bash
-# Option 1: Use Gemini
+# Option 1: Use Gemini (free tier)
 export GEMINI_API_KEY="your-gemini-key"
 
-# Option 2: Use Groq (faster!)
+# Option 2: Use Groq (fastest, free preview)
 export GROQ_API_KEY="your-groq-key"
 
-# Best: Use both for fallback
+# Option 3: Use OpenAI
+export OPENAI_API_KEY="your-openai-key"
+
+# Option 4: Use Claude
+export CLAUDE_API_KEY="your-claude-key"
+
+# Best: Use multiple providers for fallback
 export GEMINI_API_KEY="your-gemini-key"
 export GROQ_API_KEY="your-groq-key"
 
-# Verify it works
-anaphase gen domain "Test" --verbose
+# Or use Template Mode (no API key needed!)
+anaphase gen domain --name customer --template
 ```
 
 ### Quota Exceeded

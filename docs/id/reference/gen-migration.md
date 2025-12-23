@@ -1,51 +1,51 @@
 # anaphase gen migration
 
-Generate database migration files with intelligent SQL generation.
+Generate file migration database dengan intelligent SQL generation.
 
 ::: info
-**Quick Start**: Run `anaphase` (no arguments) to access the interactive menu and select "Generate Migration" for a guided experience.
+**Quick Start**: Jalankan `anaphase` (tanpa argumen) untuk mengakses menu interaktif dan pilih "Generate Migration" untuk pengalaman terpandu.
 :::
 
 ## Overview
 
-The `gen migration` command creates timestamped database migration files with up/down scripts. It intelligently generates SQL based on migration naming conventions and supports multiple database drivers.
+Command `gen migration` membuat file migration database dengan timestamp beserta script up/down. Command ini secara cerdas generate SQL berdasarkan konvensi penamaan migration dan mendukung multiple database driver.
 
 ::: info
-**Template-Based**: Migration generation uses smart templates based on naming conventions - no AI configuration required. Fast and reliable.
+**Berbasis Template**: Generasi migration menggunakan smart template berdasarkan konvensi penamaan - tidak perlu konfigurasi AI. Cepat dan andal.
 :::
 
-## Usage
+## Penggunaan
 
-### Interactive Menu (Recommended)
+### Menu Interaktif (Disarankan)
 
 ```bash
 anaphase
 ```
 
-Select **"Generate Migration"** from the menu. The interface guides you through:
-- Migration name/description
-- Database driver selection
-- Output directory configuration
+Pilih **"Generate Migration"** dari menu. Interface akan memandu Anda melalui:
+- Nama/deskripsi migration
+- Pemilihan database driver
+- Konfigurasi direktori output
 
-### CLI Direct Mode
+### Mode CLI Langsung
 
 ```bash
 anaphase gen migration <name> [flags]
 ```
 
-## Supported Databases
+## Database yang Didukung
 
-- **PostgreSQL** (default) - Full support with triggers
-- **MySQL** - Standard SQL support
-- **SQLite** - Lightweight database support
+- **PostgreSQL** (default) - Dukungan penuh dengan trigger
+- **MySQL** - Dukungan SQL standar
+- **SQLite** - Dukungan database lightweight
 
-## Naming Conventions
+## Konvensi Penamaan
 
 ::: tip
-Anaphase intelligently parses your migration name and generates appropriate SQL - no manual SQL writing needed for common patterns.
+Anaphase secara cerdas parse nama migration Anda dan generate SQL yang sesuai - tidak perlu menulis SQL manual untuk pattern umum.
 :::
 
-Anaphase automatically generates appropriate SQL based on your migration name:
+Anaphase secara otomatis generate SQL yang sesuai berdasarkan nama migration Anda:
 
 ### Create Table
 
@@ -54,9 +54,9 @@ anaphase gen migration create_users_table
 anaphase gen migration create_orders_table
 ```
 
-Generates:
-- `CREATE TABLE` with id, created_at, updated_at
-- PostgreSQL: Auto-update trigger for updated_at
+Generate:
+- `CREATE TABLE` dengan id, created_at, updated_at
+- PostgreSQL: Trigger auto-update untuk updated_at
 - Down migration: `DROP TABLE`
 
 ### Add Column
@@ -66,11 +66,11 @@ anaphase gen migration add_email_to_users
 anaphase gen migration add_total_to_orders
 ```
 
-Generates:
-- `ALTER TABLE ADD COLUMN` with inferred type
+Generate:
+- `ALTER TABLE ADD COLUMN` dengan tipe yang di-infer
 - Down migration: `DROP COLUMN`
 
-**Type Inference:**
+**Inferensi Tipe:**
 - `*_id` → `BIGINT`
 - `*_amount`, `*_price` → `DECIMAL(10,2)`
 - `*_count`, `*_quantity` → `INTEGER`
@@ -84,32 +84,32 @@ Generates:
 anaphase gen migration drop_old_cache_table
 ```
 
-Generates:
+Generate:
 - `DROP TABLE IF EXISTS`
-- Down migration: Reminder to backup data
+- Down migration: Pengingat untuk backup data
 
-## Flags
+## Flag
 
-| Flag | Default | Description |
+| Flag | Default | Deskripsi |
 |------|---------|-------------|
-| `--output` | `db/migrations` | Output directory for migration files |
+| `--output` | `db/migrations` | Direktori output untuk file migration |
 | `--driver` | `postgres` | Database driver (postgres, mysql, sqlite) |
 
-## Examples
+## Contoh
 
-### Using Interactive Menu
+### Menggunakan Menu Interaktif
 
 ```bash
-# Launch menu
+# Luncurkan menu
 anaphase
 
-# Select "Generate Migration"
-# Enter migration name: create_users_table
-# Select database: PostgreSQL
-# Choose output directory: db/migrations
+# Pilih "Generate Migration"
+# Masukkan nama migration: create_users_table
+# Pilih database: PostgreSQL
+# Pilih direktori output: db/migrations
 ```
 
-### Using CLI Directly
+### Menggunakan CLI Langsung
 
 **Create Users Table:**
 
@@ -123,7 +123,7 @@ Output:
 ✓ db/migrations/20251222101843_create_users_table.down.sql
 ```
 
-Generated SQL (up):
+SQL yang dihasilkan (up):
 ```sql
 CREATE TABLE IF NOT EXISTS users (
     id BIGSERIAL PRIMARY KEY,
@@ -131,7 +131,7 @@ CREATE TABLE IF NOT EXISTS users (
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
--- Trigger to auto-update updated_at
+-- Trigger untuk auto-update updated_at
 CREATE OR REPLACE FUNCTION update_users_updated_at()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -146,7 +146,7 @@ CREATE TRIGGER trigger_users_updated_at
     EXECUTE FUNCTION update_users_updated_at();
 ```
 
-Generated SQL (down):
+SQL yang dihasilkan (down):
 ```sql
 DROP TABLE IF EXISTS users CASCADE;
 ```
@@ -157,23 +157,23 @@ DROP TABLE IF EXISTS users CASCADE;
 anaphase gen migration add_email_to_users
 ```
 
-Generated SQL (up):
+SQL yang dihasilkan (up):
 ```sql
 ALTER TABLE users ADD COLUMN email VARCHAR(255);
 ```
 
-Generated SQL (down):
+SQL yang dihasilkan (down):
 ```sql
 ALTER TABLE users DROP COLUMN IF EXISTS email;
 ```
 
-**Custom Output Directory:**
+**Direktori Output Kustom:**
 
 ```bash
 anaphase gen migration create_products_table --output migrations
 ```
 
-**MySQL Database:**
+**Database MySQL:**
 
 ```bash
 anaphase gen migration create_orders_table --driver mysql
@@ -181,7 +181,7 @@ anaphase gen migration create_orders_table --driver mysql
 
 ## Migration Tools
 
-Anaphase generates standard SQL migration files compatible with popular migration tools:
+Anaphase generate file migration SQL standar yang kompatibel dengan migration tools populer:
 
 ### golang-migrate
 
@@ -189,7 +189,7 @@ Anaphase generates standard SQL migration files compatible with popular migratio
 # Install
 go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
 
-# Run migrations
+# Jalankan migration
 migrate -path db/migrations -database "postgres://user:pass@localhost/db?sslmode=disable" up
 
 # Rollback
@@ -202,7 +202,7 @@ migrate -path db/migrations -database "postgres://user:pass@localhost/db?sslmode
 # Install
 go install github.com/pressly/goose/v3/cmd/goose@latest
 
-# Run migrations
+# Jalankan migration
 goose -dir db/migrations postgres "user=postgres dbname=mydb" up
 
 # Rollback
@@ -215,7 +215,7 @@ goose -dir db/migrations postgres "user=postgres dbname=mydb" down
 # Install
 go install github.com/rubenv/sql-migrate/...@latest
 
-# Run migrations
+# Jalankan migration
 sql-migrate up -config=dbconfig.yml
 ```
 
@@ -227,9 +227,9 @@ sql-migrate up -config=dbconfig.yml
 anaphase gen migration create_users_table
 ```
 
-### 2. Edit SQL (if needed)
+### 2. Edit SQL (jika diperlukan)
 
-Edit the generated files to add columns, indexes, constraints:
+Edit file yang dihasilkan untuk menambahkan kolom, index, constraint:
 
 ```sql
 CREATE TABLE IF NOT EXISTS users (
@@ -246,13 +246,13 @@ CREATE INDEX idx_users_email ON users(email);
 CREATE INDEX idx_users_username ON users(username);
 ```
 
-### 3. Test Locally
+### 3. Test Secara Lokal
 
 ```bash
-# Apply migration
+# Terapkan migration
 migrate -path db/migrations -database "$DATABASE_URL" up
 
-# Verify schema
+# Verifikasi schema
 psql $DATABASE_URL -c "\dt"
 
 # Test rollback
@@ -262,64 +262,64 @@ migrate -path db/migrations -database "$DATABASE_URL" down 1
 migrate -path db/migrations -database "$DATABASE_URL" up
 ```
 
-### 4. Apply to Production
+### 4. Terapkan ke Production
 
 ```bash
-# Backup first!
+# Backup terlebih dahulu!
 pg_dump -U postgres mydb > backup_$(date +%Y%m%d_%H%M%S).sql
 
-# Run migration
+# Jalankan migration
 migrate -path db/migrations -database "$PROD_DATABASE_URL" up
 ```
 
-## Best Practices
+## Best Practice
 
-### 1. Always Reversible
+### 1. Selalu Reversible
 
-Ensure down migrations can fully reverse up migrations:
+Pastikan down migration dapat sepenuhnya reverse up migration:
 
 ```sql
--- ✅ Good - reversible
+-- ✅ Baik - reversible
 -- up.sql
 ALTER TABLE users ADD COLUMN email VARCHAR(255);
 
 -- down.sql
 ALTER TABLE users DROP COLUMN email;
 
--- ❌ Bad - data loss
+-- ❌ Buruk - data loss
 -- up.sql
 ALTER TABLE users DROP COLUMN old_email;
 
 -- down.sql
--- Can't restore dropped data!
+-- Tidak bisa restore data yang di-drop!
 ```
 
-### 2. One Change Per Migration
+### 2. Satu Perubahan Per Migration
 
 ```bash
-# ✅ Good
+# ✅ Baik
 anaphase gen migration add_email_to_users
 anaphase gen migration add_phone_to_users
 
-# ❌ Bad - do multiple changes in one migration
+# ❌ Buruk - multiple perubahan dalam satu migration
 anaphase gen migration update_users_table
 ```
 
-### 3. Test Rollbacks
+### 3. Test Rollback
 
-Always test that down migrations work:
+Selalu test bahwa down migration bekerja:
 
 ```bash
 migrate up
-# Verify changes
+# Verifikasi perubahan
 migrate down 1
-# Verify rollback
+# Verifikasi rollback
 migrate up
 ```
 
-### 4. Use Transactions
+### 4. Gunakan Transaction
 
-Wrap complex migrations in transactions (when supported):
+Wrap migration kompleks dalam transaction (jika didukung):
 
 ```sql
 BEGIN;
@@ -330,7 +330,7 @@ ALTER TABLE users ADD COLUMN phone VARCHAR(20);
 COMMIT;
 ```
 
-### 5. Backup Before Production
+### 5. Backup Sebelum Production
 
 ```bash
 # PostgreSQL
@@ -343,26 +343,26 @@ mysqldump -u root -p mydb > backup.sql
 sqlite3 mydb.db ".backup backup.db"
 ```
 
-## Advanced Examples
+## Contoh Advanced
 
-### Add Index
+### Tambahkan Index
 
 ```bash
 anaphase gen migration create_index_users_email
 ```
 
-Edit generated file:
+Edit file yang dihasilkan:
 ```sql
 CREATE INDEX idx_users_email ON users(email);
 ```
 
-### Add Foreign Key
+### Tambahkan Foreign Key
 
 ```bash
 anaphase gen migration add_user_id_to_orders
 ```
 
-Edit generated file:
+Edit file yang dihasilkan:
 ```sql
 ALTER TABLE orders ADD COLUMN user_id BIGINT;
 ALTER TABLE orders ADD CONSTRAINT fk_orders_user
@@ -370,7 +370,7 @@ ALTER TABLE orders ADD CONSTRAINT fk_orders_user
     ON DELETE CASCADE;
 ```
 
-### Modify Column Type
+### Ubah Tipe Column
 
 ```bash
 anaphase gen migration change_email_length
@@ -386,36 +386,36 @@ ALTER TABLE users ALTER COLUMN email TYPE VARCHAR(255);
 
 ## Troubleshooting
 
-### Migration Failed
+### Migration Gagal
 
 ```bash
-# Check current version
+# Cek versi saat ini
 migrate -path db/migrations -database "$DATABASE_URL" version
 
-# Force to specific version (use with caution!)
+# Force ke versi tertentu (gunakan dengan hati-hati!)
 migrate -path db/migrations -database "$DATABASE_URL" force 20251222101843
 
-# Fix issue and retry
+# Fix issue dan retry
 migrate -path db/migrations -database "$DATABASE_URL" up
 ```
 
 ### Dirty Database State
 
 ```bash
-# Check status
+# Cek status
 migrate -path db/migrations -database "$DATABASE_URL" version
 
 # Output: 20251222101843/d (dirty)
 
-# Manually fix the database state
+# Fix state database secara manual
 psql $DATABASE_URL
 
-# Then force clean
+# Kemudian force clean
 migrate -path db/migrations -database "$DATABASE_URL" force 20251222101843
 ```
 
-## See Also
+## Lihat Juga
 
-- [anaphase gen domain](/reference/gen-domain) - Generate domain entities
-- [anaphase gen repository](/reference/gen-repository) - Generate repositories
-- [Database Configuration](/config/database) - Database setup
+- [anaphase gen domain](/reference/gen-domain) - Generate entity domain
+- [anaphase gen repository](/reference/gen-repository) - Generate repository
+- [Database Configuration](/config/database) - Setup database

@@ -1,31 +1,31 @@
-# Basic E-commerce API
+# API E-commerce Dasar
 
-Build a complete e-commerce API with customers, products, and orders.
+Bangun API e-commerce lengkap dengan customer, product, dan order.
 
-::: info v0.4.0 Features
-This example uses the new **Interactive Menu** for easier navigation and **Template Mode** for quick generation without AI. Anaphase now auto-configures your .env file and installs dependencies automatically - zero manual setup required!
+::: info Fitur v0.4.0
+Contoh ini menggunakan **Interactive Menu** baru untuk navigasi yang lebih mudah dan **Template Mode** untuk generasi cepat tanpa AI. Anaphase sekarang mengkonfigurasi file .env Anda secara otomatis dan menginstal dependensi secara otomatis - tanpa setup manual!
 :::
 
-## Overview
+## Gambaran Umum
 
-In this example, you'll build a microservice with three domains:
+Dalam contoh ini, Anda akan membangun microservice dengan tiga domain:
 
-- **Customer**: User accounts with contact information
-- **Product**: Items for sale with inventory tracking
-- **Order**: Purchase orders linking customers and products
+- **Customer**: Akun pengguna dengan informasi kontak
+- **Product**: Item untuk dijual dengan pelacakan inventori
+- **Order**: Pesanan pembelian yang menghubungkan customer dan product
 
-## Prerequisites
+## Prasyarat
 
-- Anaphase CLI installed
-- PostgreSQL running (or Docker)
-- **No API key required** for Template Mode (or Google Gemini API key for AI Mode)
+- Anaphase CLI terinstal
+- PostgreSQL berjalan (atau Docker)
+- **Tidak perlu API key** untuk Template Mode (atau Google Gemini API key untuk AI Mode)
 
-## Step-by-Step
+## Langkah demi Langkah
 
-### 1. Initialize Project
+### 1. Inisialisasi Project
 
-::: info Interactive Menu Available
-Run `anaphase` without arguments to use the new interactive menu - it's the easiest way to navigate all commands!
+::: info Interactive Menu Tersedia
+Jalankan `anaphase` tanpa argumen untuk menggunakan interactive menu baru - ini cara paling mudah untuk menavigasi semua command!
 :::
 
 ```bash
@@ -33,15 +33,15 @@ anaphase init ecommerce-api
 cd ecommerce-api
 ```
 
-Anaphase automatically:
-- Creates the project structure
-- Initializes `go.mod`
-- Sets up `.env` file with defaults
-- Installs required dependencies
+Anaphase secara otomatis:
+- Membuat struktur project
+- Menginisialisasi `go.mod`
+- Menyiapkan file `.env` dengan nilai default
+- Menginstal dependensi yang diperlukan
 
-### 2. Generate Customer Domain (Template Mode)
+### 2. Generate Domain Customer (Template Mode)
 
-**Using Interactive Menu (Easiest):**
+**Menggunakan Interactive Menu (Paling Mudah):**
 ```bash
 anaphase
 # Select: Generate Domain
@@ -50,16 +50,16 @@ anaphase
 # Enter domain name: customer
 ```
 
-**Or using CLI:**
+**Atau menggunakan CLI:**
 ```bash
 anaphase gen domain --name customer --template user
 ```
 
-::: info Why Template Mode?
-Template Mode is perfect for common domains like users, products, and orders. It generates production-ready code instantly without needing an API key!
+::: info Mengapa Template Mode?
+Template Mode sempurna untuk domain umum seperti user, product, dan order. Template ini menghasilkan kode production-ready secara instan tanpa perlu API key!
 :::
 
-**Generated files:**
+**File yang dihasilkan:**
 - `internal/core/entity/customer.go`
 - `internal/core/valueobject/email.go`
 - `internal/core/valueobject/phone.go`
@@ -67,18 +67,18 @@ Template Mode is perfect for common domains like users, products, and orders. It
 - `internal/core/port/customer_repo.go`
 - `internal/core/port/customer_service.go`
 
-**Alternative: AI Mode (for custom requirements)**
+**Alternatif: AI Mode (untuk kebutuhan khusus)**
 ```bash
 anaphase gen domain \
   --name customer \
-  --prompt "Customer with email address (validated), full name,
-            phone number, and default shipping address.
-            Customers can be active or inactive."
+  --prompt "Customer dengan alamat email (tervalidasi), nama lengkap,
+            nomor telepon, dan alamat pengiriman default.
+            Customer dapat aktif atau tidak aktif."
 ```
 
-### 3. Generate Product Domain (Template Mode)
+### 3. Generate Domain Product (Template Mode)
 
-**Using Interactive Menu:**
+**Menggunakan Interactive Menu:**
 ```bash
 anaphase
 # Select: Generate Domain
@@ -87,21 +87,21 @@ anaphase
 # Enter domain name: product
 ```
 
-**Or using CLI:**
+**Atau menggunakan CLI:**
 ```bash
 anaphase gen domain --name product --template product
 ```
 
-**Generated files:**
+**File yang dihasilkan:**
 - `internal/core/entity/product.go`
 - `internal/core/valueobject/sku.go`
 - `internal/core/valueobject/money.go`
 - `internal/core/port/product_repo.go`
 - `internal/core/port/product_service.go`
 
-### 4. Generate Order Domain (Template Mode)
+### 4. Generate Domain Order (Template Mode)
 
-**Using Interactive Menu:**
+**Menggunakan Interactive Menu:**
 ```bash
 anaphase
 # Select: Generate Domain
@@ -110,85 +110,85 @@ anaphase
 # Enter domain name: order
 ```
 
-**Or using CLI:**
+**Atau menggunakan CLI:**
 ```bash
 anaphase gen domain --name order --template order
 ```
 
-**Generated files:**
+**File yang dihasilkan:**
 - `internal/core/entity/order.go`
 - `internal/core/entity/line_item.go`
 - `internal/core/port/order_repo.go`
 - `internal/core/port/order_service.go`
 
-### 5. Generate Handlers
+### 5. Generate Handler
 
-**Using Interactive Menu:**
+**Menggunakan Interactive Menu:**
 ```bash
 anaphase
 # Select: Generate Handler
-# Select domain: customer (then repeat for product and order)
+# Select domain: customer (kemudian ulangi untuk product dan order)
 ```
 
-**Or using CLI:**
+**Atau menggunakan CLI:**
 ```bash
 anaphase gen handler --domain customer
 anaphase gen handler --domain product
 anaphase gen handler --domain order
 ```
 
-**Generated files per domain:**
+**File yang dihasilkan per domain:**
 - `internal/adapter/handler/http/{domain}_handler.go`
 - `internal/adapter/handler/http/{domain}_dto.go`
 - `internal/adapter/handler/http/{domain}_handler_test.go`
 
-### 6. Generate Repositories
+### 6. Generate Repository
 
-**Using Interactive Menu:**
+**Menggunakan Interactive Menu:**
 ```bash
 anaphase
 # Select: Generate Repository
 # Select domain: customer
 # Select database: PostgreSQL
-# (Repeat for product and order)
+# (Ulangi untuk product dan order)
 ```
 
-**Or using CLI:**
+**Atau menggunakan CLI:**
 ```bash
 anaphase gen repository --domain customer --db postgres
 anaphase gen repository --domain product --db postgres
 anaphase gen repository --domain order --db postgres
 ```
 
-**Generated files per domain:**
+**File yang dihasilkan per domain:**
 - `internal/adapter/repository/postgres/{domain}_repo.go`
 - `internal/adapter/repository/postgres/schema.sql`
 - `internal/adapter/repository/postgres/{domain}_repo_test.go`
 
 ### 7. Wire Dependencies
 
-**Using Interactive Menu:**
+**Menggunakan Interactive Menu:**
 ```bash
 anaphase
 # Select: Wire Dependencies
 ```
 
-**Or using CLI:**
+**Atau menggunakan CLI:**
 ```bash
 anaphase wire
 ```
 
 ::: info Auto-Setup
-The wire command automatically installs any missing dependencies and validates your project structure!
+Command wire secara otomatis menginstal dependensi yang hilang dan memvalidasi struktur project Anda!
 :::
 
-**Generated files:**
+**File yang dihasilkan:**
 - `cmd/api/main.go`
 - `cmd/api/wire.go`
 
-### 8. Set Up Database
+### 8. Setup Database
 
-Start PostgreSQL:
+Jalankan PostgreSQL:
 
 ```bash
 docker run -d \
@@ -199,16 +199,16 @@ docker run -d \
   postgres:16-alpine
 ```
 
-Apply migrations:
+Terapkan migrasi:
 
 ```bash
 export DATABASE_URL="postgres://postgres:postgres@localhost:5432/ecommerce?sslmode=disable"
 
-# Apply all schemas
+# Terapkan semua schema
 cat internal/adapter/repository/postgres/schema.sql | psql $DATABASE_URL
 ```
 
-### 9. Run the API
+### 9. Jalankan API
 
 ```bash
 go run cmd/api/main.go
@@ -220,9 +220,9 @@ Output:
 {"time":"2024-01-15T10:30:00Z","level":"INFO","msg":"starting server","port":"8080"}
 ```
 
-## Testing the API
+## Testing API
 
-### Create a Customer
+### Buat Customer
 
 ```bash
 curl -X POST http://localhost:8080/api/v1/customers \
@@ -260,7 +260,7 @@ Response:
 }
 ```
 
-### Create a Product
+### Buat Product
 
 ```bash
 curl -X POST http://localhost:8080/api/v1/products \
@@ -290,7 +290,7 @@ Response:
 }
 ```
 
-### Create an Order
+### Buat Order
 
 ```bash
 curl -X POST http://localhost:8080/api/v1/orders \
@@ -335,13 +335,13 @@ Response:
 }
 ```
 
-### List All Products
+### Lihat Semua Product
 
 ```bash
 curl http://localhost:8080/api/v1/products
 ```
 
-### Get Customer by ID
+### Dapatkan Customer berdasarkan ID
 
 ```bash
 curl http://localhost:8080/api/v1/customers/550e8400-e29b-41d4-a716-446655440000
@@ -359,15 +359,15 @@ curl -X PUT http://localhost:8080/api/v1/products/7c9e6679-7425-40de-944b-e07fc1
   }'
 ```
 
-### Delete Customer
+### Hapus Customer
 
 ```bash
 curl -X DELETE http://localhost:8080/api/v1/customers/550e8400-e29b-41d4-a716-446655440000
 ```
 
-## Project Structure
+## Struktur Project
 
-After all generation:
+Setelah semua generasi:
 
 ```
 ecommerce-api/
@@ -414,36 +414,36 @@ ecommerce-api/
 └── go.sum
 ```
 
-## Available Endpoints
+## Endpoint yang Tersedia
 
-Once running, your API has:
+Setelah berjalan, API Anda memiliki:
 
-### Customers
-- `POST /api/v1/customers` - Create customer
-- `GET /api/v1/customers/:id` - Get customer
+### Customer
+- `POST /api/v1/customers` - Buat customer
+- `GET /api/v1/customers/:id` - Dapatkan customer
 - `PUT /api/v1/customers/:id` - Update customer
-- `DELETE /api/v1/customers/:id` - Delete customer
+- `DELETE /api/v1/customers/:id` - Hapus customer
 
-### Products
-- `POST /api/v1/products` - Create product
-- `GET /api/v1/products/:id` - Get product
+### Product
+- `POST /api/v1/products` - Buat product
+- `GET /api/v1/products/:id` - Dapatkan product
 - `PUT /api/v1/products/:id` - Update product
-- `DELETE /api/v1/products/:id` - Delete product
+- `DELETE /api/v1/products/:id` - Hapus product
 
-### Orders
-- `POST /api/v1/orders` - Create order
-- `GET /api/v1/orders/:id` - Get order
-- `PUT /api/v1/orders/:id` - Update order status
-- `DELETE /api/v1/orders/:id` - Cancel order
+### Order
+- `POST /api/v1/orders` - Buat order
+- `GET /api/v1/orders/:id` - Dapatkan order
+- `PUT /api/v1/orders/:id` - Update status order
+- `DELETE /api/v1/orders/:id` - Batalkan order
 
 ### System
 - `GET /health` - Health check
 
-## Next Steps
+## Langkah Selanjutnya
 
-### Implement Business Logic
+### Implementasi Business Logic
 
-Add service layer implementations:
+Tambahkan implementasi service layer:
 
 ```go
 // internal/core/service/customer_service.go
@@ -458,19 +458,19 @@ func NewCustomerService(repo port.CustomerRepository) port.CustomerService {
 }
 
 func (s *customerService) CreateCustomer(ctx context.Context, email, name string) (*entity.Customer, error) {
-    // Validate
+    // Validasi
     emailVO, err := valueobject.NewEmail(email)
     if err != nil {
         return nil, err
     }
 
-    // Create entity
+    // Buat entity
     customer, err := entity.NewCustomer(emailVO, name)
     if err != nil {
         return nil, err
     }
 
-    // Save
+    // Simpan
     if err := s.repo.Save(ctx, customer); err != nil {
         return nil, err
     }
@@ -479,25 +479,25 @@ func (s *customerService) CreateCustomer(ctx context.Context, email, name string
 }
 ```
 
-### Add Validation
+### Tambahkan Validasi
 
-Use a validation library in handlers:
+Gunakan validation library di handler:
 
 ```bash
 go get github.com/go-playground/validator/v10
 ```
 
-### Add Authentication
+### Tambahkan Authentication
 
-Implement JWT middleware:
+Implementasi JWT middleware:
 
 ```bash
 go get github.com/golang-jwt/jwt/v5
 ```
 
-### Add Tests
+### Tambahkan Test
 
-Write integration tests:
+Tulis integration test:
 
 ```go
 func TestCreateCustomer(t *testing.T) {
@@ -516,13 +516,13 @@ func TestCreateCustomer(t *testing.T) {
 }
 ```
 
-## Complete Example
+## Contoh Lengkap
 
-Full working example available at:
+Contoh lengkap yang berfungsi tersedia di:
 https://github.com/lisvindanu/anaphase-examples/tree/main/ecommerce-api
 
-## See Also
+## Lihat Juga
 
-- [Architecture Guide](/guide/architecture)
-- [Quick Start](/guide/quick-start)
-- [Command Reference](/reference/commands)
+- [Panduan Arsitektur](/guide/architecture)
+- [Panduan Cepat](/guide/quick-start)
+- [Referensi Command](/reference/commands)

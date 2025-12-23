@@ -1,33 +1,33 @@
 # Domain-Driven Design
 
-**This is what makes Anaphase different.** While other frameworks use MVC or Active Record patterns, Anaphase enforces true Domain-Driven Design principles that keep your business logic clean, testable, and maintainable.
+**Inilah yang membuat Anaphase berbeda.** Sementara framework lain menggunakan pola MVC atau Active Record, Anaphase memaksakan prinsip Domain-Driven Design yang sesungguhnya untuk menjaga logika bisnis Anda tetap bersih, mudah ditest, dan maintainable.
 
-::: tip DDD in Both Modes
-As of v0.4.0, Anaphase offers two generation modes, both producing DDD-compliant code:
+::: tip DDD di Kedua Mode
+Sejak v0.4.0, Anaphase menawarkan dua mode generasi, keduanya menghasilkan kode yang sesuai dengan DDD:
 
-- **Template Mode**: Generates clean DDD structure with entities, value objects, repositories, and ports
-- **AI Mode**: Generates advanced DDD patterns including aggregates, domain events, and complex business rules
+- **Template Mode**: Menghasilkan struktur DDD yang bersih dengan entities, value objects, repositories, dan ports
+- **AI Mode**: Menghasilkan pola DDD tingkat lanjut termasuk aggregates, domain events, dan aturan bisnis yang kompleks
 
-Regardless of mode, all generated code follows the architectural principles described in this guide.
+Terlepas dari mode yang digunakan, semua kode yang dihasilkan mengikuti prinsip arsitektur yang dijelaskan dalam panduan ini.
 :::
 
-## What is DDD?
+## Apa itu DDD?
 
-Domain-Driven Design (DDD) is an approach to software development for **complex domains** that:
+Domain-Driven Design (DDD) adalah pendekatan pengembangan software untuk **domain yang kompleks** yang:
 
-1. **Focuses on the core domain** and domain logic
-2. **Uses a ubiquitous language** shared by developers and domain experts
-3. **Models complex domains** through entities, value objects, and aggregates
-4. **Isolates domain logic** from infrastructure concerns
+1. **Fokus pada core domain** dan logika domain
+2. **Menggunakan ubiquitous language** yang dibagikan oleh developer dan domain experts
+3. **Memodelkan domain yang kompleks** melalui entities, value objects, dan aggregates
+4. **Mengisolasi logika domain** dari concern infrastruktur
 
-## Why DDD Over MVC?
+## Mengapa DDD Lebih Baik dari MVC?
 
-### The Problem with Traditional MVC
+### Masalah dengan MVC Tradisional
 
-Most Go frameworks (like Goravel) use the **MVC pattern with Active Record**:
+Kebanyakan framework Go (seperti Goravel) menggunakan **pola MVC dengan Active Record**:
 
 ```go
-// ❌ MVC/Active Record: Business logic scattered everywhere
+// ❌ MVC/Active Record: Business logic tersebar di mana-mana
 type Order struct {
     orm.Model
     UserID      uint
@@ -51,16 +51,16 @@ func (s *OrderService) CalculateTotal(order *Order) {
 }
 ```
 
-**Problems:**
-- ❌ Business logic scattered across controllers, services, models
-- ❌ Domain knowledge mixed with technical concerns (DB, HTTP)
-- ❌ Difficult to test (everything coupled to framework)
-- ❌ Hard to understand (where is the business logic?)
-- ❌ Cannot change (modifying one rule affects many files)
+**Masalah:**
+- ❌ Logika bisnis tersebar di controllers, services, models
+- ❌ Pengetahuan domain tercampur dengan concern teknis (DB, HTTP)
+- ❌ Sulit untuk test (semuanya coupled ke framework)
+- ❌ Sulit dipahami (di mana logika bisnisnya?)
+- ❌ Tidak bisa diubah (memodifikasi satu rule mempengaruhi banyak file)
 
-### The DDD Solution
+### Solusi DDD
 
-Anaphase enforces **Rich Domain Models** where business logic lives in the domain:
+Anaphase memaksakan **Rich Domain Models** di mana logika bisnis berada di domain:
 
 ```go
 // ✅ DDD: Business logic encapsulated in domain
@@ -103,72 +103,72 @@ func (o *Order) AddItem(product *Product, quantity int) error {
 }
 ```
 
-**Benefits:**
-- ✅ All business logic in domain (easy to find and understand)
-- ✅ Pure Go (no framework dependency, easy to test)
-- ✅ Type-safe (compiler catches errors)
-- ✅ Self-documenting (code reads like business language)
-- ✅ Change-friendly (modify rules in one place)
+**Keuntungan:**
+- ✅ Semua logika bisnis di domain (mudah ditemukan dan dipahami)
+- ✅ Pure Go (tidak ada ketergantungan framework, mudah untuk test)
+- ✅ Type-safe (compiler menangkap error)
+- ✅ Self-documenting (kode terbaca seperti bahasa bisnis)
+- ✅ Change-friendly (modifikasi rules di satu tempat)
 
-## When to Use DDD vs MVC
+## Kapan Menggunakan DDD vs MVC
 
-### Use DDD (Anaphase) When:
+### Gunakan DDD (Anaphase) Ketika:
 
-✅ **Complex Business Logic**
-- Multiple business rules per operation
-- Rules that change frequently
-- Domain experts involved in requirements
+✅ **Logika Bisnis yang Kompleks**
+- Banyak aturan bisnis per operasi
+- Rules yang sering berubah
+- Domain experts terlibat dalam requirements
 
-✅ **Long-term Projects**
-- Enterprise applications
-- 5+ year lifecycle
-- Multiple teams working on different domains
+✅ **Proyek Jangka Panjang**
+- Aplikasi enterprise
+- Lifecycle 5+ tahun
+- Banyak tim bekerja pada domain yang berbeda
 
-✅ **Microservices Architecture**
-- Clear bounded contexts
+✅ **Arsitektur Microservices**
+- Bounded contexts yang jelas
 - Independent deployments
-- Different teams own different services
+- Tim yang berbeda memiliki service yang berbeda
 
-✅ **Domain Complexity**
-- E-commerce with inventory, pricing rules, promotions
-- Financial systems with complex calculations
-- Healthcare with regulatory requirements
-- Logistics with route optimization
+✅ **Kompleksitas Domain**
+- E-commerce dengan inventory, pricing rules, promotions
+- Sistem finansial dengan kalkulasi kompleks
+- Healthcare dengan persyaratan regulasi
+- Logistik dengan optimisasi rute
 
-### Use MVC (Goravel) When:
+### Gunakan MVC (Goravel) Ketika:
 
-✅ **Simple CRUD**
+✅ **CRUD Sederhana**
 - Basic create, read, update, delete
-- Few business rules
-- Data-centric applications
+- Sedikit aturan bisnis
+- Aplikasi yang data-centric
 
 ✅ **Rapid Prototyping**
-- MVP or proof of concept
-- Short-term projects
-- Quick demos
+- MVP atau proof of concept
+- Proyek jangka pendek
+- Demo cepat
 
-✅ **Small Team**
+✅ **Tim Kecil**
 - 1-3 developers
 - Full-stack developers
-- Everyone knows everything
+- Semua orang tahu segalanya
 
-## Key DDD Concepts
+## Konsep Kunci DDD
 
-Understanding these tactical patterns is crucial for using Anaphase effectively:
+Memahami tactical patterns ini sangat penting untuk menggunakan Anaphase secara efektif:
 
 ## Core Building Blocks
 
 ### Entities
 
-Objects with **identity** that persists over time.
+Objek dengan **identitas** yang persisten dari waktu ke waktu.
 
-**Characteristics:**
-- Has unique identifier (ID)
-- Can change state (mutable)
-- Tracked lifecycle (CreatedAt, UpdatedAt)
-- Contains business logic
+**Karakteristik:**
+- Memiliki identifier unik (ID)
+- Dapat berubah state (mutable)
+- Lifecycle yang dilacak (CreatedAt, UpdatedAt)
+- Berisi logika bisnis
 
-**Example:**
+**Contoh:**
 ```go
 type Customer struct {
     ID        uuid.UUID         // Identity
@@ -189,27 +189,27 @@ func (c *Customer) UpdateEmail(email *Email) error {
 }
 ```
 
-**When to use:**
-- Object needs unique identity
-- Object changes over time
-- You care about which specific instance
+**Kapan menggunakan:**
+- Objek membutuhkan identitas unik
+- Objek berubah dari waktu ke waktu
+- Anda peduli tentang instance spesifik mana
 
-**Examples:**
+**Contoh:**
 - Customer, Order, Product
 - User, Invoice, Account
 - Booking, Shipment, Payment
 
 ### Value Objects
 
-Objects without identity, defined by their **attributes**.
+Objek tanpa identitas, didefinisikan berdasarkan **atribut** mereka.
 
-**Characteristics:**
-- No ID
-- Immutable (cannot change)
-- Compared by value, not identity
-- Self-validating
+**Karakteristik:**
+- Tidak ada ID
+- Immutable (tidak dapat berubah)
+- Dibandingkan berdasarkan nilai, bukan identitas
+- Validasi mandiri (self-validating)
 
-**Example:**
+**Contoh:**
 ```go
 type Email struct {
     value string
@@ -232,27 +232,27 @@ func (e *Email) Equals(other *Email) bool {
 }
 ```
 
-**When to use:**
-- Represents a concept or measurement
-- No need for identity
-- Can be shared and replaced
+**Kapan menggunakan:**
+- Merepresentasikan konsep atau pengukuran
+- Tidak memerlukan identitas
+- Dapat dibagikan dan diganti
 
-**Examples:**
+**Contoh:**
 - Email, Phone, Address
 - Money, Quantity, Price
 - DateRange, Coordinates, URL
 
 ### Aggregates
 
-Cluster of entities and value objects treated as a **single unit**.
+Cluster dari entities dan value objects yang diperlakukan sebagai **satu unit**.
 
-**Characteristics:**
-- Has root entity (aggregate root)
-- Enforces invariants
+**Karakteristik:**
+- Memiliki root entity (aggregate root)
+- Memaksakan invariants
 - Transaction boundary
 - Consistency boundary
 
-**Example:**
+**Contoh:**
 ```go
 // Order is the aggregate root
 type Order struct {
@@ -289,27 +289,27 @@ func (o *Order) AddItem(productID uuid.UUID, quantity int, price *Money) error {
 }
 ```
 
-**Rules:**
-- Only reference by ID, not directly
-- Changes go through root
-- Repository only for root
+**Aturan:**
+- Hanya referensi by ID, tidak secara langsung
+- Perubahan melalui root
+- Repository hanya untuk root
 
-**Examples:**
-- Order (with LineItems)
-- ShoppingCart (with CartItems)
-- Invoice (with InvoiceLines)
+**Contoh:**
+- Order (dengan LineItems)
+- ShoppingCart (dengan CartItems)
+- Invoice (dengan InvoiceLines)
 
 ### Repositories
 
-Abstraction for **persistence and retrieval** of aggregates.
+Abstraksi untuk **persistence dan retrieval** dari aggregates.
 
-**Characteristics:**
-- One repository per aggregate root
-- Works with complete aggregates
-- Interface (port) in domain layer
-- Implementation in infrastructure layer
+**Karakteristik:**
+- Satu repository per aggregate root
+- Bekerja dengan complete aggregates
+- Interface (port) di domain layer
+- Implementation di infrastructure layer
 
-**Example:**
+**Contoh:**
 ```go
 // Port (interface) in domain layer
 package port
@@ -348,21 +348,21 @@ func (r *orderRepository) Save(ctx context.Context, order *entity.Order) error {
 }
 ```
 
-**Benefits:**
+**Keuntungan:**
 - Swap implementations (Postgres, MySQL, Mock)
-- Test without database
-- Domain doesn't depend on infrastructure
+- Test tanpa database
+- Domain tidak bergantung pada infrastructure
 
 ### Services
 
-Operations that **don't naturally fit** on entities or value objects.
+Operasi yang **tidak cocok secara natural** di entities atau value objects.
 
 **Domain Services:**
-- Coordinate multiple entities
-- Implement business processes
+- Mengkoordinasikan banyak entities
+- Mengimplementasikan proses bisnis
 - Stateless
 
-**Example:**
+**Contoh:**
 ```go
 package service
 
@@ -406,7 +406,7 @@ func (s *OrderService) PlaceOrder(ctx context.Context, customerID uuid.UUID, ite
 }
 ```
 
-## DDD Patterns in Anaphase
+## Pola DDD di Anaphase
 
 ### Entity Generation
 
@@ -414,22 +414,22 @@ func (s *OrderService) PlaceOrder(ctx context.Context, customerID uuid.UUID, ite
 anaphase gen domain --name customer --prompt "Customer with email and name"
 ```
 
-Generates entity with:
+Menghasilkan entity dengan:
 - Unique ID (uuid.UUID)
 - Lifecycle tracking (CreatedAt, UpdatedAt)
-- Constructor with validation
+- Constructor dengan validasi
 - Validate() method
 
 ### Value Object Detection
 
-AI recognizes value objects:
+AI mengenali value objects:
 
 ```bash
 --prompt "Customer with email (validated), billing address"
 ```
 
-Generates:
-- `Email` value object with validation
+Menghasilkan:
+- `Email` value object dengan validasi
 - `Address` value object (composite)
 
 ### Aggregate Modeling
@@ -438,14 +438,14 @@ Generates:
 --prompt "Order with line items. Each line item has product and quantity."
 ```
 
-AI understands:
-- Order is aggregate root
-- LineItem is part of aggregate
-- Only Order gets a repository
+AI memahami:
+- Order adalah aggregate root
+- LineItem adalah bagian dari aggregate
+- Hanya Order yang mendapat repository
 
 ### Repository Interfaces
 
-Generated repositories follow aggregate rules:
+Repository yang dihasilkan mengikuti aturan aggregate:
 
 ```go
 // ✅ Repository for aggregate root
@@ -457,11 +457,11 @@ type OrderRepository interface {
 // ❌ No repository for LineItem (part of aggregate)
 ```
 
-## Common Patterns
+## Pola Umum
 
 ### Money Pattern
 
-Always use value object for money:
+Selalu gunakan value object untuk uang:
 
 ```go
 type Money struct {
@@ -487,14 +487,14 @@ func (m *Money) Add(other *Money) (*Money, error) {
 }
 ```
 
-**Why:**
-- Avoid floating-point errors
-- Enforce currency matching
-- Encapsulate money operations
+**Mengapa:**
+- Hindari error floating-point
+- Memaksakan pencocokan mata uang
+- Encapsulate operasi uang
 
 ### Enum Pattern
 
-Use typed constants for status:
+Gunakan typed constants untuk status:
 
 ```go
 type OrderStatus string
@@ -517,7 +517,7 @@ func (o *Order) Confirm() error {
 
 ### Factory Pattern
 
-Use constructors for validation:
+Gunakan constructors untuk validasi:
 
 ```go
 func NewOrder(customerID uuid.UUID) (*Order, error) {
@@ -536,11 +536,11 @@ func NewOrder(customerID uuid.UUID) (*Order, error) {
 }
 ```
 
-## Anti-Patterns to Avoid
+## Anti-Patterns yang Harus Dihindari
 
 ### Anemic Domain Model
 
-❌ **Don't:**
+❌ **Jangan:**
 ```go
 type Customer struct {
     ID    uuid.UUID
@@ -554,7 +554,7 @@ func (s *CustomerService) UpdateEmail(customer *Customer, email string) {
 }
 ```
 
-✅ **Do:**
+✅ **Lakukan:**
 ```go
 type Customer struct {
     ID    uuid.UUID
@@ -575,7 +575,7 @@ func (c *Customer) UpdateEmail(email *Email) error {
 
 ### Exposing Internals
 
-❌ **Don't:**
+❌ **Jangan:**
 ```go
 type Order struct {
     Items []*LineItem  // Direct access
@@ -585,7 +585,7 @@ type Order struct {
 order.Items = append(order.Items, newItem)
 ```
 
-✅ **Do:**
+✅ **Lakukan:**
 ```go
 type Order struct {
     items []*LineItem  // Private
@@ -607,7 +607,7 @@ func (o *Order) Items() []*LineItem {
 
 ### Large Aggregates
 
-❌ **Don't:**
+❌ **Jangan:**
 ```go
 type Customer struct {
     ID      uuid.UUID
@@ -616,7 +616,7 @@ type Customer struct {
 }
 ```
 
-✅ **Do:**
+✅ **Lakukan:**
 ```go
 type Customer struct {
     ID    uuid.UUID
@@ -631,23 +631,23 @@ type Order struct {
 
 ## Best Practices
 
-### 1. Use Ubiquitous Language
+### 1. Gunakan Ubiquitous Language
 
-Use domain terminology:
+Gunakan terminologi domain:
 
 ```bash
 # Finance domain
-"account" not "thing"
-"transaction" not "record"
-"balance" not "amount"
+"account" bukan "thing"
+"transaction" bukan "record"
+"balance" bukan "amount"
 
 # E-commerce domain
-"order" not "purchase"
-"inventory" not "stock count"
-"SKU" not "product code"
+"order" bukan "purchase"
+"inventory" bukan "stock count"
+"SKU" bukan "product code"
 ```
 
-### 2. Make Invariants Explicit
+### 2. Buat Invariants Eksplisit
 
 Encode business rules:
 
@@ -663,9 +663,9 @@ func (a *Account) Withdraw(amount *Money) error {
 }
 ```
 
-### 3. Keep Aggregates Small
+### 3. Jaga Aggregates Tetap Kecil
 
-Only include what must be consistent:
+Hanya sertakan apa yang harus konsisten:
 
 ```go
 // ✅ Good: Small aggregate
@@ -683,7 +683,7 @@ type Order struct {
 }
 ```
 
-### 4. Validate at Boundaries
+### 4. Validasi di Boundaries
 
 ```go
 // Constructor validates
@@ -700,6 +700,6 @@ email, err := NewEmail("invalid")  // Returns error
 
 ## Next Steps
 
-- [Architecture](/guide/architecture) - See how DDD fits in Clean Architecture
-- [AI Generation](/guide/ai-generation) - How AI generates DDD code
-- [Examples](/examples/basic) - DDD in practice
+- [Architecture](/guide/architecture) - Lihat bagaimana DDD cocok di Clean Architecture
+- [AI Generation](/guide/ai-generation) - Bagaimana AI menghasilkan kode DDD
+- [Examples](/examples/basic) - DDD dalam praktik
