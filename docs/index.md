@@ -4,7 +4,7 @@ layout: home
 hero:
   name: Anaphase
   text: AI-Powered Microservice Generator
-  tagline: Generate production-ready Golang microservices with AI. From idea to deployment in minutes.
+  tagline: Interactive CLI that generates production-ready Golang microservices. Works with or without AI - your choice.
   image:
     src: /hero-image.svg
     alt: Anaphase
@@ -21,13 +21,17 @@ features:
     title: Domain-Driven Design First
     details: "**Our key differentiator.** True DDD with Aggregates, Entities, Value Objects, and Bounded Contexts. Not just MVC with extra layers - actual tactical DDD patterns that scale."
 
+  - icon: 🎨
+    title: Interactive Menu
+    details: "**NEW in v0.4!** Beautiful TUI menu for all commands. No need to memorize syntax - just run 'anaphase' and select what you need. Supports keyboard navigation and filtering."
+
   - icon: 🤖
-    title: AI-Powered Generation
-    details: Leverage multiple AI providers (Gemini, Groq, OpenAI, Claude) to generate complete domain models from natural language. Just describe your business logic, get DDD-compliant code.
+    title: Dual Mode Generation
+    details: "**AI Mode:** Use Gemini, OpenAI, or Claude for smart generation. **Template Mode:** Works without API keys using intelligent templates. Your choice, always."
 
   - icon: ⚡
     title: Lightning Fast
-    details: Generate complete CRUD APIs with handlers, repositories, and tests in seconds. Auto-wire dependencies and get running immediately.
+    details: Generate complete CRUD APIs with handlers, repositories, and tests in seconds. Auto-setup everything - configs, dependencies, .env files. Zero manual setup.
 
   - icon: 🎯
     title: Type-Safe
@@ -52,27 +56,70 @@ features:
 
 ## Quick Example
 
-Generate a complete e-commerce microservice in 3 commands:
+Generate a complete e-commerce microservice with the interactive menu:
 
 ```bash
-# Initialize project
-anaphase init my-ecommerce
+# Just run anaphase - no commands to remember!
+anaphase
 
-# Generate domain with AI
-anaphase gen domain --name customer --prompt "Customer with email, name, and billing address"
+# Interactive menu appears:
+⚡ Anaphase CLI - DDD Microservice Generator
+   💡 Commands marked [AI] require API key setup
 
-# Auto-wire and run
-anaphase wire
-go run cmd/api/main.go
+▶ 🚀 Initialize Project
+  🤖 Generate Domain [AI]
+  📡 Generate Handler
+  💾 Generate Repository
+  ...
+
+# Select "Initialize Project"
+Project name: my-ecommerce
+Database (postgres/mysql/sqlite): postgres
+
+✅ Project created with auto-generated .env and dependencies!
+
+cd my-ecommerce
+anaphase  # Generate domains interactively
+make run  # It just works!
 ```
 
 Your API is now running at `http://localhost:8080` with:
-- ✅ CRUD endpoints for customers
-- ✅ PostgreSQL repository with migrations
+- ✅ CRUD endpoints
+- ✅ Database repository with proper schema
 - ✅ Input validation and error handling
-- ✅ Structured logging
+- ✅ Structured logging with proper configuration
 - ✅ Graceful shutdown
 - ✅ Health checks
+- ✅ **All dependencies installed and ready**
+
+## 🆕 Template Mode - No AI Required!
+
+**v0.4.0** introduces Template Mode as automatic fallback when AI isn't configured:
+
+```bash
+anaphase
+# Select: Generate Domain
+# No AI configured → Automatic fallback to Template Mode
+
+📝 Template Mode - Domain Generation
+
+Entity name: Product
+Fields: name:string, price:float64, stock:int, sku:string
+
+✅ Generated:
+  ✓ internal/core/entity/product.go
+  ✓ internal/core/port/product_repository.go
+  ✓ internal/core/port/product_service.go
+```
+
+### When to Use Each Mode
+
+| Mode | Best For | Requires API Key |
+|------|----------|-----------------|
+| **AI Mode** | Complex business logic, natural language descriptions | ✅ Yes |
+| **Template Mode** | Standard CRUD entities, quick scaffolding | ❌ No |
+
+Both modes generate **100% DDD-compliant code** - just choose what fits your workflow!
 
 ## Why Anaphase Over Goravel?
 
