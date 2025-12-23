@@ -162,6 +162,14 @@ func NewMenuModel() MenuModel {
 					shortcut:     "5",
 					category:     "Generation",
 				},
+				{
+					title:        "Generate Swagger",
+					desc:         "OpenAPI/Swagger documentation",
+					command:      "gen swagger",
+					needsInput:   false,
+					shortcut:     "9",
+					category:     "Generation",
+				},
 			},
 		},
 		{
