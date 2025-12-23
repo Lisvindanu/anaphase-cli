@@ -103,13 +103,21 @@ go mod download
 go install ./cmd/anaphase
 ```
 
-## Configure AI Provider
+## Configure AI Provider (Optional)
 
-Anaphase requires an AI provider for domain generation. Currently supported:
+::: info AI is Optional!
+**New in v0.4**: Anaphase works immediately with **Template Mode** - no AI required!
 
-- **Google Gemini** (Recommended, free tier available)
+Only configure an AI provider if you want **AI Mode** for advanced generation.
+:::
 
-### Get Gemini API Key
+Supported AI providers:
+- **Google Gemini** (Recommended, generous free tier)
+- **OpenAI** (GPT-4, GPT-3.5-turbo)
+- **Anthropic Claude** (Claude 3.5 Sonnet)
+- **Groq** (Fast inference, free tier)
+
+### Get an API Key (Optional)
 
 1. Visit [Google AI Studio](https://makersuite.google.com/app/apikey)
 2. Sign in with your Google account
@@ -237,45 +245,58 @@ docker run -d \
 
 ## Verify Installation
 
-Test that everything works:
+Test that everything works - **no configuration needed**:
 
 ```bash
 # Check version
 anaphase --version
 
-# Check help
-anaphase --help
+# Try the interactive menu
+anaphase
 
 # Initialize a test project
-mkdir test-project
-cd test-project
-anaphase init
+anaphase init my-test --db sqlite
+cd my-test
 ```
 
-You should see:
+You should see the interactive menu or successful project creation:
 
 ```
-✅ Project initialized successfully!
+✅ Project created with auto-generated .env and dependencies!
 
-Next steps:
-  1. Configure your AI provider (see docs)
-  2. Generate your first domain:
-     anaphase gen domain --name user --prompt "User with email and name"
-  3. Run the API:
-     go run cmd/api/main.go
+cd my-test
+anaphase  # Generate domains interactively
+make run  # It just works!
 ```
+
+::: tip Try Template Mode First
+Generate your first domain without AI:
+```bash
+anaphase gen domain
+# Enter: Entity name: User
+# Enter: Fields: name:string, email:string
+# ✅ Generated entity, repository, and service!
+```
+:::
 
 ## Environment Variables
 
 Anaphase respects these environment variables:
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `GEMINI_API_KEY` | Google Gemini API key | Required |
-| `DATABASE_URL` | Database connection string | `postgres://...` |
-| `PORT` | HTTP server port | `8080` |
-| `LOG_LEVEL` | Logging level (`debug`, `info`, `warn`, `error`) | `info` |
-| `ANAPHASE_CONFIG` | Config file path | `~/.anaphase/config.yaml` |
+| Variable | Description | Default | Required |
+|----------|-------------|---------|----------|
+| `GEMINI_API_KEY` | Google Gemini API key (for AI Mode) | - | ❌ Optional |
+| `OPENAI_API_KEY` | OpenAI API key (for AI Mode) | - | ❌ Optional |
+| `ANTHROPIC_API_KEY` | Claude API key (for AI Mode) | - | ❌ Optional |
+| `GROQ_API_KEY` | Groq API key (for AI Mode) | - | ❌ Optional |
+| `DATABASE_URL` | Database connection string | Auto-generated | ❌ Optional |
+| `PORT` | HTTP server port | `8080` | ❌ Optional |
+| `LOG_LEVEL` | Logging level | `info` | ❌ Optional |
+| `ANAPHASE_CONFIG` | Config file path | `~/.anaphase/config.yaml` | ❌ Optional |
+
+::: info
+All environment variables are **optional**. Anaphase works out of the box with Template Mode and auto-generated configurations.
+:::
 
 ## Troubleshooting
 
@@ -381,11 +402,18 @@ docker pull ghcr.io/lisvindanu/anaphase-cli:latest
 
 Check the [changelog](https://github.com/lisvindanu/anaphase-cli/releases) for new features:
 
-**Recent Updates:**
+**v0.4.0 - Latest Release:**
+- 🎨 **Interactive Menu** - Beautiful TUI with search (Ctrl+K) and filtering
+- 📝 **Template Mode** - Works without AI! Instant scaffolding for standard CRUD
+- 🔍 **Documentation Search** - Press Ctrl+K on docs site
+- ⚙️ **Auto-Setup** - Auto-generated .env files and dependencies
+- 🗄️ **Database Selection** - Choose database during project init
+- 🎯 **Zero-Config** - No setup required, works immediately
+
+**Previous Updates:**
 - ✨ Provider Selection CLI - Choose AI provider with `--provider` flag
 - ✨ Config Management - Manage providers with `anaphase config`
 - ✨ Middleware Generator - Generate auth, rate limit, logging, CORS
-- ✨ Interactive Mode - Guided prompts with `-i` flag
 - ✨ Code Quality Tools - Lint, format, and validate code
 - ✨ Migration Generator - Database migration files with smart SQL
 
