@@ -21,6 +21,7 @@ type HandlerConfig struct {
 type HandlerGenerator struct {
 	domainName string
 	config     *HandlerConfig
+	moduleName string
 }
 
 // NewHandlerGenerator creates a new handler generator
@@ -34,6 +35,11 @@ func NewHandlerGenerator(domainName string, config *HandlerConfig) *HandlerGener
 // Generate creates handler files
 func (g *HandlerGenerator) Generate(ctx context.Context) ([]string, error) {
 	var generatedFiles []string
+
+	// Detect module name from go.mod
+	if err := g.detectModuleName(); err != nil {
+		return nil, fmt.Errorf("detect module name: %w", err)
+	}
 
 	// Create output directory
 	outputDir := filepath.Join("internal", "adapter", "handler", g.config.Protocol)
@@ -125,7 +131,7 @@ func (g *HandlerGenerator) generateHandler(outputDir string) (string, error) {
 	b.WriteString("\t\"net/http\"\n\n")
 	b.WriteString("\t\"github.com/go-chi/chi/v5\"\n")
 	b.WriteString("\t\"github.com/google/uuid\"\n\n")
-	b.WriteString("\t\"github.com/lisvindanu/anaphase-cli/internal/core/port\"\n")
+	b.WriteString(fmt.Sprintf("\t\"%s/internal/core/port\"\n", g.moduleName))
 	b.WriteString(")\n\n")
 
 	// Handler struct
@@ -279,6 +285,27 @@ func (g *HandlerGenerator) generateHandlerTest(outputDir string) (string, error)
 	}
 
 	return filename, nil
+}
+
+// detectModuleName reads go.mod and extracts module name
+func (g *HandlerGenerator) detectModuleName() error {
+	goModFile := "go.mod"
+	data, err := os.ReadFile(goModFile)
+	if err != nil {
+		return fmt.Errorf("read go.mod: %w", err)
+	}
+
+	// Parse module line
+	for _, line := range strings.Split(string(data), "\n") {
+		line = strings.TrimSpace(line)
+		if strings.HasPrefix(line, "module ") {
+			g.moduleName = strings.TrimSpace(strings.TrimPrefix(line, "module"))
+			g.config.Logger.Info("detected module name", "module", g.moduleName)
+			return nil
+		}
+	}
+
+	return fmt.Errorf("module name not found in go.mod")
 }
 
 // toPascalCase converts string to PascalCase

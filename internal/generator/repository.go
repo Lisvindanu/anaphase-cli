@@ -20,6 +20,7 @@ type RepositoryConfig struct {
 type RepositoryGenerator struct {
 	domainName string
 	config     *RepositoryConfig
+	moduleName string
 }
 
 // NewRepositoryGenerator creates a new repository generator
@@ -33,6 +34,19 @@ func NewRepositoryGenerator(domainName string, config *RepositoryConfig) *Reposi
 // Generate creates repository files
 func (g *RepositoryGenerator) Generate(ctx context.Context) ([]string, error) {
 	var generatedFiles []string
+
+	// Detect module name from go.mod
+	if err := g.detectModuleName(); err != nil {
+		return nil, fmt.Errorf("detect module name: %w", err)
+	}
+
+	// Detect database type from .env if not specified
+	if g.config.Database == "" || g.config.Database == "postgres" {
+		if err := g.detectDatabaseType(); err != nil {
+			g.config.Logger.Warn("failed to detect database type, using postgres", "error", err)
+			g.config.Database = "postgres"
+		}
+	}
 
 	// Create output directory
 	outputDir := filepath.Join("internal", "adapter", "repository", g.config.Database)
@@ -92,8 +106,8 @@ func (g *RepositoryGenerator) generateRepository(outputDir string) (string, erro
 		b.WriteString("\t\"go.mongodb.org/mongo-driver/bson\"\n")
 	}
 
-	b.WriteString("\n\t\"github.com/lisvindanu/anaphase-cli/internal/core/entity\"\n")
-	b.WriteString("\t\"github.com/lisvindanu/anaphase-cli/internal/core/port\"\n")
+	b.WriteString(fmt.Sprintf("\n\t\"%s/internal/core/entity\"\n", g.moduleName))
+	b.WriteString(fmt.Sprintf("\t\"%s/internal/core/port\"\n", g.moduleName))
 	b.WriteString(")\n\n")
 
 	// Repository struct
@@ -305,4 +319,59 @@ func (g *RepositoryGenerator) generateRepositoryTest(outputDir string) (string, 
 	}
 
 	return filename, nil
+}
+
+// detectModuleName reads go.mod and extracts module name  
+func (g *RepositoryGenerator) detectModuleName() error {
+	goModFile := "go.mod"
+	data, err := os.ReadFile(goModFile)
+	if err != nil {
+		return fmt.Errorf("read go.mod: %w", err)
+	}
+
+	for _, line := range strings.Split(string(data), "\n") {
+		line = strings.TrimSpace(line)
+		if strings.HasPrefix(line, "module ") {
+			g.moduleName = strings.TrimSpace(strings.TrimPrefix(line, "module"))
+			g.config.Logger.Info("detected module name", "module", g.moduleName)
+			return nil
+		}
+	}
+
+	return fmt.Errorf("module name not found in go.mod")
+}
+
+// detectDatabaseType reads .env file and detects database type
+func (g *RepositoryGenerator) detectDatabaseType() error {
+	envFile := ".env"
+	data, err := os.ReadFile(envFile)
+	if err != nil {
+		return fmt.Errorf("read .env: %w", err)
+	}
+
+	envContent := string(data)
+
+	if strings.Contains(envContent, "DATABASE_URL=") {
+		for _, line := range strings.Split(envContent, "\n") {
+			line = strings.TrimSpace(line)
+			if strings.HasPrefix(line, "DATABASE_URL=") {
+				dbURL := strings.TrimPrefix(line, "DATABASE_URL=")
+
+				if strings.HasPrefix(dbURL, "postgres://") || strings.HasPrefix(dbURL, "postgresql://") {
+					g.config.Database = "postgres"
+				} else if strings.HasPrefix(dbURL, "mysql://") {
+					g.config.Database = "mysql"
+				} else if strings.HasPrefix(dbURL, "sqlite://") || strings.Contains(dbURL, ".db") {
+					g.config.Database = "sqlite"
+				} else if strings.HasPrefix(dbURL, "mongodb://") {
+					g.config.Database = "mongodb"
+				}
+
+				g.config.Logger.Info("detected database type", "type", g.config.Database)
+				return nil
+			}
+		}
+	}
+
+	return fmt.Errorf("DATABASE_URL not found in .env")
 }
