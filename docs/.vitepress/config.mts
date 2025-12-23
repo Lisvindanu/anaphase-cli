@@ -57,6 +57,49 @@ export default defineConfig({
   themeConfig: {
     logo: '/logo.svg',
 
+    // Search feature (Ctrl+K)
+    search: {
+      provider: 'local',
+      options: {
+        locales: {
+          root: {
+            translations: {
+              button: {
+                buttonText: 'Search',
+                buttonAriaLabel: 'Search documentation'
+              },
+              modal: {
+                noResultsText: 'No results for',
+                resetButtonTitle: 'Clear search',
+                footer: {
+                  selectText: 'to select',
+                  navigateText: 'to navigate',
+                  closeText: 'to close'
+                }
+              }
+            }
+          },
+          id: {
+            translations: {
+              button: {
+                buttonText: 'Cari',
+                buttonAriaLabel: 'Cari dokumentasi'
+              },
+              modal: {
+                noResultsText: 'Tidak ada hasil untuk',
+                resetButtonTitle: 'Hapus pencarian',
+                footer: {
+                  selectText: 'untuk memilih',
+                  navigateText: 'untuk navigasi',
+                  closeText: 'untuk menutup'
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
     nav: [
       { text: 'Guide', link: '/guide/introduction' },
       { text: 'Quick Start', link: '/guide/quick-start' },
