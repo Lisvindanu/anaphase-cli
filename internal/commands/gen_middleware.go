@@ -13,36 +13,34 @@ var (
 )
 
 var genMiddlewareCmd = &cobra.Command{
-	Use:   "middleware",
+	Use:   "middleware <type>",
 	Short: "Generate HTTP middleware",
 	Long: `Generate common HTTP middleware for your application.
 
 Available middleware types:
-  --type auth       - JWT authentication middleware
-  --type ratelimit  - Rate limiting middleware
-  --type logging    - Structured logging middleware
-  --type cors       - CORS configuration middleware
+  auth       - JWT authentication middleware
+  ratelimit  - Rate limiting middleware
+  logging    - Structured logging middleware
+  cors       - CORS configuration middleware
 
 Example:
-  anaphase gen middleware --type auth
-  anaphase gen middleware --type ratelimit --output internal/middleware
-  anaphase gen middleware --type logging
-  anaphase gen middleware --type cors`,
+  anaphase gen middleware auth
+  anaphase gen middleware ratelimit --output internal/middleware
+  anaphase gen middleware logging
+  anaphase gen middleware cors`,
+	Args: cobra.ExactArgs(1),
 	RunE: runGenMiddleware,
 }
-
-var middlewareType string
 
 func init() {
 	genCmd.AddCommand(genMiddlewareCmd)
 
-	genMiddlewareCmd.Flags().StringVar(&middlewareType, "type", "", "Middleware type (auth, ratelimit, logging, cors)")
 	genMiddlewareCmd.Flags().StringVar(&genMiddlewareOutput, "output", "internal/middleware", "Output directory for generated middleware")
-
-	genMiddlewareCmd.MarkFlagRequired("type")
 }
 
 func runGenMiddleware(cmd *cobra.Command, args []string) error {
+	middlewareType := args[0]
+
 	fmt.Println(ui.RenderTitle("Middleware Generator"))
 
 	// Validate middleware type

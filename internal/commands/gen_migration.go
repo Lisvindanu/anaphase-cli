@@ -47,6 +47,13 @@ func init() {
 func runGenMigration(cmd *cobra.Command, args []string) error {
 	name := args[0]
 
+	// Auto-detect database type from .env if using default
+	if migrationDriver == "postgres" && !cmd.Flags().Changed("driver") {
+		if detectedDB := detectDatabaseFromEnv(); detectedDB != "" {
+			migrationDriver = detectedDB
+		}
+	}
+
 	fmt.Println(ui.RenderTitle("Migration Generator"))
 	ui.PrintInfo(fmt.Sprintf("Name: %s", name))
 	ui.PrintInfo(fmt.Sprintf("Driver: %s", migrationDriver))
@@ -267,4 +274,34 @@ func generateAddColumn(tableName, columnName, driver string) string {
 
 func generateDropColumn(tableName, columnName, driver string) string {
 	return fmt.Sprintf("ALTER TABLE %s DROP COLUMN IF EXISTS %s;\n\n", tableName, columnName)
+}
+
+// detectDatabaseFromEnv reads .env file and detects database type
+func detectDatabaseFromEnv() string {
+	envFile := ".env"
+	data, err := os.ReadFile(envFile)
+	if err != nil {
+		return ""
+	}
+
+	envContent := string(data)
+
+	if strings.Contains(envContent, "DATABASE_URL=") {
+		for _, line := range strings.Split(envContent, "\n") {
+			line = strings.TrimSpace(line)
+			if strings.HasPrefix(line, "DATABASE_URL=") {
+				dbURL := strings.TrimPrefix(line, "DATABASE_URL=")
+
+				if strings.HasPrefix(dbURL, "postgres://") || strings.HasPrefix(dbURL, "postgresql://") {
+					return "postgres"
+				} else if strings.HasPrefix(dbURL, "mysql://") {
+					return "mysql"
+				} else if strings.HasPrefix(dbURL, "sqlite://") || strings.Contains(dbURL, ".db") {
+					return "sqlite"
+				}
+			}
+		}
+	}
+
+	return ""
 }
