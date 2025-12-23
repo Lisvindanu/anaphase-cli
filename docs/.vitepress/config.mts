@@ -8,14 +8,128 @@ export default defineConfig({
     root: {
       label: 'English',
       lang: 'en-US',
-      link: '/'
+      link: '/',
+      themeConfig: {
+        nav: [
+          { text: 'Guide', link: '/guide/introduction' },
+          { text: 'Quick Start', link: '/guide/quick-start' },
+          { text: 'Reference', link: '/reference/commands' },
+          { text: 'Examples', link: '/examples/basic' }
+        ],
+        sidebar: [
+          {
+            text: 'Introduction',
+            items: [
+              { text: 'What is Anaphase?', link: '/guide/introduction' },
+              { text: 'Quick Start', link: '/guide/quick-start' },
+              { text: 'Installation', link: '/guide/installation' },
+              { text: '🆘 Troubleshooting', link: '/guide/troubleshooting' }
+            ]
+          },
+          {
+            text: 'Core Concepts',
+            items: [
+              { text: 'Architecture', link: '/guide/architecture' },
+              { text: 'AI-Powered Generation', link: '/guide/ai-generation' },
+              { text: 'Domain-Driven Design', link: '/guide/ddd' }
+            ]
+          },
+          {
+            text: 'Commands',
+            items: [
+              { text: 'anaphase init', link: '/reference/init' },
+              { text: 'anaphase config', link: '/reference/config' },
+              { text: 'anaphase gen domain', link: '/reference/gen-domain' },
+              { text: 'anaphase gen handler', link: '/reference/gen-handler' },
+              { text: 'anaphase gen repository', link: '/reference/gen-repository' },
+              { text: 'anaphase gen middleware', link: '/reference/gen-middleware' },
+              { text: 'anaphase gen migration', link: '/reference/gen-migration' },
+              { text: 'anaphase quality', link: '/reference/quality' },
+              { text: 'anaphase wire', link: '/reference/wire' }
+            ]
+          },
+          {
+            text: 'Examples',
+            items: [
+              { text: 'Basic E-commerce', link: '/examples/basic' },
+              { text: 'Multi-Domain Service', link: '/examples/multi-domain' },
+              { text: 'Custom Handlers', link: '/examples/custom-handlers' }
+            ]
+          },
+          {
+            text: 'Configuration',
+            items: [
+              { text: 'AI Providers', link: '/config/ai-providers' },
+              { text: 'Database Settings', link: '/config/database' },
+              { text: 'Project Structure', link: '/config/project-structure' }
+            ]
+          }
+        ]
+      }
     },
     id: {
       label: 'Bahasa Indonesia',
       lang: 'id-ID',
       link: '/id/',
       title: 'Anaphase',
-      description: 'Generator Microservice Golang dengan AI'
+      description: 'Generator Microservice Golang dengan AI',
+      themeConfig: {
+        nav: [
+          { text: 'Panduan', link: '/id/guide/introduction' },
+          { text: 'Quick Start', link: '/id/guide/quick-start' },
+          { text: 'Referensi', link: '/id/reference/commands' },
+          { text: 'Contoh', link: '/id/examples/basic' }
+        ],
+        sidebar: [
+          {
+            text: 'Pendahuluan',
+            items: [
+              { text: 'Apa itu Anaphase?', link: '/id/guide/introduction' },
+              { text: 'Quick Start', link: '/id/guide/quick-start' },
+              { text: 'Instalasi', link: '/id/guide/installation' },
+              { text: '🆘 Troubleshooting', link: '/id/guide/troubleshooting' }
+            ]
+          },
+          {
+            text: 'Konsep Inti',
+            items: [
+              { text: 'Architecture', link: '/id/guide/architecture' },
+              { text: 'Generasi Berbasis AI', link: '/id/guide/ai-generation' },
+              { text: 'Domain-Driven Design', link: '/id/guide/ddd' }
+            ]
+          },
+          {
+            text: 'Command',
+            items: [
+              { text: 'anaphase init', link: '/id/reference/init' },
+              { text: 'anaphase config', link: '/id/reference/config' },
+              { text: 'anaphase gen domain', link: '/id/reference/gen-domain' },
+              { text: 'anaphase gen handler', link: '/id/reference/gen-handler' },
+              { text: 'anaphase gen repository', link: '/id/reference/gen-repository' },
+              { text: 'anaphase gen middleware', link: '/id/reference/gen-middleware' },
+              { text: 'anaphase gen migration', link: '/id/reference/gen-migration' },
+              { text: 'anaphase quality', link: '/id/reference/quality' },
+              { text: 'anaphase wire', link: '/id/reference/wire' }
+            ]
+          },
+          {
+            text: 'Contoh',
+            items: [
+              { text: 'E-commerce Dasar', link: '/id/examples/basic' },
+              { text: 'Multi-Domain Service', link: '/id/examples/multi-domain' },
+              { text: 'Custom Handler', link: '/id/examples/custom-handlers' }
+            ]
+          },
+          {
+            text: 'Konfigurasi',
+            items: [
+              { text: 'AI Provider', link: '/id/config/ai-providers' },
+              { text: 'Pengaturan Database', link: '/id/config/database' },
+              { text: 'Struktur Project', link: '/id/config/project-structure' }
+            ]
+          }
+        ]
+      }
     }
   },
 
@@ -100,63 +214,6 @@ export default defineConfig({
       }
     },
 
-    nav: [
-      { text: 'Guide', link: '/guide/introduction' },
-      { text: 'Quick Start', link: '/guide/quick-start' },
-      { text: 'Reference', link: '/reference/commands' },
-      { text: 'Examples', link: '/examples/basic' }
-    ],
-
-    sidebar: [
-      {
-        text: 'Introduction',
-        items: [
-          { text: 'What is Anaphase?', link: '/guide/introduction' },
-          { text: 'Quick Start', link: '/guide/quick-start' },
-          { text: 'Installation', link: '/guide/installation' },
-          { text: '🆘 Troubleshooting', link: '/guide/troubleshooting' }
-        ]
-      },
-      {
-        text: 'Core Concepts',
-        items: [
-          { text: 'Architecture', link: '/guide/architecture' },
-          { text: 'AI-Powered Generation', link: '/guide/ai-generation' },
-          { text: 'Domain-Driven Design', link: '/guide/ddd' }
-        ]
-      },
-      {
-        text: 'Commands',
-        items: [
-          { text: 'anaphase init', link: '/reference/init' },
-          { text: 'anaphase config', link: '/reference/config' },
-          { text: 'anaphase gen domain', link: '/reference/gen-domain' },
-          { text: 'anaphase gen handler', link: '/reference/gen-handler' },
-          { text: 'anaphase gen repository', link: '/reference/gen-repository' },
-          { text: 'anaphase gen middleware', link: '/reference/gen-middleware' },
-          { text: 'anaphase gen migration', link: '/reference/gen-migration' },
-          { text: 'anaphase quality', link: '/reference/quality' },
-          { text: 'anaphase wire', link: '/reference/wire' }
-        ]
-      },
-      {
-        text: 'Examples',
-        items: [
-          { text: 'Basic E-commerce', link: '/examples/basic' },
-          { text: 'Multi-Domain Service', link: '/examples/multi-domain' },
-          { text: 'Custom Handlers', link: '/examples/custom-handlers' }
-        ]
-      },
-      {
-        text: 'Configuration',
-        items: [
-          { text: 'AI Providers', link: '/config/ai-providers' },
-          { text: 'Database Settings', link: '/config/database' },
-          { text: 'Project Structure', link: '/config/project-structure' }
-        ]
-      }
-    ],
-
     socialLinks: [
       { icon: 'github', link: 'https://github.com/lisvindanu/anaphase-cli' }
     ],
@@ -164,71 +221,6 @@ export default defineConfig({
     footer: {
       message: 'Released under the MIT License.',
       copyright: 'Copyright © 2024-present Anaphase'
-    },
-
-    // Locale-specific theme config
-    locales: {
-      root: {
-        // English is already configured above (default)
-      },
-      id: {
-        nav: [
-          { text: 'Panduan', link: '/id/guide/introduction' },
-          { text: 'Quick Start', link: '/id/guide/quick-start' },
-          { text: 'Referensi', link: '/id/reference/commands' },
-          { text: 'Contoh', link: '/id/examples/basic' }
-        ],
-
-        sidebar: [
-          {
-            text: 'Pendahuluan',
-            items: [
-              { text: 'Apa itu Anaphase?', link: '/id/guide/introduction' },
-              { text: 'Quick Start', link: '/id/guide/quick-start' },
-              { text: 'Instalasi', link: '/id/guide/installation' },
-              { text: '🆘 Troubleshooting', link: '/id/guide/troubleshooting' }
-            ]
-          },
-          {
-            text: 'Konsep Inti',
-            items: [
-              { text: 'Architecture', link: '/id/guide/architecture' },
-              { text: 'Generasi Berbasis AI', link: '/id/guide/ai-generation' },
-              { text: 'Domain-Driven Design', link: '/id/guide/ddd' }
-            ]
-          },
-          {
-            text: 'Command',
-            items: [
-              { text: 'anaphase init', link: '/id/reference/init' },
-              { text: 'anaphase config', link: '/id/reference/config' },
-              { text: 'anaphase gen domain', link: '/id/reference/gen-domain' },
-              { text: 'anaphase gen handler', link: '/id/reference/gen-handler' },
-              { text: 'anaphase gen repository', link: '/id/reference/gen-repository' },
-              { text: 'anaphase gen middleware', link: '/id/reference/gen-middleware' },
-              { text: 'anaphase gen migration', link: '/id/reference/gen-migration' },
-              { text: 'anaphase quality', link: '/id/reference/quality' },
-              { text: 'anaphase wire', link: '/id/reference/wire' }
-            ]
-          },
-          {
-            text: 'Contoh',
-            items: [
-              { text: 'E-commerce Dasar', link: '/id/examples/basic' },
-              { text: 'Multi-Domain Service', link: '/id/examples/multi-domain' },
-              { text: 'Custom Handler', link: '/id/examples/custom-handlers' }
-            ]
-          },
-          {
-            text: 'Konfigurasi',
-            items: [
-              { text: 'AI Provider', link: '/id/config/ai-providers' },
-              { text: 'Pengaturan Database', link: '/id/config/database' },
-              { text: 'Struktur Project', link: '/id/config/project-structure' }
-            ]
-          }
-        ]
-      }
     }
   }
 })
