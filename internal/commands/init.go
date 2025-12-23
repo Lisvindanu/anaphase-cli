@@ -3,9 +3,11 @@ package commands
 import (
 	"fmt"
 	"os"
+	"os/exec"
 
 	"github.com/lisvindanu/anaphase-cli/internal/generator"
 	"github.com/lisvindanu/anaphase-cli/internal/setup"
+	"github.com/lisvindanu/anaphase-cli/internal/ui"
 	"github.com/spf13/cobra"
 )
 
@@ -135,6 +137,20 @@ func runInit(cmd *cobra.Command, args []string) error {
 
 	if err := setup.EnsureGitignore(); err != nil {
 		fmt.Printf("Warning: Could not update .gitignore: %v\n", err)
+	}
+
+	// Run go mod tidy to download dependencies
+	fmt.Println()
+	ui.PrintInfo("📦 Installing dependencies (go mod tidy)...")
+	tidyCmd := exec.Command("go", "mod", "tidy")
+	tidyCmd.Stdout = os.Stdout
+	tidyCmd.Stderr = os.Stderr
+
+	if err := tidyCmd.Run(); err != nil {
+		ui.PrintWarning(fmt.Sprintf("Warning: go mod tidy failed: %v", err))
+		ui.PrintInfo("You can run 'go mod tidy' manually later")
+	} else {
+		ui.PrintSuccess("✅ Dependencies installed successfully!")
 	}
 
 	// Return to original directory
