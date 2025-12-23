@@ -20,75 +20,97 @@ var (
 )
 
 type MenuItem struct {
-	title       string
-	desc        string
-	command     string
-	subcommands []string
+	title          string
+	desc           string
+	command        string
+	subcommands    []string
+	needsInput     bool     // Does this command need interactive input?
+	inputPrompts   []string // Prompts for input if needsInput is true
 }
 
-func (i MenuItem) Title() string       { return i.title }
-func (i MenuItem) Description() string { return i.desc }
-func (i MenuItem) FilterValue() string { return i.title }
+func (i MenuItem) Title() string         { return i.title }
+func (i MenuItem) Description() string   { return i.desc }
+func (i MenuItem) FilterValue() string   { return i.title }
+func (i MenuItem) NeedsInput() bool      { return i.needsInput }
+func (i MenuItem) InputPrompts() []string { return i.inputPrompts }
+func (i MenuItem) Command() string       { return i.command }
 
 type MenuModel struct {
-	list     list.Model
-	choice   string
-	quitting bool
+	list         list.Model
+	choice       string
+	selectedItem *MenuItem
+	quitting     bool
 }
 
 func NewMenuModel() MenuModel {
 	items := []list.Item{
 		MenuItem{
-			title:   "🚀 Initialize Project",
-			desc:    "Create a new microservice project with DDD structure",
-			command: "init",
+			title:        "🚀 Initialize Project",
+			desc:         "Create a new microservice project with DDD structure",
+			command:      "init",
+			needsInput:   true,
+			inputPrompts: []string{"Project name"},
 		},
 		MenuItem{
-			title:   "🤖 Generate Domain",
-			desc:    "AI-powered domain generation from natural language",
-			command: "gen domain",
+			title:        "🤖 Generate Domain",
+			desc:         "AI-powered domain generation from natural language",
+			command:      "gen domain",
+			needsInput:   true,
+			inputPrompts: []string{"Domain description (e.g., 'user authentication with email and password')"},
 		},
 		MenuItem{
-			title:   "📡 Generate Handler",
-			desc:    "Create HTTP handlers with CRUD endpoints",
-			command: "gen handler",
+			title:        "📡 Generate Handler",
+			desc:         "Create HTTP handlers with CRUD endpoints",
+			command:      "gen handler",
+			needsInput:   true,
+			inputPrompts: []string{"Handler name (e.g., 'user', 'product')"},
 		},
 		MenuItem{
-			title:   "💾 Generate Repository",
-			desc:    "Create database repository (Postgres/MySQL/Mongo)",
-			command: "gen repository",
+			title:        "💾 Generate Repository",
+			desc:         "Create database repository (Postgres/MySQL/Mongo)",
+			command:      "gen repository",
+			needsInput:   true,
+			inputPrompts: []string{"Repository name (e.g., 'user', 'product')"},
 		},
 		MenuItem{
-			title:   "🛡️  Generate Middleware",
-			desc:    "Create middleware (auth, ratelimit, logging, cors)",
-			command: "gen middleware",
+			title:        "🛡️  Generate Middleware",
+			desc:         "Create middleware (auth, ratelimit, logging, cors)",
+			command:      "gen middleware",
+			needsInput:   true,
+			inputPrompts: []string{"Middleware type (auth/ratelimit/logging/cors)"},
 		},
 		MenuItem{
-			title:   "📊 Generate Migration",
-			desc:    "Create database migration files",
-			command: "gen migration",
+			title:        "📊 Generate Migration",
+			desc:         "Create database migration files",
+			command:      "gen migration",
+			needsInput:   true,
+			inputPrompts: []string{"Migration name (e.g., 'create_users_table')"},
 		},
 		MenuItem{
-			title:   "🔌 Auto-Wire Dependencies",
-			desc:    "Automatic dependency injection with AST discovery",
-			command: "wire",
+			title:      "🔌 Auto-Wire Dependencies",
+			desc:       "Automatic dependency injection with AST discovery",
+			command:    "wire",
+			needsInput: false,
 		},
 		MenuItem{
-			title:   "📐 Describe Architecture",
-			desc:    "Generate architecture diagrams (Mermaid/ASCII)",
-			command: "describe",
+			title:      "📐 Describe Architecture",
+			desc:       "Generate architecture diagrams (Mermaid/ASCII)",
+			command:    "describe",
+			needsInput: false,
 		},
 		MenuItem{
-			title:   "✨ Code Quality",
-			desc:    "Lint, format, and validate code",
-			command: "quality",
+			title:       "✨ Code Quality",
+			desc:        "Lint, format, and validate code",
+			command:     "quality",
 			subcommands: []string{"lint", "format", "validate"},
+			needsInput:  false,
 		},
 		MenuItem{
-			title:   "⚙️  Configuration",
-			desc:    "Manage AI providers and settings",
-			command: "config",
+			title:       "⚙️  Configuration",
+			desc:        "Manage AI providers and settings",
+			command:     "config",
 			subcommands: []string{"list", "set-provider", "check"},
+			needsInput:  false,
 		},
 	}
 
@@ -159,6 +181,7 @@ func (m MenuModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			i, ok := m.list.SelectedItem().(MenuItem)
 			if ok {
 				m.choice = i.command
+				m.selectedItem = &i
 			}
 			return m, tea.Quit
 		}
@@ -182,6 +205,10 @@ func (m MenuModel) View() string {
 
 func (m MenuModel) GetChoice() string {
 	return m.choice
+}
+
+func (m MenuModel) GetSelectedItem() *MenuItem {
+	return m.selectedItem
 }
 
 // FormatCommand formats the selected command for execution

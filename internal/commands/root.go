@@ -1,8 +1,10 @@
 package commands
 
 import (
+	"bufio"
 	"fmt"
 	"os"
+	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/lisvindanu/anaphase-cli/internal/ui"
@@ -51,15 +53,46 @@ func showInteractiveMenu(cmd *cobra.Command) {
 	// Get the selected command
 	if menuModel, ok := finalModel.(ui.MenuModel); ok {
 		choice := menuModel.GetChoice()
-		if choice != "" {
-			// Parse and execute the selected command
+		selectedItem := menuModel.GetSelectedItem()
+
+		if choice != "" && selectedItem != nil {
+			// Parse command parts
 			cmdParts := ui.FormatCommand(choice)
+
+			// Collect inputs if needed
+			var inputs []string
+			if selectedItem.NeedsInput() {
+				fmt.Println()
+				fmt.Println(ui.RenderTitle(selectedItem.Title()))
+				fmt.Println()
+
+				scanner := bufio.NewScanner(os.Stdin)
+				for _, prompt := range selectedItem.InputPrompts() {
+					fmt.Printf("%s %s: ", ui.RenderInfo(""), prompt)
+
+					if !scanner.Scan() {
+						fmt.Println(ui.RenderWarning("Input cancelled"))
+						return
+					}
+
+					input := strings.TrimSpace(scanner.Text())
+					if input == "" {
+						fmt.Println(ui.RenderWarning("Input cannot be empty"))
+						return
+					}
+
+					inputs = append(inputs, input)
+				}
+
+				// Add inputs as arguments
+				cmdParts = append(cmdParts, inputs...)
+			}
 
 			// Show info about the selected command
 			fmt.Printf("\n%s\n\n", ui.RenderInfo(fmt.Sprintf("Running: anaphase %s", choice)))
 
 			// Find and execute the subcommand
-			subCmd, _, err := cmd.Root().Find(cmdParts)
+			subCmd, _, err := cmd.Root().Find(cmdParts[:1]) // Just the command name
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error finding command: %v\n", err)
 				return
@@ -70,7 +103,7 @@ func showInteractiveMenu(cmd *cobra.Command) {
 			subCmd.SetErr(os.Stderr)
 
 			// Set args and execute
-			subCmd.SetArgs(cmdParts[1:]) // Skip the first part which is the command name
+			subCmd.SetArgs(cmdParts[1:]) // All args after command name
 			if err := subCmd.Execute(); err != nil {
 				os.Exit(1)
 			}
